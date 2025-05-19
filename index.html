@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily GuessrTracker</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <!-- Add CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.css">
+</head>
+
+<body>
+    <header>
+        <h1>Daily GuessrTracker</h1>
+        <div class="header-actions">
+            <button id="editSchema" class="btn warning-btn">Edit Games</button>
+            <button id="exportData" class="btn">Export Data</button>
+            <button id="importData" class="btn">Import Data</button>
+            <input type="file" id="importFile" accept=".json" style="display: none;">
+        </div>
+    </header>
+
+    <main>
+        <section id="activeGames" class="game-section">
+            <h2>Today's Games</h2>
+            <div id="gameList" class="game-grid">
+                <!-- Games will be populated here -->
+            </div>
+        </section>
+
+        <section id="completedGames" class="game-section">
+            <h2>Completed Games</h2>
+            <div id="completedGameList" class="game-grid">
+                <!-- Completed games will be populated here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for entering game results -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Enter Game Results</h2>
+            <div id="modalContent">
+                <textarea id="resultInput" placeholder="Paste your game results here..."></textarea>
+                <button id="submitResult" class="btn">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for viewing stats -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Game Statistics</h2>
+            <div id="statsContent">
+                <div class="chart-container">
+                    <canvas id="statsChart"></canvas>
+                </div>
+                <div class="history-container">
+                    <h3>History</h3>
+                    <div id="historyList" class="history-list">
+                        <!-- History entries will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schema Modal -->
+    <div id="schemaModal" class="modal">
+        <div class="modal-content schema-modal">
+            <span class="close">&times;</span>
+            <h2>Edit Game Schema</h2>
+            <div class="warning-box">
+                <h3>⚠️ Warning</h3>
+                <p>Editing the game schema requires knowledge of JavaScript and regular expressions. Incorrect
+                    modifications may break the app's functionality.</p>
+            </div>
+            <div class="schema-actions">
+                <button id="editSchemaManually" class="btn">Edit Schema Manually</button>
+            </div>
+            <div id="schemaEditor" class="schema-editor" style="display: none;">
+                <textarea id="schemaInput" placeholder="Paste your game schema here..."></textarea>
+                <div class="schema-buttons">
+                    <button id="saveSchema" class="btn">Save Changes</button>
+                    <button id="cancelSchema" class="btn secondary-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.13.4/jshint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/javascript-lint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/javascript-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+
+    <!-- Chart.js and its dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+    <!-- Our app code -->
+    <script src="js/storage.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
