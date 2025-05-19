@@ -65,7 +65,7 @@ MIT License - feel free to use this project for your own daily game tracking nee
 
 ## Schema
 
-The app uses a simple JSON format to define games and how to extract stats from their outputs. Here's how it works:
+The app uses a JSON format to define games and how to extract stats from their outputs. Here's how it works:
 
 ### Basic Game Setup
 
@@ -77,19 +77,50 @@ The app uses a simple JSON format to define games and how to extract stats from 
 }
 ```
 
-Every game needs these three things:
+Every game needs these three properties:
 
-- `id`: A short name for the game (no spaces)
-- `name`: What players see in the app
-- `url`: Where to play the game
+- `id`: A unique identifier (no spaces)
+- `name`: Display name shown in the UI
+- `url`: Link to play the game
 
-### Adding Stats Tracking
+### Tracking Game Results
 
-To track stats, add `result_parsing_rules`. Here's how to track different types of stats:
+To track stats, add `result_parsing_rules`. The app can track different types of data:
 
-#### 1. Numbers from Text
+#### Parser Types
 
-To get a number from text (like "3/6" from Wordle):
+The parser supports several data types:
+
+1. **number**: Extract a numeric value from text (e.g., "3/6" → 3)
+2. **count**: Count occurrences of emojis or patterns
+3. **boolean**: Check if a pattern exists (true/false)
+
+#### Completion State
+
+Games can have a success/failure state, which affects:
+
+- Which results are included in averages
+- Whether success rate is shown in charts
+
+```json
+{
+  "name": "completion_state",
+  "regex": "\\d/6",
+  "capture_groups_mapping": [
+    {
+      "target_field_name": "CompletionState",
+      "group_index": 0,
+      "type": "boolean"
+    }
+  ]
+}
+```
+
+This example marks Wordle as successful if it contains a pattern like "3/6".
+
+#### Parsing Numbers
+
+To extract numeric values:
 
 ```json
 {
@@ -105,102 +136,184 @@ To get a number from text (like "3/6" from Wordle):
 }
 ```
 
-This looks for a pattern like "3/6" and extracts the number before the slash.
+This extracts the number from patterns like "3/6" into an "Attempts" field.
 
-#### 2. Counting Emojis
+#### Counting Emojis
 
-To count how many times an emoji appears (like counting green squares in Wordle):
+To count occurrences:
 
 ```json
 {
-  "name": "green_tiles",
-  "regex": "🟩",
+  "name": "tries",
+  "regex": "🎮",
   "capture_groups_mapping": [
     {
-      "target_field_name": "Green Tiles",
+      "target_field_name": "Tries",
       "group_index": 0,
-      "type": "count"
+      "type": "count",
+      "count_emojis": ["🟥", "🟩"]
     }
   ]
 }
 ```
 
-This counts how many times 🟩 appears in the output.
+This counts the red and green squares in game results.
 
-### Complete Example
+### Game-Specific Examples
 
-Here's a complete example for Wordle that tracks:
-
-- Number of attempts (e.g., "3/6")
-- Number of green squares (🟩)
-- Number of yellow squares (🟨)
-- Number of black squares (⬛)
+#### 1. Wordle (Success/Failure + Attempts)
 
 ```json
-[
-  {
-    "id": "wordle",
-    "name": "Wordle",
-    "url": "https://www.nytimes.com/games/wordle/index.html",
-    "result_parsing_rules": {
-      "extractors": [
-        {
-          "name": "attempts",
-          "regex": "(\\d)/6",
-          "capture_groups_mapping": [
-            {
-              "target_field_name": "Attempts",
-              "group_index": 1,
-              "type": "number"
-            }
-          ]
-        },
-        {
-          "name": "green_tiles",
-          "regex": "🟩",
-          "capture_groups_mapping": [
-            {
-              "target_field_name": "Green Tiles",
-              "group_index": 0,
-              "type": "count"
-            }
-          ]
-        },
-        {
-          "name": "yellow_tiles",
-          "regex": "🟨",
-          "capture_groups_mapping": [
-            {
-              "target_field_name": "Yellow Tiles",
-              "group_index": 0,
-              "type": "count"
-            }
-          ]
-        },
-        {
-          "name": "black_tiles",
-          "regex": "⬛",
-          "capture_groups_mapping": [
-            {
-              "target_field_name": "Black Tiles",
-              "group_index": 0,
-              "type": "count"
-            }
-          ]
-        }
-      ]
-    }
+{
+  "id": "wordle",
+  "name": "Wordle",
+  "url": "https://www.nytimes.com/games/wordle/index.html",
+  "result_parsing_rules": {
+    "extractors": [
+      {
+        "name": "completion_state",
+        "regex": "\\d/6",
+        "capture_groups_mapping": [
+          {
+            "target_field_name": "CompletionState",
+            "group_index": 0,
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "name": "attempts",
+        "regex": "(\\d)/6",
+        "capture_groups_mapping": [
+          {
+            "target_field_name": "Attempts",
+            "group_index": 1,
+            "type": "number"
+          }
+        ]
+      }
+    ]
+  },
+  "average_display": {
+    "field": "Attempts",
+    "template": "30-day avg: {avg}/6",
+    "days": 30
   }
-]
+}
 ```
 
-### Adding a New Game
+- **Success**: Has a number followed by "/6"
+- **Failure**: Contains "X/6"
+- **Display**: Average attempts of successful games
+
+#### 2. Framed (Visual Game With Attempts)
+
+```json
+{
+  "id": "framed",
+  "name": "Framed",
+  "url": "https://framed.wtf",
+  "result_parsing_rules": {
+    "extractors": [
+      {
+        "name": "completion_state",
+        "regex": "🟩",
+        "capture_groups_mapping": [
+          {
+            "target_field_name": "CompletionState",
+            "group_index": 0,
+            "type": "boolean"
+          }
+        ]
+      },
+      {
+        "name": "tries",
+        "regex": "🎥",
+        "capture_groups_mapping": [
+          {
+            "target_field_name": "Tries",
+            "group_index": 0,
+            "type": "count",
+            "count_emojis": ["🟥", "🟩"]
+          }
+        ]
+      }
+    ]
+  },
+  "average_display": {
+    "field": "Tries",
+    "template": "30-day avg: {avg} tries",
+    "days": 30
+  }
+}
+```
+
+- **Success**: Contains at least one green square (🟩)
+- **Failure**: No green squares
+- **Tracking**: Counts red and green squares as attempts
+- **Note**: Ignores unused attempts (grey/white squares)
+
+#### 3. Scrandle (Score-Only Game)
+
+```json
+{
+  "id": "scrandle",
+  "name": "Scrandle",
+  "url": "https://scrandle.com/",
+  "result_parsing_rules": {
+    "extractors": [
+      {
+        "name": "score",
+        "regex": "(\\d+)/10",
+        "capture_groups_mapping": [
+          {
+            "target_field_name": "Score",
+            "group_index": 1,
+            "type": "number"
+          }
+        ]
+      }
+    ]
+  },
+  "average_display": {
+    "field": "Score",
+    "template": "30-day avg: {avg}/10",
+    "days": 30
+  }
+}
+```
+
+- **No Success/Failure**: Game doesn't have winning/losing concept
+- **Score**: Tracks correct answers out of 10
+- **Chart**: No success rate shown, only score trends
+
+### Display Configuration
+
+The `average_display` section controls how averages appear on game cards:
+
+```json
+"average_display": {
+  "field": "Attempts",    // Field to average
+  "template": "30-day avg: {avg}/6",  // Display format
+  "days": 30              // Time period
+}
+```
+
+### How Charts Work
+
+- Games with `CompletionState` show success rate (percentage of games won)
+- Statistics only include successful attempts in averages if there's a completion state
+- Games without completion state show all metrics without success rate
+
+### Adding New Games
 
 To add a new game:
 
 1. Copy an existing game's structure
 2. Change the `id`, `name`, and `url`
-3. Add `result_parsing_rules` if you want to track stats
-4. For each stat you want to track:
-   - If it's a number in text, use `type: "number"`
-   - If it's counting emojis or symbols, use `type: "count"`
+3. Define `result_parsing_rules` appropriate for the game:
+   - Include `completion_state` if the game has success/failure
+   - Add extractors for any numeric values you want to track
+   - Choose appropriate display template
+
+This schema design ensures flexibility across different game types while maintaining consistent tracking.

@@ -128,7 +128,38 @@ const GAMES = [
     {
         id: 'daily-dozen-trivia',
         name: 'Daily Dozen Trivia',
-        url: 'https://dailydozentrivia.com'
+        url: 'https://dailydozentrivia.com',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "score",
+                    regex: "Score: (\\d+)",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Score",
+                            group_index: 1,
+                            type: "number"
+                        }
+                    ]
+                },
+                {
+                    name: "correct",
+                    regex: "(\\d+) Correct",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Correct",
+                            group_index: 1,
+                            type: "number"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Score",
+            template: "30-day avg: {avg} pts",
+            days: 30
+        }
     },
     {
         id: 'nyt-connections',
@@ -158,12 +189,76 @@ const GAMES = [
     {
         id: 'guessthe-game',
         name: 'GuessThe.Game',
-        url: 'https://guessthe.game'
+        url: 'https://guessthe.game',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "completion_state",
+                    regex: "🟩",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            group_index: 0,
+                            type: "boolean"
+                        }
+                    ]
+                },
+                {
+                    name: "tries",
+                    regex: "🎮",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Tries",
+                            group_index: 0,
+                            type: "count",
+                            count_emojis: ["🟥", "🟩"]
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Tries",
+            template: "30-day avg: {avg} tries",
+            days: 30
+        }
     },
     {
         id: 'gamedle',
         name: 'Gamedle',
-        url: 'https://gamedle.wtf'
+        url: 'https://gamedle.wtf',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "completion_state",
+                    regex: "🟩",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            group_index: 0,
+                            type: "boolean"
+                        }
+                    ]
+                },
+                {
+                    name: "tries",
+                    regex: "🕹️",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Tries",
+                            group_index: 0,
+                            type: "count",
+                            count_emojis: ["🟥", "🟨", "🟩"]
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Tries",
+            template: "30-day avg: {avg} tries",
+            days: 30
+        }
     },
     {
         id: 'puckdoku',
@@ -188,7 +283,27 @@ const GAMES = [
     {
         id: 'thrice',
         name: 'Thrice',
-        url: 'https://thrice.geekswhodrink.com'
+        url: 'https://thrice.geekswhodrink.com',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "points",
+                    regex: "(\\d+) points",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Points",
+                            group_index: 1,
+                            type: "number"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Points",
+            template: "30-day avg: {avg}/15",
+            days: 30
+        }
     },
     {
         id: 'relatle',
@@ -239,6 +354,11 @@ const GAMES = [
             template: "30-day avg: {avg}/10",
             days: 30
         }
+    },
+    {
+        id: 'starwars-guessr',
+        name: 'Star Wars Guessr',
+        url: 'https://starwarsguessr.com/'
     }
 ];
 
@@ -288,6 +408,313 @@ class App {
         toast.addEventListener('animationend', () => {
             toast.remove();
         });
+    }
+
+    // Apply styling to a game card
+    applyGameStyling(card, game) {
+        try {
+            // Extract domain for favicon
+            const domain = new URL(game.url).hostname;
+
+            // Create consistent favicon container
+            const iconWrapper = card.querySelector('.card-icon-wrapper');
+            iconWrapper.style.width = '48px';
+            iconWrapper.style.height = '48px';
+            iconWrapper.style.display = 'flex';
+            iconWrapper.style.justifyContent = 'center';
+            iconWrapper.style.alignItems = 'center';
+            iconWrapper.style.overflow = 'hidden';
+
+            // Generate direct colors for fallback instead of using string hash
+            const initialColors = {
+                primary: chroma.random().desaturate(0.5).hex(),
+                background: '#f0f0f0',
+                darkBackground: '#222222',
+                lightModeText: '#000000',
+                darkModeText: '#ffffff'
+            };
+
+            // Apply initial colors
+            card.style.borderColor = initialColors.primary;
+            card.style.backgroundColor = initialColors.background;
+
+            // Set data attributes for colors
+            card.dataset.primaryColor = initialColors.primary;
+            card.dataset.lightBackground = initialColors.background;
+            card.dataset.darkBackground = initialColors.darkBackground;
+            card.dataset.lightModeText = initialColors.lightModeText;
+            card.dataset.darkModeText = initialColors.darkModeText;
+
+            // Apply initial colors
+            this.applyCardColors(card);
+
+            // Start with fallback icon
+            this.createFallbackIcon(card, game);
+
+            // Try to load the favicon 
+            this.loadFavicon(card, game, domain);
+
+        } catch (error) {
+            console.error(`Error styling card for ${game.name}:`, error);
+            this.createFallbackIcon(card, game);
+        }
+    }
+
+    // Create a simple fallback icon when an image can't be loaded
+    createFallbackIcon(card, game) {
+        try {
+            // Clear current content
+            const iconWrapper = card.querySelector('.card-icon-wrapper');
+            while (iconWrapper && iconWrapper.firstChild) {
+                iconWrapper.removeChild(iconWrapper.firstChild);
+            }
+
+            // Create a simple colored circle with the first letter
+            const iconDiv = document.createElement('div');
+            iconDiv.className = 'fallback-icon';
+            iconDiv.style.width = '48px';
+            iconDiv.style.height = '48px';
+            iconDiv.style.borderRadius = '50%';
+            iconDiv.style.backgroundColor = card.dataset.primaryColor || '#cccccc';
+            iconDiv.style.display = 'flex';
+            iconDiv.style.justifyContent = 'center';
+            iconDiv.style.alignItems = 'center';
+            iconDiv.style.fontWeight = 'bold';
+            iconDiv.style.fontSize = '24px';
+            iconDiv.style.color = '#ffffff';
+            iconDiv.textContent = game.name.charAt(0).toUpperCase();
+
+            if (iconWrapper) {
+                iconWrapper.appendChild(iconDiv);
+            }
+        } catch (e) {
+            console.error(`Error creating fallback icon for ${game.name}:`, e);
+        }
+    }
+
+    // Load favicon and extract colors
+    loadFavicon(card, game, domain) {
+        // Check if we have a cached favicon
+        const cachedFavicon = localStorage.getItem(`favicon_data_${domain}`);
+        if (cachedFavicon) {
+            // Display cached favicon
+            this.displayFavicon(card, cachedFavicon, game);
+
+            // Extract colors from cached favicon
+            this.extractColorsWithVibrant(cachedFavicon, card);
+            return;
+        }
+
+        // First try direct display (always works for UI but doesn't let us cache)
+        const directImg = document.createElement('img');
+        directImg.style.display = 'none';
+        document.body.appendChild(directImg);
+
+        directImg.onload = () => {
+            try {
+                // Try to copy image to canvas to convert to data URL
+                const canvas = document.createElement('canvas');
+                canvas.width = 48;
+                canvas.height = 48;
+                const ctx = canvas.getContext('2d');
+
+                try {
+                    // This will throw a security error if CORS blocks it
+                    ctx.drawImage(directImg, 0, 0, 48, 48);
+
+                    // If we got here, we successfully cached the image!
+                    const dataUrl = canvas.toDataURL('image/png');
+                    localStorage.setItem(`favicon_data_${domain}`, dataUrl);
+
+                    // Display the cached version
+                    this.displayFavicon(card, dataUrl, game);
+
+                    // Extract colors
+                    this.extractColorsWithVibrant(dataUrl, card);
+                } catch (canvasError) {
+                    // CORS error when trying to draw to canvas
+                    console.info(`Canvas security error for ${domain}, trying alternative approach`);
+
+                    // Just display the direct image for now (it works for display)
+                    this.displayFavicon(card, directImg.src, game);
+
+                    // Try to use built-in icons
+                    this.tryBuiltInIcons(domain, game, card);
+                }
+            } catch (e) {
+                console.warn(`Error processing favicon for ${domain}:`, e);
+                // Still show the image, just don't cache it
+                this.displayFavicon(card, directImg.src, game);
+            } finally {
+                // Clean up
+                document.body.removeChild(directImg);
+            }
+        };
+
+        directImg.onerror = () => {
+            console.warn(`Favicon load failed for ${game.name}`);
+            document.body.removeChild(directImg);
+            this.tryBuiltInIcons(domain, game, card);
+        };
+
+        // Set source to Google's favicon service
+        directImg.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+    }
+
+    // Extract colors using Vibrant.js
+    extractColorsWithVibrant(imageUrl, card) {
+        if (!window.Vibrant) return;
+
+        try {
+            // Create a new image element
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+
+            // Set up onload handler before setting src
+            img.onload = () => {
+                try {
+                    // Use Vibrant.from for node-vibrant 3.1.6
+                    Vibrant.from(img).getPalette((err, palette) => {
+                        if (err || !palette) return;
+
+                        // Prefer DarkVibrant as requested
+                        const swatch = palette.DarkVibrant ||
+                            palette.Vibrant ||
+                            palette.LightVibrant ||
+                            palette.Muted;
+
+                        if (!swatch) return;
+
+                        // Create color scheme from the swatch
+                        const baseColor = chroma(swatch.getHex());
+                        const colors = {
+                            primary: baseColor.hex(),
+                            lightBackground: baseColor.luminance(0.93).hex(),
+                            darkBackground: baseColor.luminance(0.15).hex()
+                        };
+
+                        // Determine text colors based on contrast
+                        colors.lightModeText = chroma.contrast(colors.lightBackground, '#000000') >= 4.5 ? '#000000' : '#ffffff';
+                        colors.darkModeText = chroma.contrast(colors.darkBackground, '#ffffff') >= 4.5 ? '#ffffff' : '#000000';
+
+                        // Update card colors
+                        card.dataset.primaryColor = colors.primary;
+                        card.dataset.lightBackground = colors.lightBackground;
+                        card.dataset.darkBackground = colors.darkBackground;
+                        card.dataset.lightModeText = colors.lightModeText;
+                        card.dataset.darkModeText = colors.darkModeText;
+
+                        // Apply the colors
+                        this.applyCardColors(card);
+                    });
+                } catch (e) {
+                    console.warn('Error processing image with Vibrant.js:', e);
+                }
+            };
+
+            img.onerror = () => {
+                console.warn('Error loading image for Vibrant.js processing');
+            };
+
+            // Set the source last
+            img.src = imageUrl;
+        } catch (e) {
+            console.warn('Error extracting colors with Vibrant.js:', e);
+        }
+    }
+
+    // Try to use built-in icons
+    tryBuiltInIcons(domain, game, card) {
+        // Define some common icons for game types
+        const gameTypeIcons = {
+            'wordle': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB0klEQVR4Ae2WA6wcQRxAZ23btrVdO4lt27Zt++tvsLZt28YX1/q73WY2k9nZ6bbJnOQlu7Pz5vUyM/ubiVZZt9bAf2kgISFBVrLTQI5k0/r62h/u7g4fS5UyO7Rli9n927cTf0VExPyvBorXR0RIJwsXVmtYuPB/aWB69eqaxP+d8+dbfg8MTPwnDTjpJ1+3TpeVPHy4euDBg0nJfy8GBoofX76UgufPiydOngx0clLvvHpV+uHjo3Z7xQp1/uLF5fCrVyXpG3/xQsqdPSslJibKyVhMTHR8fFyMiorGx8eJRWL8K0gkkjfOzk561erVR6ZVqlR5YoUKhQD3nTsrvLZvr3Ht2jUwNTV9XKVK+cKBgYF0TUzsmz948NKyjo6qFStWYGRkRHx8PItLcj0AE0M3t2hxsE+f45b9+p0ZVrv2O8O6ddsUKlRIs2DBLOqbN2/av3r1ah0tLa3RnTp1BBBCMG/ePAYMGICjoyN6enrfgO6hoaG/+5ZAW+AZ4A1UKVmypPDw8ECn9R8oPLQBHoAvoA8YAHrAA6As0EhNTU3Mnj2b69ev4+rqagvMBGyAA4AApgGzgSKAbpYsWSa1a9dO7N69m2PHjnH16lVyALmBvMAk4DjQH8gD8J8a+A2XRujG7k32hwAAAABJRU5ErkJggg==',
+            'nyt': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAe1BMVEUAAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8GYa6oAAAAKHRSTlMA8Qbgz0Uum4Vn9MUP69iRKrVX3Cwh5U8+MeO8q52FdmNFHhQS7nVa1QAAAMxJREFUOMvVkdcOwjAMRRNGGaWMMgrde/z/FzLiBqSAeOId6/jasuME+EeDQsVoVA4kkZ0Jfz3dJLqFzVIjt4SUO41lx0wi4ydHlrUtS/1QSVZ4ZN6AZHlJZFikp5ih92TK7Bn2DwvYNhXBYfkLI8Uf5CWvTBVgXB6BvcldxgZY5lU7ogtSHuRbMFn5I2T7Y5HPJbP3MMcQyiLnp05dIKZhgM7IxUk/MjI3tcmLg3UjEfDI0XJxwt1cOcmQkVs2zcCB0bU9cvcfegJyjQ9bGlWJCQAAAABJRU5ErkJggg==',
+            'world': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAA5FBMVEUAAAD///8AZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswLvx0UAAAASnRSTlMAAQMEBQcKCw4REhUYGhscICEkKS0uMzs9QkdJTVFXWVpgZGdpbHR4fH+DhYiNkJeYm5yfoqWoq66ytLa4u8HFyMrN0NXY3ODj9MbJNMIAAAEkSURBVDjLfZLncoJAFIW/FVBEwV6j0STGHmss0ReN5v1fKCziwizjzO6P755y5swC8KPk4qIEYGKMfBsjQDj0ZYj8Atp4EwDl7RgWvqY+HA/wRc/AGj8zHXkGBkLh29NfYm4XQEpRwJQS1OzRrQxh8hQSKQMR34HkgRgdKGuDIZTLYhzIfgrZuSG4fcHwkYA0hJ6uIxDIE6WfoOMooKQp2V2BGEnMZEOvS7ItwRZnJ5A4u4sMnkNIGfH/LJvrI/YBkAH+FFy+gOs0wLkDTp41XdQMxN+B8XsA30J4FZ6jLNpkf0T8fDtw7sRAOx1DZO88J+aoKfge+Ie6k7tM946ejlKFmZ9/qKs0qwSWiADdWgBREfpNBKmGb8N0KzT8D/AHVr9K1tPsimkAAAAASUVORK5CYII='
+        };
+
+        // Check if we have a local icon for this type of game
+        for (const [keyword, dataUrl] of Object.entries(gameTypeIcons)) {
+            if (domain.toLowerCase().includes(keyword.toLowerCase())) {
+                // Store in localStorage
+                localStorage.setItem(`favicon_data_${domain}`, dataUrl);
+
+                // Display the icon
+                this.displayFavicon(card, dataUrl, game);
+
+                // Extract colors
+                this.extractColorsWithVibrant(dataUrl, card);
+                return;
+            }
+        }
+    }
+
+    // Display a favicon
+    displayFavicon(card, src, game) {
+        try {
+            // Clear current content
+            const iconWrapper = card.querySelector('.card-icon-wrapper');
+            while (iconWrapper && iconWrapper.firstChild) {
+                iconWrapper.removeChild(iconWrapper.firstChild);
+            }
+
+            // Create favicon element
+            const favicon = new Image();
+            favicon.className = 'game-favicon';
+            favicon.alt = `${game.name} icon`;
+            favicon.src = src;
+            favicon.style.width = '48px';
+            favicon.style.height = '48px';
+            favicon.style.objectFit = 'contain';
+
+            // Add to DOM
+            if (iconWrapper) {
+                iconWrapper.appendChild(favicon);
+            }
+        } catch (e) {
+            console.warn(`Error displaying favicon for ${game.name}:`, e);
+        }
+    }
+
+    // Apply colors to a card based on current color scheme
+    applyCardColors(card) {
+        const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isCompleted = card.classList.contains('completed');
+
+        // Get stored colors
+        const primary = card.dataset.primaryColor;
+
+        // For completed cards, use a neutral background
+        let background, textColor;
+
+        if (isCompleted) {
+            // Use a neutral grey background for completed cards
+            background = isDarkMode ? '#2a2a2a' : '#f0f0f0';
+            textColor = isDarkMode ? '#ffffff' : '#333333';
+        } else {
+            // Use the extracted colors for active cards
+            background = isDarkMode ? card.dataset.darkBackground : card.dataset.lightBackground;
+            textColor = isDarkMode ? card.dataset.darkModeText : card.dataset.lightModeText;
+        }
+
+        // Apply colors
+        if (primary) {
+            card.style.borderColor = isCompleted ? 'transparent' : primary;
+        }
+        if (background) card.style.backgroundColor = background;
+
+        // Apply text colors 
+        const cardTitle = card.querySelector('.card-header h3');
+        const averageDisplay = card.querySelector('.average-display');
+
+        if (cardTitle) cardTitle.style.color = textColor;
+
+        // Adjust average display color
+        if (averageDisplay) {
+            const avgColor = isDarkMode
+                ? chroma(textColor).brighten(0.5).hex()
+                : chroma(textColor).darken(0.5).hex();
+            averageDisplay.style.color = avgColor;
+        }
     }
 
     initializeEventListeners() {
@@ -418,6 +845,11 @@ class App {
         }
 
         card.innerHTML = `
+            <div class="card-icon-container">
+                <div class="card-icon-wrapper">
+                    <img class="game-favicon" alt="${game.name} icon" src="">
+                </div>
+            </div>
             <div class="card-header">
                 <h3>${game.name}</h3>
                 ${averageDisplay ? `<div class="average-display">${averageDisplay}</div>` : ''}
@@ -433,6 +865,9 @@ class App {
         card.querySelector('.play-btn').addEventListener('click', () => window.open(game.url, '_blank'));
         card.querySelector('.stats-btn').addEventListener('click', () => this.showStats(game.id));
         card.querySelector('.result-btn').addEventListener('click', () => this.showResultInput(game.id));
+
+        // Apply brand styling to the card
+        this.applyGameStyling(card, game);
 
         return card;
     }
