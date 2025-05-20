@@ -1,0 +1,17 @@
+# Test runner and spec files
+tests/
+test_runner.html
+
+# Jasmine library (if vendored and you prefer not to commit it)
+# If you downloaded and included it manually and want it in the repo, you can remove this line.
+# If installed via a package manager, it would typically be in node_modules/
+jasmine/
+
+# Common ignores
+node_modules/
+
+# OS-generated files
+.DS_Store
+*.swp
+*~
+Thumbs.db 

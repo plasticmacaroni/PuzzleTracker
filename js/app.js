@@ -1,5 +1,5 @@
-// Game configuration
-const GAMES = [
+// Game configuration - define as global variable by attaching to window
+window.GAMES = [
     {
         id: 'wordle',
         name: 'Wordle',
@@ -25,6 +25,17 @@ const GAMES = [
                             target_field_name: "Attempts",
                             group_index: 1,
                             type: "number"
+                        }
+                    ]
+                },
+                {
+                    name: "attempts_calculator",
+                    regex: "Puzzle #\\d+",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Attempts",
+                            type: "boolean",
+                            value: true
                         }
                     ]
                 }
@@ -164,7 +175,39 @@ const GAMES = [
     {
         id: 'nyt-connections',
         name: 'NYT Connections',
-        url: 'https://www.nytimes.com/games/connections'
+        url: 'https://www.nytimes.com/games/connections',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "completion_state",
+                    regex: "🟨🟨🟨🟨.*?🟩🟩🟩🟩.*?🟦🟦🟦🟦.*?🟪🟪🟪🟪",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            group_index: 0,
+                            type: "boolean"
+                        }
+                    ]
+                },
+                {
+                    name: "attempts_extractor",
+                    regex: "Puzzle #\\d+",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Attempts",
+                            type: "count",
+                            count_emojis: ["[🟨🟩🟦🟪]{1,4}\\s*(?:\\r?\\n|$)"],
+                            group_index: 0
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Attempts",
+            template: "30-day avg: {avg} attempts",
+            days: 30
+        }
     },
     {
         id: 'globle',
@@ -177,9 +220,50 @@ const GAMES = [
         url: 'https://boxofficega.me'
     },
     {
+        id: 'tradle',
+        name: 'Tradle',
+        url: 'https://games.oec.world/en/tradle/'
+    },
+    {
         id: 'costcodle',
         name: 'Costcodle',
-        url: 'https://costcodle.com'
+        url: 'https://costcodle.com',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "attempts",
+                    regex: "(\\d)/6",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Attempts",
+                            group_index: 1,
+                            type: "number"
+                        },
+                        {
+                            target_field_name: "CompletionState",
+                            type: "boolean",
+                            value: true
+                        }
+                    ]
+                },
+                {
+                    name: "failures",
+                    regex: "X/6",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            type: "boolean",
+                            value: false
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Attempts",
+            template: "30-day avg: {avg}/6",
+            days: 30
+        }
     },
     {
         id: 'movie-to-movie',
@@ -278,7 +362,38 @@ const GAMES = [
     {
         id: 'foodguessr',
         name: 'FoodGuessr',
-        url: 'https://foodguessr.com'
+        url: 'https://foodguessr.com',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "completion_state",
+                    regex: "Total score:",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            group_index: 0,
+                            type: "boolean"
+                        }
+                    ]
+                },
+                {
+                    name: "score",
+                    regex: "Total score: ([\\d,]+) / 15,000",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Score",
+                            group_index: 1,
+                            type: "number"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Score",
+            template: "30-day avg: {avg:,.0f}/15,000",
+            days: 30
+        }
     },
     {
         id: 'thrice',
@@ -365,9 +480,74 @@ const GAMES = [
 class App {
     constructor() {
         this.currentGameId = null;
-        this.initializeEventListeners();
-        this.startCardPolling();
+        this.toastContainer = null;
+        this.schemaEditor = null;
+        this.initializeDarkMode();
         this.initializeToastContainer();
+        this.initializeEventListeners();
+        this.showDailyReminderBanner();
+        this.updateCardPositions();
+        this.startCardPolling();
+    }
+
+    // Helper function to get today's date in local timezone
+    getLocalDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const dateStr = `${year}-${month}-${day}`;
+        console.log('Using local date:', dateStr, '(Browser time)');
+        return dateStr;
+    }
+
+    initializeDarkMode() {
+        // Check if user has already set a preference
+        const darkModePreference = localStorage.getItem('darkModePreference');
+
+        // If there's a preference, apply it
+        if (darkModePreference === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else if (darkModePreference === 'light') {
+            document.body.classList.remove('dark-mode');
+        } else {
+            // If no preference, check system preference
+            const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (prefersDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        // Create dark mode toggle button
+        const darkModeToggle = document.createElement('button');
+        darkModeToggle.id = 'darkModeToggle';
+        darkModeToggle.className = 'btn dark-mode-toggle';
+        darkModeToggle.innerHTML = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        darkModeToggle.title = document.body.classList.contains('dark-mode') ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+
+        // Add event listener to toggle button
+        darkModeToggle.addEventListener('click', () => this.toggleDarkMode());
+
+        // Add to header
+        const headerActions = document.querySelector('.header-actions');
+        headerActions.prepend(darkModeToggle);
+    }
+
+    toggleDarkMode() {
+        const isDarkMode = document.body.classList.toggle('dark-mode');
+
+        // Update button
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        darkModeToggle.innerHTML = isDarkMode ? '☀️' : '🌙';
+        darkModeToggle.title = isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+
+        // Save preference
+        localStorage.setItem('darkModePreference', isDarkMode ? 'dark' : 'light');
+
+        // Update card colors for all games
+        document.querySelectorAll('.game-card').forEach(card => {
+            this.applyCardColors(card);
+        });
     }
 
     initializeToastContainer() {
@@ -625,12 +805,9 @@ class App {
 
     // Try to use built-in icons
     tryBuiltInIcons(domain, game, card) {
-        // Define some common icons for game types
-        const gameTypeIcons = {
-            'wordle': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAB0klEQVR4Ae2WA6wcQRxAZ23btrVdO4lt27Zt++tvsLZt28YX1/q73WY2k9nZ6bbJnOQlu7Pz5vUyM/ubiVZZt9bAf2kgISFBVrLTQI5k0/r62h/u7g4fS5UyO7Rli9n927cTf0VExPyvBorXR0RIJwsXVmtYuPB/aWB69eqaxP+d8+dbfg8MTPwnDTjpJ1+3TpeVPHy4euDBg0nJfy8GBoofX76UgufPiydOngx0clLvvHpV+uHjo3Z7xQp1/uLF5fCrVyXpG3/xQsqdPSslJibKyVhMTHR8fFyMiorGx8eJRWL8K0gkkjfOzk561erVR6ZVqlR5YoUKhQD3nTsrvLZvr3Ht2jUwNTV9XKVK+cKBgYF0TUzsmz948NKyjo6qFStWYGRkRHx8PItLcj0AE0M3t2hxsE+f45b9+p0ZVrv2O8O6ddsUKlRIs2DBLOqbN2/av3r1ah0tLa3RnTp1BBBCMG/ePAYMGICjoyN6enrfgO6hoaG/+5ZAW+AZ4A1UKVmypPDw8ECn9R8oPLQBHoAvoA8YAHrAA6As0EhNTU3Mnj2b69ev4+rqagvMBGyAA4AApgGzgSKAbpYsWSa1a9dO7N69m2PHjnH16lVyALmBvMAk4DjQH8gD8J8a+A2XRujG7k32hwAAAABJRU5ErkJggg==',
-            'nyt': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAe1BMVEUAAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8GYa6oAAAAKHRSTlMA8Qbgz0Uum4Vn9MUP69iRKrVX3Cwh5U8+MeO8q52FdmNFHhQS7nVa1QAAAMxJREFUOMvVkdcOwjAMRRNGGaWMMgrde/z/FzLiBqSAeOId6/jasuME+EeDQsVoVA4kkZ0Jfz3dJLqFzVIjt4SUO41lx0wi4ydHlrUtS/1QSVZ4ZN6AZHlJZFikp5ih92TK7Bn2DwvYNhXBYfkLI8Uf5CWvTBVgXB6BvcldxgZY5lU7ogtSHuRbMFn5I2T7Y5HPJbP3MMcQyiLnp05dIKZhgM7IxUk/MjI3tcmLg3UjEfDI0XJxwt1cOcmQkVs2zcCB0bU9cvcfegJyjQ9bGlWJCQAAAABJRU5ErkJggg==',
-            'world': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAA5FBMVEUAAAD///8AZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswAZswLvx0UAAAASnRSTlMAAQMEBQcKCw4REhUYGhscICEkKS0uMzs9QkdJTVFXWVpgZGdpbHR4fH+DhYiNkJeYm5yfoqWoq66ytLa4u8HFyMrN0NXY3ODj9MbJNMIAAAEkSURBVDjLfZLncoJAFIW/FVBEwV6j0STGHmss0ReN5v1fKCziwizjzO6P755y5swC8KPk4qIEYGKMfBsjQDj0ZYj8Atp4EwDl7RgWvqY+HA/wRc/AGj8zHXkGBkLh29NfYm4XQEpRwJQS1OzRrQxh8hQSKQMR34HkgRgdKGuDIZTLYhzIfgrZuSG4fcHwkYA0hJ6uIxDIE6WfoOMooKQp2V2BGEnMZEOvS7ItwRZnJ5A4u4sMnkNIGfH/LJvrI/YBkAH+FFy+gOs0wLkDTp41XdQMxN+B8XsA30J4FZ6jLNpkf0T8fDtw7sRAOx1DZO88J+aoKfge+Ie6k7tM946ejlKFmZ9/qKs0qwSWiADdWgBREfpNBKmGb8N0KzT8D/AHVr9K1tPsimkAAAAASUVORK5CYII='
-        };
+        // We previously had hardcoded fallback icons here, but they've been removed
+        // to reduce code size and unnecessary data embedding
+        const gameTypeIcons = {};
 
         // Check if we have a local icon for this type of game
         for (const [keyword, dataUrl] of Object.entries(gameTypeIcons)) {
@@ -703,17 +880,26 @@ class App {
         if (background) card.style.backgroundColor = background;
 
         // Apply text colors 
-        const cardTitle = card.querySelector('.card-header h3');
+        const cardTitle = card.querySelector('.card-title');
         const averageDisplay = card.querySelector('.average-display');
+        const cardDivider = card.querySelector('.card-divider');
 
         if (cardTitle) cardTitle.style.color = textColor;
 
-        // Adjust average display color
+        // Style divider if present
+        if (cardDivider) {
+            cardDivider.style.backgroundColor = isCompleted ?
+                (isDarkMode ? '#444' : '#eee') :
+                chroma(primary).alpha(0.3).css();
+        }
+
+        // Adjust average display color and alignment
         if (averageDisplay) {
             const avgColor = isDarkMode
                 ? chroma(textColor).brighten(0.5).hex()
                 : chroma(textColor).darken(0.5).hex();
             averageDisplay.style.color = avgColor;
+            averageDisplay.style.textAlign = 'center';
         }
     }
 
@@ -722,6 +908,19 @@ class App {
         document.getElementById('exportData').addEventListener('click', () => storage.exportData());
         document.getElementById('importData').addEventListener('click', () => document.getElementById('importFile').click());
         document.getElementById('importFile').addEventListener('change', (e) => this.handleImport(e));
+
+        // Schema import/export buttons
+        document.getElementById('exportSchemaOnly').addEventListener('click', () => storage.exportGameSchema());
+        document.getElementById('importSchemaOnly').addEventListener('click', () => document.getElementById('importSchemaFile').click());
+        document.getElementById('importSchemaFile').addEventListener('change', (e) => this.handleSchemaImport(e));
+
+        // Reminder banner buttons
+        document.getElementById('exportDataBanner').addEventListener('click', () => {
+            storage.exportData();
+            this.hideBanner();
+        });
+        document.getElementById('dismissBanner').addEventListener('click', () => this.hideBanner());
+        document.getElementById('closeBanner').addEventListener('click', () => this.hideBanner());
 
         // Modal close buttons
         document.querySelectorAll('.close').forEach(btn => {
@@ -735,14 +934,113 @@ class App {
             }
         });
 
-        // Schema editor
-        document.getElementById('editSchema').addEventListener('click', () => this.showSchemaModal());
+        // Game management modal
+        document.getElementById('editSchema').addEventListener('click', () => this.showSchemaModal('manage'));
         document.getElementById('editSchemaManually').addEventListener('click', () => this.showSchemaEditor());
         document.getElementById('saveSchema').addEventListener('click', () => this.saveSchema());
         document.getElementById('cancelSchema').addEventListener('click', () => this.hideSchemaEditor());
+        document.getElementById('quickAddGame').addEventListener('click', () => this.handleQuickAddGame());
+
+        // Tab buttons
+        document.getElementById('quickAddTab').addEventListener('click', () => this.switchTab('quickAdd'));
+        document.getElementById('manageTab').addEventListener('click', () => this.switchTab('manage'));
+        document.getElementById('advancedTab').addEventListener('click', () => this.switchTab('advanced'));
 
         // Result submit button
         document.getElementById('submitResult').addEventListener('click', () => this.handleResultSubmit());
+    }
+
+    // New method to switch between tabs
+    switchTab(tabName) {
+        // Hide all tab content
+        document.querySelectorAll('.modal-tab-content').forEach(tab => {
+            tab.style.display = 'none';
+        });
+
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Show selected tab content and mark tab as active
+        if (tabName === 'quickAdd') {
+            document.getElementById('quickAddSection').style.display = 'block';
+            document.getElementById('quickAddTab').classList.add('active');
+        } else if (tabName === 'manage') {
+            document.getElementById('manageSection').style.display = 'block';
+            document.getElementById('manageTab').classList.add('active');
+            this.loadManageGamesContent();
+        } else if (tabName === 'advanced') {
+            document.getElementById('advancedSection').style.display = 'block';
+            document.getElementById('advancedTab').classList.add('active');
+        }
+    }
+
+    // Method to load game management content
+    loadManageGamesContent() {
+        const activeGamesList = document.getElementById('activeGamesList');
+        const hiddenGamesList = document.getElementById('hiddenGamesList');
+
+        // Clear previous entries
+        activeGamesList.innerHTML = '';
+        hiddenGamesList.innerHTML = '';
+
+        // Process all games
+        GAMES.forEach(game => {
+            const isHidden = storage.isGameHidden(game.id);
+            const gameItem = this.createGameListItem(game, isHidden);
+
+            if (isHidden) {
+                hiddenGamesList.appendChild(gameItem);
+            } else {
+                activeGamesList.appendChild(gameItem);
+            }
+        });
+    }
+
+    showSchemaModal(activeTab = 'manage') {
+        const modal = document.getElementById('schemaModal');
+        modal.style.display = 'block';
+
+        // Switch to the specified tab
+        this.switchTab(activeTab);
+    }
+
+    closeModals() {
+        // Save any changes that might have been made in the manage games modal
+        const modal = document.getElementById('schemaModal');
+        const manageSection = document.getElementById('manageSection');
+
+        if (modal.style.display === 'block' && manageSection.style.display === 'block') {
+            // Refresh the main game lists to reflect changes
+            this.updateCardPositions();
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.style.display = 'none';
+        });
+    }
+
+    hideGame(gameId) {
+        const game = GAMES.find(g => g.id === gameId);
+        if (!game) return;
+
+        if (confirm(`Are you sure you want to hide ${game.name}? It can be restored later.`)) {
+            if (storage.hideGame(gameId)) {
+                // Remove from active list and add to hidden list in the modal
+                const activeItem = document.querySelector(`#activeGamesList [data-game-id="${gameId}"]`);
+                if (activeItem) {
+                    activeItem.remove();
+
+                    // Create item for hidden list
+                    const hiddenList = document.getElementById('hiddenGamesList');
+                    const gameItem = this.createGameListItem(game, true);
+                    hiddenList.appendChild(gameItem);
+                }
+
+                this.showToast('Game Hidden', `${game.name} has been hidden`, 'info');
+            }
+        }
     }
 
     async handleImport(event) {
@@ -758,12 +1056,6 @@ class App {
         }
     }
 
-    closeModals() {
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.style.display = 'none';
-        });
-    }
-
     startCardPolling() {
         // Initial render
         this.updateCardPositions();
@@ -775,19 +1067,30 @@ class App {
     updateCardPositions() {
         const activeList = document.getElementById('gameList');
         const completedList = document.getElementById('completedGameList');
-        const today = new Date().toISOString().split('T')[0];
+        const today = this.getLocalDateString();
+        // console.log('Today\'s date:', today);
 
         // Track current positions
         const currentPositions = new Map();
         GAMES.forEach(game => {
+            // Skip hidden games
+            if (storage.isGameHidden(game.id)) return;
+
             const results = storage.getGameResults(game.id);
+            // console.log(`Game ${game.id} results:`, results);
+
             const hasTodayResult = results.some(result => result.date === today);
+            // console.log(`Game ${game.id} has today\'s result:`, hasTodayResult);
+
             currentPositions.set(game.id, hasTodayResult);
         });
 
         // Only update if positions have changed
         let needsUpdate = false;
         GAMES.forEach(game => {
+            // Skip hidden games
+            if (storage.isGameHidden(game.id)) return;
+
             const card = document.querySelector(`[data-game-id="${game.id}"]`);
             if (!card) {
                 needsUpdate = true;
@@ -796,10 +1099,12 @@ class App {
             const isInCompleted = card.closest('#completedGameList') !== null;
             const shouldBeCompleted = currentPositions.get(game.id);
             if (isInCompleted !== shouldBeCompleted) {
+                // console.log(`Game ${game.id} position needs update: currently in completed=${isInCompleted}, should be in completed=${shouldBeCompleted}`);
                 needsUpdate = true;
             }
         });
 
+        // console.log('Needs update:', needsUpdate);
         if (!needsUpdate) return;
 
         // Clear both lists
@@ -808,12 +1113,17 @@ class App {
 
         // Sort games into appropriate lists based only on today's date
         GAMES.forEach(game => {
+            // Skip hidden games
+            if (storage.isGameHidden(game.id)) return;
+
             const card = this.createGameCard(game);
             const hasTodayResult = currentPositions.get(game.id);
 
             if (hasTodayResult) {
+                // console.log(`Moving ${game.id} to completed list`);
                 completedList.appendChild(card);
             } else {
+                // console.log(`Keeping ${game.id} in active list`);
                 activeList.appendChild(card);
             }
         });
@@ -828,6 +1138,9 @@ class App {
             card.classList.add('completed');
         }
 
+        // Add randomized puzzle decoration position
+        this.addRandomPuzzleDecoration(card);
+
         // Get average if configured
         let averageDisplay = '';
         if (game.average_display) {
@@ -838,22 +1151,31 @@ class App {
             );
 
             if (avg) {
-                averageDisplay = game.average_display.template.replace('{avg}', avg);
+                // Handle any format specifiers in the template
+                const template = game.average_display.template;
+                if (template.includes('{avg:')) {
+                    // The getGameAverage method already returns formatted value for format specifiers
+                    averageDisplay = template.replace(/{avg:[^}]+}/, avg);
+                } else {
+                    // Simple {avg} replacement
+                    averageDisplay = template.replace('{avg}', avg);
+                }
             } else {
                 averageDisplay = 'New Game!';
             }
         }
 
         card.innerHTML = `
-            <div class="card-icon-container">
+            <div class="card-top-row">
                 <div class="card-icon-wrapper">
                     <img class="game-favicon" alt="${game.name} icon" src="">
                 </div>
+                <h3 class="card-title">${game.name}</h3>
             </div>
-            <div class="card-header">
-                <h3>${game.name}</h3>
-                ${averageDisplay ? `<div class="average-display">${averageDisplay}</div>` : ''}
-            </div>
+            ${averageDisplay ? `
+            <div class="card-divider"></div>
+            <div class="average-display">${averageDisplay}</div>
+            ` : ''}
             <div class="game-actions">
                 <button class="btn play-btn" data-url="${game.url}">Play</button>
                 <button class="btn stats-btn" data-game="${game.id}">Stats</button>
@@ -872,6 +1194,94 @@ class App {
         return card;
     }
 
+    // New method to add randomized puzzle decoration position
+    addRandomPuzzleDecoration(card) {
+        // Create and add the first puzzle piece element
+        const puzzlePiece1 = document.createElement('div');
+        puzzlePiece1.className = 'puzzle-decoration piece1';
+
+        // Make sure pieces are more visible by positioning them more inside the card
+        const positions1 = ['top-center', 'middle-right', 'bottom-center', 'middle-left'];
+        const randomPos1 = positions1[Math.floor(Math.random() * positions1.length)];
+        puzzlePiece1.classList.add(randomPos1);
+
+        // Larger size for better visibility
+        const size1 = 80 + Math.floor(Math.random() * 60); // Random size between 80px and 140px
+        puzzlePiece1.style.width = `${size1}px`;
+        puzzlePiece1.style.height = `${size1}px`;
+
+        // More defined puzzle piece shape with stronger border-radius
+        const radius1 = [
+            `${40 + Math.random() * 30}% ${70 + Math.random() * 30}% ${70 + Math.random() * 30}% ${40 + Math.random() * 30}%`,
+            `${40 + Math.random() * 30}% ${40 + Math.random() * 30}% ${70 + Math.random() * 30}% ${70 + Math.random() * 30}%`
+        ].join(' / ');
+        puzzlePiece1.style.borderRadius = radius1;
+
+        // Much higher opacity and more visible styling
+        if (document.body.classList.contains('dark-mode')) {
+            puzzlePiece1.style.backgroundColor = `rgba(255, 255, 255, ${(0.12 + Math.random() * 0.08).toFixed(2)})`;
+        } else {
+            const color = this.stringToColor(card.querySelector('.card-title').textContent);
+            const colorRgb = this.hexToRgb(color);
+            puzzlePiece1.style.backgroundColor = `rgba(${colorRgb.r}, ${colorRgb.g}, ${colorRgb.b}, ${(0.15 + Math.random() * 0.1).toFixed(2)})`;
+        }
+
+        // Add border to make it more defined
+        puzzlePiece1.style.border = `1px solid rgba(255, 255, 255, ${document.body.classList.contains('dark-mode') ? 0.1 : 0.03})`;
+
+        // Create and add the second puzzle piece element
+        const puzzlePiece2 = document.createElement('div');
+        puzzlePiece2.className = 'puzzle-decoration piece2';
+
+        // Ensure second piece position is different from first
+        let positions2 = [...positions1];
+        positions2 = positions2.filter(pos => pos !== randomPos1);
+        const randomPos2 = positions2[Math.floor(Math.random() * positions2.length)];
+        puzzlePiece2.classList.add(randomPos2);
+
+        // Randomize the size for second piece
+        const size2 = 70 + Math.floor(Math.random() * 40); // Random size between 70px and 110px
+        puzzlePiece2.style.width = `${size2}px`;
+        puzzlePiece2.style.height = `${size2}px`;
+
+        // More defined puzzle piece shape
+        const radius2 = [
+            `${40 + Math.random() * 30}% ${70 + Math.random() * 30}% ${70 + Math.random() * 30}% ${40 + Math.random() * 30}%`,
+            `${40 + Math.random() * 30}% ${40 + Math.random() * 30}% ${70 + Math.random() * 30}% ${70 + Math.random() * 30}%`
+        ].join(' / ');
+        puzzlePiece2.style.borderRadius = radius2;
+
+        // Much higher opacity for visibility
+        if (document.body.classList.contains('dark-mode')) {
+            puzzlePiece2.style.backgroundColor = `rgba(255, 255, 255, ${(0.12 + Math.random() * 0.08).toFixed(2)})`;
+        } else {
+            // Use a different color variant for the second piece
+            const color = this.stringToColor(card.querySelector('.card-title').textContent + '1');
+            const colorRgb = this.hexToRgb(color);
+            puzzlePiece2.style.backgroundColor = `rgba(${colorRgb.r}, ${colorRgb.g}, ${colorRgb.b}, ${(0.15 + Math.random() * 0.1).toFixed(2)})`;
+        }
+
+        // Add border to make it more defined
+        puzzlePiece2.style.border = `1px solid rgba(255, 255, 255, ${document.body.classList.contains('dark-mode') ? 0.1 : 0.03})`;
+
+        // Add the pieces to the card
+        card.appendChild(puzzlePiece1);
+        card.appendChild(puzzlePiece2);
+    }
+
+    // Helper method to convert hex color to RGB components
+    hexToRgb(hex) {
+        // Remove # if present
+        hex = hex.replace('#', '');
+
+        // Parse the hex values
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+
+        return { r, g, b };
+    }
+
     showStats(gameId) {
         const results = storage.getGameResults(gameId);
 
@@ -881,6 +1291,8 @@ class App {
         }
 
         const modal = document.getElementById('statsModal');
+        const chartContainer = document.querySelector('.chart-container');
+        const game = GAMES.find(g => g.id === gameId);
 
         // Parse all results for visualization
         const parsedResults = results.map(result => {
@@ -896,8 +1308,30 @@ class App {
             }
         }).filter(Boolean);
 
-        // Create chart with parsed data
-        gameCharts.createChart('statsChart', gameId, parsedResults);
+        // Check if there are any tracked variables
+        const hasTrackedVariables = parsedResults.length > 0 && parsedResults.some(result => {
+            // Check if there are any properties besides date
+            return Object.keys(result).length > 1;
+        });
+
+        // Update chart container based on tracked variables
+        if (hasTrackedVariables) {
+            // Show chart and create it with parsed data
+            chartContainer.style.display = 'block';
+            chartContainer.innerHTML = '<canvas id="statsChart"></canvas>';
+            gameCharts.createChart('statsChart', gameId, parsedResults);
+        } else {
+            // Hide chart and show message
+            chartContainer.style.display = 'block';
+            chartContainer.innerHTML = `
+                <div class="no-stats-message">
+                    <h3>No Statistics Available</h3>
+                    <p>This game doesn't have statistics tracking configured in the schema.</p>
+                    <p>You can still track your history, but graphs and averages aren't available.</p>
+                    <p class="hint">To enable statistics, edit the game schema to add result parsing rules.</p>
+                </div>
+            `;
+        }
 
         // Display raw history
         const historyList = document.getElementById('historyList');
@@ -1028,11 +1462,6 @@ class App {
         this.showToast('Nice job!', `Completed today's ${game.name}`, 'success');
     }
 
-    showSchemaModal() {
-        const modal = document.getElementById('schemaModal');
-        modal.style.display = 'block';
-    }
-
     showSchemaEditor() {
         const editor = document.getElementById('schemaEditor');
         editor.style.display = 'block';
@@ -1062,6 +1491,62 @@ class App {
         document.getElementById('schemaEditor').style.display = 'none';
     }
 
+    handleQuickAddGame() {
+        const nameInput = document.getElementById('quickAddName');
+        const urlInput = document.getElementById('quickAddUrl');
+
+        const name = nameInput.value.trim();
+        const url = urlInput.value.trim();
+
+        // Validate inputs
+        if (!name) {
+            this.showToast('Error', 'Game name is required', 'error');
+            nameInput.focus();
+            return;
+        }
+
+        if (!url) {
+            this.showToast('Error', 'Game URL is required', 'error');
+            urlInput.focus();
+            return;
+        }
+
+        try {
+            // Create a unique ID from the name
+            const id = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+
+            // Check if game with this ID already exists
+            if (GAMES.some(game => game.id === id)) {
+                this.showToast('Error', 'A game with a similar name already exists', 'error');
+                return;
+            }
+
+            // Create simple game object
+            const newGame = {
+                id,
+                name,
+                url
+            };
+
+            // Add to games array
+            GAMES.push(newGame);
+
+            // Save to localStorage for persistence
+            storage.saveGamesSchema(GAMES);
+
+            // Clear form inputs
+            nameInput.value = '';
+            urlInput.value = '';
+
+            // Refresh display
+            this.updateCardPositions();
+
+            this.showToast('Success', `${name} added successfully. Note: Statistics tracking will require manual schema editing.`, 'success');
+        } catch (error) {
+            this.showToast('Error', 'Failed to add game: ' + error.message, 'error');
+        }
+    }
+
     async saveSchema() {
         try {
             const newSchema = JSON.parse(this.schemaEditor.getValue());
@@ -1079,6 +1564,9 @@ class App {
             GAMES.length = 0;
             GAMES.push(...newSchema);
 
+            // Save to localStorage for persistence
+            storage.saveGamesSchema(GAMES);
+
             // Refresh the display
             this.updateCardPositions();
             this.hideSchemaEditor();
@@ -1088,9 +1576,256 @@ class App {
             this.showToast('Error', 'Invalid schema format: ' + error.message, 'error');
         }
     }
+
+    // Helper method to create a game list item for the manage games modal
+    createGameListItem(game, isHidden) {
+        const item = document.createElement('div');
+        item.className = 'game-list-item';
+        item.setAttribute('data-game-id', game.id);
+
+        // Create icon (reuse favicon code)
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'game-icon';
+
+        // Create a fallback icon by default
+        const fallbackIcon = document.createElement('div');
+        fallbackIcon.className = 'fallback-icon-small';
+        fallbackIcon.textContent = game.name.charAt(0).toUpperCase();
+        fallbackIcon.style.width = '24px';
+        fallbackIcon.style.height = '24px';
+        fallbackIcon.style.borderRadius = '50%';
+        fallbackIcon.style.backgroundColor = this.stringToColor(game.name);
+        fallbackIcon.style.display = 'flex';
+        fallbackIcon.style.justifyContent = 'center';
+        fallbackIcon.style.alignItems = 'center';
+        fallbackIcon.style.fontWeight = 'bold';
+        fallbackIcon.style.fontSize = '12px';
+        fallbackIcon.style.color = '#ffffff';
+
+        iconContainer.appendChild(fallbackIcon);
+
+        // Create name
+        const nameEl = document.createElement('div');
+        nameEl.className = 'game-name';
+        nameEl.textContent = game.name;
+
+        // Create actions container
+        const actions = document.createElement('div');
+        actions.className = 'game-actions-small';
+
+        // Get default game IDs (original games)
+        const defaultGameIds = new Set(window.GAMES_DEFAULT ? window.GAMES_DEFAULT.map(g => g.id) : []);
+
+        // Create appropriate button based on state and type
+        if (isHidden) {
+            // Create restore button for hidden games
+            const restoreBtn = document.createElement('button');
+            restoreBtn.className = 'btn restore-btn';
+            restoreBtn.textContent = 'Restore';
+            restoreBtn.addEventListener('click', () => this.restoreGame(game.id));
+            actions.appendChild(restoreBtn);
+        } else {
+            // For visible games, show hide or remove based on if it's a default game
+            const isDefault = defaultGameIds.has(game.id);
+
+            const actionBtn = document.createElement('button');
+            if (isDefault) {
+                actionBtn.className = 'btn hide-btn';
+                actionBtn.textContent = 'Hide';
+                actionBtn.addEventListener('click', () => this.hideGame(game.id));
+            } else {
+                actionBtn.className = 'btn remove-btn warning-btn';
+                actionBtn.textContent = 'Remove';
+                actionBtn.addEventListener('click', () => this.removeGame(game.id));
+            }
+            actions.appendChild(actionBtn);
+        }
+
+        // Assemble the item
+        item.appendChild(iconContainer);
+        item.appendChild(nameEl);
+        item.appendChild(actions);
+
+        // Try to load the favicon
+        if (game.url) {
+            try {
+                const url = new URL(game.url);
+                const domain = url.hostname;
+
+                // First check local storage for cached favicon
+                const cachedFavicon = localStorage.getItem(`favicon_data_${domain}`);
+                if (cachedFavicon) {
+                    // Create and add the favicon if cached
+                    const faviconImg = document.createElement('img');
+                    faviconImg.className = 'game-favicon-small';
+                    faviconImg.alt = `${game.name} icon`;
+                    faviconImg.src = cachedFavicon;
+
+                    // Replace the fallback icon
+                    iconContainer.innerHTML = '';
+                    iconContainer.appendChild(faviconImg);
+                } else {
+                    // If not cached, use Google favicon API directly for the small icons
+                    const faviconImg = document.createElement('img');
+                    faviconImg.className = 'game-favicon-small';
+                    faviconImg.alt = `${game.name} icon`;
+                    faviconImg.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+
+                    // Replace the fallback icon
+                    iconContainer.innerHTML = '';
+                    iconContainer.appendChild(faviconImg);
+                }
+            } catch (e) {
+                console.warn(`Error loading favicon for ${game.name} in management interface:`, e);
+                // Fallback icon is already created, so no need to do anything
+            }
+        }
+
+        return item;
+    }
+
+    // Helper method to create a consistent color from a string
+    stringToColor(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        let color = '#';
+        for (let i = 0; i < 3; i++) {
+            const value = (hash >> (i * 8)) & 0xFF;
+            color += ('00' + value.toString(16)).substr(-2);
+        }
+        return color;
+    }
+
+    restoreGame(gameId) {
+        const game = GAMES.find(g => g.id === gameId);
+        if (!game) return;
+
+        if (storage.unhideGame(gameId)) {
+            // Remove from hidden list and add to active list
+            const hiddenItem = document.querySelector(`#hiddenGamesList [data-game-id="${gameId}"]`);
+            if (hiddenItem) {
+                hiddenItem.remove();
+
+                // Create item for active list
+                const activeList = document.getElementById('activeGamesList');
+                const gameItem = this.createGameListItem(game, false);
+                activeList.appendChild(gameItem);
+            }
+
+            this.showToast('Game Restored', `${game.name} has been restored`, 'success');
+        }
+    }
+
+    removeGame(gameId) {
+        const game = GAMES.find(g => g.id === gameId);
+        if (!game) return;
+
+        // Double confirmation for removing a game since it's destructive
+        if (confirm(`Are you sure you want to REMOVE ${game.name}? This cannot be undone and will delete the game definition.`)) {
+            if (confirm(`⚠️ FINAL WARNING: Remove ${game.name} permanently?`)) {
+                // Find the game index
+                const index = GAMES.findIndex(g => g.id === gameId);
+                if (index !== -1) {
+                    // Remove the game
+                    GAMES.splice(index, 1);
+
+                    // Save the updated games schema
+                    storage.saveGamesSchema(GAMES);
+
+                    // Remove item from the active list
+                    const activeItem = document.querySelector(`#activeGamesList [data-game-id="${gameId}"]`);
+                    if (activeItem) {
+                        activeItem.remove();
+                    }
+
+                    this.showToast('Game Removed', `${game.name} has been permanently removed`, 'success');
+                }
+            }
+        }
+    }
+
+    // Handler for schema import
+    async handleSchemaImport(event) {
+        const file = event.target.files[0];
+        if (file) {
+            try {
+                await storage.importGameSchema(file);
+                this.updateCardPositions();
+                // Reset the file input
+                event.target.value = '';
+            } catch (error) {
+                this.showToast('Error', 'Error importing schema: ' + error.message, 'error');
+                // Reset the file input
+                event.target.value = '';
+            }
+        }
+    }
+
+    // Reminder banner methods
+    showDailyReminderBanner() {
+        // Check if we've shown the banner today
+        const today = this.getLocalDateString();
+        const lastShown = localStorage.getItem('reminderBannerLastShown');
+
+        if (lastShown === today) {
+            // Already shown today, don't show again
+            return;
+        }
+
+        // Only show banner if there are tracked stats (games with results)
+        const hasTrackedStats = this.hasAnyTrackedStatistics();
+        if (!hasTrackedStats) {
+            return;
+        }
+
+        // Show banner after a short delay
+        setTimeout(() => {
+            const banner = document.getElementById('reminderBanner');
+            banner.classList.remove('hidden');
+
+            // Mark as shown today
+            localStorage.setItem('reminderBannerLastShown', today);
+        }, 1000);
+    }
+
+    // Check if there are any games with tracked statistics
+    hasAnyTrackedStatistics() {
+        // Check all games that have average_display configuration
+        const gamesWithStats = GAMES.filter(game => game.average_display);
+
+        // For each game, check if there's at least one result
+        for (const game of gamesWithStats) {
+            const results = storage.getGameResults(game.id);
+            // If the game has any results, return true
+            if (results && results.length > 0) {
+                return true;
+            }
+        }
+
+        // No games found with statistics
+        return false;
+    }
+
+    hideBanner() {
+        const banner = document.getElementById('reminderBanner');
+        banner.classList.add('hidden');
+    }
 }
 
-// Initialize the app when the DOM is loaded
+// Store default games for reference
+window.GAMES_DEFAULT = JSON.parse(JSON.stringify(window.GAMES));
+
+// Store default games for reference and create app instance
 document.addEventListener('DOMContentLoaded', () => {
+    // Store default games for reference
+    // Important: This must happen BEFORE Storage tries to load games
+    window.GAMES_DEFAULT = JSON.parse(JSON.stringify(window.GAMES));
+
+    // Create the App instance
     window.app = new App();
+
+    // Add version info in console for debugging
+    console.info('GuessrTracker v1.2.0');
 }); 

@@ -31,6 +31,26 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
 
+/* Card top row with icon and title */
+.card-top-row {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    gap: 12px;
+}
+
+.card-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.card-divider {
+    height: 1px;
+    background-color: #eee;
+    margin: 0 15px;
+}
+
 /* Icon container at the top of each card */
 .card-icon-container {
     width: 100%;
@@ -90,6 +110,8 @@
     font-size: 14px;
     color: #666;
     margin-top: 4px;
+    padding: 8px 15px;
+    text-align: center;
 }
 
 .game-actions {
@@ -155,7 +177,12 @@
         border-bottom-color: #444;
     }
 
-    .card-header h3 {
+    .card-divider {
+        background-color: #444;
+    }
+
+    .card-header h3,
+    .card-title {
         color: #eee;
     }
 

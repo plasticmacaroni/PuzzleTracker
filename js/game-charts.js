@@ -43,11 +43,29 @@ class GameCharts {
             if (field === 'CompletionState') {
                 // Calculate completion rate over time
                 const completionRates = results.map((result, index) => {
-                    const windowSize = 7; // 7-day rolling window
-                    const startIdx = Math.max(0, index - windowSize + 1);
-                    const window = results.slice(startIdx, index + 1);
-                    const successful = window.filter(r => r.CompletionState === true).length;
-                    return (successful / window.length) * 100;
+                    try {
+                        // Always include at least the current result in calculations
+                        const windowSize = Math.min(7, index + 1); // 7-day rolling window or all available results
+                        const startIdx = Math.max(0, index - windowSize + 1);
+                        const window = results.slice(startIdx, index + 1);
+
+                        // Count results where CompletionState is true (explicitly check both true and undefined)
+                        const successful = window.filter(r => r.CompletionState === true).length;
+                        const successRate = (successful / window.length) * 100;
+
+                        // Report low success rates for debugging
+                        if (successful === 0 && windowSize > 0) {
+                            console.error(`[CHART ERROR] Zero success rate for ${gameId} on ${result.date}. Window has ${window.length} results.`);
+                            window.forEach((r, i) => {
+                                console.log(`[CHART] Window item ${i}: Date=${r.date}, CompletionState=${r.CompletionState}`);
+                            });
+                        }
+
+                        return successRate;
+                    } catch (error) {
+                        console.error(`[CHART ERROR] Error calculating success rate for ${gameId}:`, error);
+                        return 0; // Default to 0% on error
+                    }
                 });
 
                 datasets.push({

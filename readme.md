@@ -65,9 +65,9 @@ MIT License - feel free to use this project for your own daily game tracking nee
 
 ## Schema
 
-The app uses a JSON format to define games and how to extract stats from their outputs. Here's how it works:
+The app uses a JSON schema to define games and how to extract statistics from their outputs. Here's how it works:
 
-### Basic Game Setup
+### Basic Game Structure
 
 ```json
 {
@@ -77,91 +77,116 @@ The app uses a JSON format to define games and how to extract stats from their o
 }
 ```
 
-Every game needs these three properties:
+Every game must include:
 
 - `id`: A unique identifier (no spaces)
 - `name`: Display name shown in the UI
 - `url`: Link to play the game
 
-### Tracking Game Results
+### Result Parsing Rules
 
-To track stats, add `result_parsing_rules`. The app can track different types of data:
+To track stats, add a `result_parsing_rules` object with `extractors`:
+
+```json
+"result_parsing_rules": {
+  "extractors": [
+    {
+      "name": "completion_state",
+      "regex": "\\d/6",
+      "capture_groups_mapping": [
+        {
+          "target_field_name": "CompletionState",
+          "group_index": 0,
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "name": "attempts",
+      "regex": "(\\d)/6",
+      "capture_groups_mapping": [
+        {
+          "target_field_name": "Attempts",
+          "group_index": 1,
+          "type": "number"
+        }
+      ]
+    }
+  ]
+}
+```
 
 #### Parser Types
 
-The parser supports several data types:
+The app supports these data types:
 
-1. **number**: Extract a numeric value from text (e.g., "3/6" → 3)
-2. **count**: Count occurrences of emojis or patterns
-3. **boolean**: Check if a pattern exists (true/false)
+1. **boolean**: Checks if a pattern exists (returns true/false)
 
-#### Completion State
+   ```json
+   {
+     "name": "completion_state",
+     "regex": "\\d/6",
+     "capture_groups_mapping": [
+       {
+         "target_field_name": "CompletionState",
+         "group_index": 0,
+         "type": "boolean"
+       }
+     ]
+   }
+   ```
 
-Games can have a success/failure state, which affects:
+2. **number**: Extracts numeric values from text (e.g., "3/6" → 3)
 
-- Which results are included in averages
-- Whether success rate is shown in charts
+   ```json
+   {
+     "name": "attempts",
+     "regex": "(\\d)/6",
+     "capture_groups_mapping": [
+       {
+         "target_field_name": "Attempts",
+         "group_index": 1,
+         "type": "number"
+       }
+     ]
+   }
+   ```
+
+3. **count**: Counts occurrences of specific patterns or emojis
+   ```json
+   {
+     "name": "tries",
+     "regex": "🎮",
+     "capture_groups_mapping": [
+       {
+         "target_field_name": "Tries",
+         "group_index": 0,
+         "type": "count",
+         "count_emojis": ["🟥", "🟩"]
+       }
+     ]
+   }
+   ```
+
+### Display Configuration
+
+The `average_display` property controls how averages are shown on game cards:
 
 ```json
-{
-  "name": "completion_state",
-  "regex": "\\d/6",
-  "capture_groups_mapping": [
-    {
-      "target_field_name": "CompletionState",
-      "group_index": 0,
-      "type": "boolean"
-    }
-  ]
+"average_display": {
+  "field": "Attempts",
+  "template": "30-day avg: {avg}/6",
+  "days": 30
 }
 ```
 
-This example marks Wordle as successful if it contains a pattern like "3/6".
+- `field`: The statistic to average
+- `template`: Format string with `{avg}` placeholder
+- `days`: Number of days to include in the average
 
-#### Parsing Numbers
+### Complete Game Example
 
-To extract numeric values:
-
-```json
-{
-  "name": "attempts",
-  "regex": "(\\d)/6",
-  "capture_groups_mapping": [
-    {
-      "target_field_name": "Attempts",
-      "group_index": 1,
-      "type": "number"
-    }
-  ]
-}
-```
-
-This extracts the number from patterns like "3/6" into an "Attempts" field.
-
-#### Counting Emojis
-
-To count occurrences:
-
-```json
-{
-  "name": "tries",
-  "regex": "🎮",
-  "capture_groups_mapping": [
-    {
-      "target_field_name": "Tries",
-      "group_index": 0,
-      "type": "count",
-      "count_emojis": ["🟥", "🟩"]
-    }
-  ]
-}
-```
-
-This counts the red and green squares in game results.
-
-### Game-Specific Examples
-
-#### 1. Wordle (Success/Failure + Attempts)
+Here's a full example for Wordle:
 
 ```json
 {
@@ -202,11 +227,7 @@ This counts the red and green squares in game results.
 }
 ```
 
-- **Success**: Has a number followed by "/6"
-- **Failure**: Contains "X/6"
-- **Display**: Average attempts of successful games
-
-#### 2. Framed (Visual Game With Attempts)
+And for a game with emoji counting (like Framed):
 
 ```json
 {
@@ -248,72 +269,13 @@ This counts the red and green squares in game results.
 }
 ```
 
-- **Success**: Contains at least one green square (🟩)
-- **Failure**: No green squares
-- **Tracking**: Counts red and green squares as attempts
-- **Note**: Ignores unused attempts (grey/white squares)
-
-#### 3. Scrandle (Score-Only Game)
-
-```json
-{
-  "id": "scrandle",
-  "name": "Scrandle",
-  "url": "https://scrandle.com/",
-  "result_parsing_rules": {
-    "extractors": [
-      {
-        "name": "score",
-        "regex": "(\\d+)/10",
-        "capture_groups_mapping": [
-          {
-            "target_field_name": "Score",
-            "group_index": 1,
-            "type": "number"
-          }
-        ]
-      }
-    ]
-  },
-  "average_display": {
-    "field": "Score",
-    "template": "30-day avg: {avg}/10",
-    "days": 30
-  }
-}
-```
-
-- **No Success/Failure**: Game doesn't have winning/losing concept
-- **Score**: Tracks correct answers out of 10
-- **Chart**: No success rate shown, only score trends
-
-### Display Configuration
-
-The `average_display` section controls how averages appear on game cards:
-
-```json
-"average_display": {
-  "field": "Attempts",    // Field to average
-  "template": "30-day avg: {avg}/6",  // Display format
-  "days": 30              // Time period
-}
-```
-
-### How Charts Work
-
-- Games with `CompletionState` show success rate (percentage of games won)
-- Statistics only include successful attempts in averages if there's a completion state
-- Games without completion state show all metrics without success rate
-
 ### Adding New Games
 
 To add a new game:
 
-1. Copy an existing game's structure
-2. Change the `id`, `name`, and `url`
-3. Define `result_parsing_rules` appropriate for the game:
-   - Include `completion_state` if the game has success/failure
-   - Add extractors for any numeric values you want to track
-   - Choose appropriate display template
+1. Understand the game's output format
+2. Create the basic structure with id, name, and url
+3. Define extractors that match patterns in the game output
+4. Add an average_display configuration if needed
 
-This schema design ensures flexibility across different game types while maintaining consistent tracking.
+Games without parsing rules will still appear but won't track statistics.
