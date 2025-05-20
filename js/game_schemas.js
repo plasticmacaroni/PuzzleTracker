@@ -304,8 +304,122 @@ window.GAMES = [
     },
     {
         id: 'gamedle',
-        name: 'Gamedle',
-        url: 'https://gamedle.wtf',
+        name: 'Gamedle (Guess)',
+        url: 'https://www.gamedle.wtf/guess',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "completion_state",
+                    regex: "🟩",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            group_index: 0,
+                            type: "boolean",
+                            value: true
+                        }
+                    ]
+                },
+                {
+                    name: "tries",
+                    regex: "🕹️",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Tries",
+                            group_index: 0,
+                            type: "count",
+                            count_emojis: ["🟥", "🟨", "🟩"]
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Tries",
+            template: "30-day avg: {avg} tries",
+            days: 30
+        }
+    },
+    {
+        id: 'gamedle-classic',
+        name: 'Gamedle (Classic)',
+        url: 'https://www.gamedle.wtf/classic',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "completion_state",
+                    regex: "🟩",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            group_index: 0,
+                            type: "boolean",
+                            value: true
+                        }
+                    ]
+                },
+                {
+                    name: "tries",
+                    regex: "🕹️",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Tries",
+                            group_index: 0,
+                            type: "count",
+                            count_emojis: ["🟥", "🟨", "🟩"]
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Tries",
+            template: "30-day avg: {avg} tries",
+            days: 30
+        }
+    },
+    {
+        id: 'gamedle-artwork',
+        name: 'Gamedle (Artwork)',
+        url: 'https://www.gamedle.wtf/artwork',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "completion_state",
+                    regex: "🟩",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            group_index: 0,
+                            type: "boolean",
+                            value: true
+                        }
+                    ]
+                },
+                {
+                    name: "tries",
+                    regex: "🕹️",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Tries",
+                            group_index: 0,
+                            type: "count",
+                            count_emojis: ["🟥", "🟨", "🟩"]
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Tries",
+            template: "30-day avg: {avg} tries",
+            days: 30
+        }
+    },
+    {
+        id: 'gamedle-keywords',
+        name: 'Gamedle (Keywords)',
+        url: 'https://www.gamedle.wtf/keywords',
         result_parsing_rules: {
             extractors: [
                 {
