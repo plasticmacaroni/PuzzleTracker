@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PuzzleTracker | Track Your Daily Puzzle Games</title>
+    <meta name="description"
+        content="Track and visualize your performance across various daily puzzle games like Wordle, Connections, and more.">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <!-- Add CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Daily reminder banner -->
+    <div id="reminderBanner" class="reminder-banner hidden">
+        <div class="reminder-message">
+            <strong>⚠️ Reminder:</strong> Your data is stored in your browser. To prevent data loss, remember to export
+            your data regularly.
+        </div>
+        <div class="reminder-actions">
+            <button id="exportDataBanner" class="banner-btn primary">Export Now</button>
+            <button id="dismissBanner" class="banner-btn">Dismiss</button>
+        </div>
+        <button id="closeBanner" class="banner-close">&times;</button>
+    </div>
+
+    <header>
+        <div class="title-container">
+            <h1><i class="fa-solid fa-puzzle-piece"></i> PuzzleTracker</h1>
+            <p class="tagline">Track your daily puzzles. Visualize your progress.</p>
+        </div>
+        <div class="header-actions">
+            <button id="editSchema" class="btn warning-btn"><i class="fa-solid fa-gamepad"></i> Manage Games</button>
+            <button id="exportData" class="btn"><i class="fa-solid fa-file-export"></i> Export</button>
+            <button id="importData" class="btn"><i class="fa-solid fa-file-import"></i> Import</button>
+            <input type="file" id="importFile" accept=".json" style="display: none;">
+        </div>
+    </header>
+
+    <main>
+        <section id="activeGames" class="game-section">
+            <h2><i class="fa-solid fa-clock"></i> Today's Puzzles</h2>
+            <div id="gameList" class="game-grid">
+                <!-- Games will be populated here -->
+            </div>
+        </section>
+
+        <section id="completedGames" class="game-section">
+            <h2><i class="fa-solid fa-check-circle"></i> Completed Puzzles</h2>
+            <div id="completedGameList" class="game-grid">
+                <!-- Completed games will be populated here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal for entering game results -->
+    <div id="resultModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Enter Puzzle Results</h2>
+            <div id="modalContent">
+                <textarea id="resultInput" placeholder="Paste your game results here..."></textarea>
+                <button id="submitResult" class="btn"><i class="fa-solid fa-paper-plane"></i> Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for viewing stats -->
+    <div id="statsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2><i class="fa-solid fa-chart-line"></i> Puzzle Statistics</h2>
+            <div id="statsContent">
+                <div class="chart-container">
+                    <canvas id="statsChart"></canvas>
+                </div>
+                <div class="history-container">
+                    <h3>History</h3>
+                    <div id="historyList" class="history-list">
+                        <!-- History entries will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Schema Modal -->
+    <div id="schemaModal" class="modal">
+        <div class="modal-content schema-modal">
+            <span class="close">&times;</span>
+            <h2>Game Management</h2>
+            <div class="modal-tabs">
+                <button id="manageTab" class="tab-btn active">Manage Games</button>
+                <button id="quickAddTab" class="tab-btn">Add Game</button>
+                <button id="advancedTab" class="tab-btn">Advanced</button>
+            </div>
+
+            <div id="manageSection" class="modal-tab-content">
+                <div class="manage-games-description">
+                    <p>Here you can manage which games appear in your tracker:</p>
+                    <ul>
+                        <li><strong>Hide</strong>: Default games can be hidden but not removed completely</li>
+                        <li><strong>Remove</strong>: Custom-added games can be completely removed</li>
+                        <li><strong>Unhide</strong>: Hidden games can be restored at any time</li>
+                    </ul>
+                </div>
+                <div class="manage-games-container">
+                    <div class="games-list-section">
+                        <h3>Active Games</h3>
+                        <div id="activeGamesList" class="games-list"></div>
+                    </div>
+                    <div class="games-list-section">
+                        <h3>Hidden Games</h3>
+                        <div id="hiddenGamesList" class="games-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quickAddSection" class="modal-tab-content" style="display: none;">
+                <h3>Quick Add Game</h3>
+                <div class="quick-add-form">
+                    <p class="note">Note: Games added this way won't have statistics tracking until schema is edited
+                        manually.</p>
+                    <div class="form-group">
+                        <label for="quickAddName">Game Name:</label>
+                        <input type="text" id="quickAddName" placeholder="Enter game name">
+                    </div>
+                    <div class="form-group">
+                        <label for="quickAddUrl">Game URL:</label>
+                        <input type="url" id="quickAddUrl" placeholder="https://example.com">
+                    </div>
+                    <button id="quickAddGame" class="btn">Add Game</button>
+                </div>
+            </div>
+
+            <div id="advancedSection" class="modal-tab-content" style="display: none;">
+                <h3>Advanced Configuration</h3>
+                <div class="warning-box">
+                    <h3>⚠️ Warning</h3>
+                    <p>Editing the game schema requires knowledge of JavaScript and regular expressions. Incorrect
+                        modifications may break the app's functionality.</p>
+                </div>
+
+                <div class="schema-actions">
+                    <button id="editSchemaManually" class="btn warning-btn">Edit Schema Manually</button>
+                </div>
+
+                <div id="schemaEditor" class="schema-editor" style="display: none;">
+                    <textarea id="schemaInput" placeholder="Paste your game schema here..."></textarea>
+                    <div class="schema-buttons">
+                        <button id="saveSchema" class="btn">Save Changes</button>
+                        <button id="cancelSchema" class="btn secondary-btn">Cancel</button>
+                    </div>
+                </div>
+
+                <hr class="section-divider">
+
+                <h3>Schema Sharing</h3>
+                <p class="schema-sharing-info">Share your game configurations or import configurations from others.</p>
+                <div class="schema-sharing-buttons">
+                    <button id="exportSchemaOnly" class="btn">Export Game Schema</button>
+                    <button id="importSchemaOnly" class="btn">Import Game Schema</button>
+                    <input type="file" id="importSchemaFile" accept=".json" style="display: none;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manage Games Modal -->
+    <div id="manageGamesModal" class="modal">
+        <div class="modal-content manage-games-modal">
+            <span class="close">&times;</span>
+            <h2>Manage Games</h2>
+            <div class="manage-games-description">
+                <p>Here you can manage which games appear in your tracker:</p>
+                <ul>
+                    <li><strong>Hide</strong>: Default games can be hidden but not removed completely</li>
+                    <li><strong>Remove</strong>: Custom-added games can be completely removed</li>
+                    <li><strong>Unhide</strong>: Hidden games can be restored at any time</li>
+                </ul>
+            </div>
+            <div class="manage-games-container">
+                <div class="games-list-section">
+                    <h3>Active Games</h3>
+                    <div id="activeGamesList" class="games-list"></div>
+                </div>
+                <div class="games-list-section">
+                    <h3>Hidden Games</h3>
+                    <div id="hiddenGamesList" class="games-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/lint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.13.4/jshint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/lint/javascript-lint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/hint/javascript-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.min.js"></script>
+
+    <!-- Chart.js and its dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+
+    <!-- Chroma.js for color manipulation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js"></script>
+
+    <!-- Vibrant.js for color extraction from images -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/node-vibrant/3.1.6/vibrant.min.js"></script>
+
+    <!-- Our app code -->
+    <script src="js/game_schemas.js"></script>
+    <script src="js/parser.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>
