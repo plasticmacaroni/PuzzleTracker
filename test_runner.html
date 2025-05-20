@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Jasmine Tests - GuessrTrackr</title>
+
+    <!-- Load Jasmine Framework (Update version if needed) -->
+    <link rel="shortcut icon" type="image/png" href="jasmine/lib/jasmine-5.7.1/jasmine_favicon.png">
+    <link rel="stylesheet" href="jasmine/lib/jasmine-5.7.1/jasmine.css">
+
+    <script src="jasmine/lib/jasmine-5.7.1/jasmine.js"></script>
+    <script src="jasmine/lib/jasmine-5.7.1/jasmine-html.js"></script>
+    <script src="jasmine/lib/jasmine-5.7.1/boot0.js"></script>
+    <script src="jasmine/lib/jasmine-5.7.1/boot1.js"></script>
+
+    <!-- 1. Define G_TEST_CONFIG (Test-specific Schemas) -->
+    <script>
+        const G_TEST_CONFIG = [
+            {
+                id: 'wordle-test', // Test-specific version of Wordle
+                name: 'Wordle (Test Config)',
+                url: 'http://test.com/wordle',
+                result_parsing_rules: {
+                    extractors: [
+                        { name: "attempts", regex: "(\\d)/6", capture_groups_mapping: [{ target_field_name: "Attempts", group_index: 1, type: "number" }] },
+                        { name: "completion_state_X", regex: "X/6", capture_groups_mapping: [{ target_field_name: "CompletionState", type: "boolean", value: false }] },
+                        { name: "completion_state_num", regex: "\\d/6", capture_groups_mapping: [{ target_field_name: "CompletionState", type: "boolean", value: true }] }
+                    ]
+                },
+                average_display: { field: "Attempts", template: "Avg: {avg}/6", days: 30 }
+            },
+            {
+                id: 'nyt-connections-test', // Test-specific version of NYT Connections
+                name: 'NYT Connections (Test Config)',
+                url: 'http://test.com/nyt-connections',
+                result_parsing_rules: {
+                    extractors: [
+                        {
+                            name: "completion_state_success",
+                            regex: "^(?=.*🟨🟨🟨🟨)(?=.*🟩🟩🟩🟩)(?=.*🟦🟦🟦🟦)(?=.*🟪🟪🟪🟪).*",
+                            capture_groups_mapping: [
+                                { target_field_name: "CompletionState", type: "boolean", value: true }
+                            ]
+                        },
+                        {
+                            name: "attempts_extractor",
+                            regex: "[🟨🟩🟦🟪]{1,4}\\s*(?:\\r?\\n|$)",
+                            capture_groups_mapping: [
+                                { target_field_name: "Attempts", type: "count" }
+                            ]
+                        }
+                    ]
+                },
+                average_display: { field: "Attempts", template: "Avg: {avg} attempts", days: 30 }
+            }
+            // Add other test-only schemas here if needed.
+        ];
+    </script>
+
+    <!-- 2. Load LIVE Game Schemas (populates window.GAMES) -->
+    <script src="js/game_schemas.js"></script>
+
+    <!-- 3. Initialize GAMES_DEFAULT by merging live and test schemas -->
+    <script>
+        console.log('[DEBUG] window.GAMES before merge:', JSON.parse(JSON.stringify(window.GAMES || []))); // Added for debugging
+        let mergedSchemas = [];
+        const liveSchemas = window.GAMES || []; // Schemas from game_schemas.js
+        const testConfigSchemas = G_TEST_CONFIG || []; // Schemas from G_TEST_CONFIG
+
+        // Create a map of testConfigSchemas for easy lookup and override
+        const testSchemaMap = new Map();
+        testConfigSchemas.forEach(schema => testSchemaMap.set(schema.id, schema));
+
+        // Add live schemas, potentially replacing with test config versions
+        liveSchemas.forEach(liveSchema => {
+            if (testSchemaMap.has(liveSchema.id)) {
+                // Test config overrides live schema for the same ID
+                mergedSchemas.push(testSchemaMap.get(liveSchema.id));
+                testSchemaMap.delete(liveSchema.id); // Remove from map to avoid re-adding
+            } else {
+                mergedSchemas.push(liveSchema);
+            }
+        });
+
+        // Add any remaining testConfigSchemas that weren't overrides
+        testSchemaMap.forEach(testSchema => mergedSchemas.push(testSchema));
+
+        window.GAMES_DEFAULT = JSON.parse(JSON.stringify(mergedSchemas));
+        console.log('test_runner.html: GAMES_DEFAULT initialized from merged live and G_TEST_CONFIG schemas. Count:', window.GAMES_DEFAULT.length);
+        if (!liveSchemas.length) {
+            console.warn("test_runner.html: window.GAMES (from js/game_schemas.js) was empty or not found.");
+        }
+
+        // Mock minimal window.app
+        window.app = {
+            showToast: function (title, message, type, duration) {
+                console.log(`Mock Toast: [${type}] ${title} - ${message}`);
+            }
+        };
+    </script>
+
+    <!-- 4. Load Your Application Utility Code -->
+    <script src="js/parser.js"></script>
+    <script src="js/storage.js"></script>
+    <!-- app.js is still not loaded to avoid UI init -->
+
+
+    <!-- 5. Load Your Test Code -->
+    <script src="tests/parser.spec.js"></script>
+    <script src="tests/storage.spec.js"></script>
+    <!-- Add more .spec.js files as needed -->
+
+</head>
+
+<body>
+    <!-- Jasmine will populate this page with test results -->
+</body>
+
+</html>
