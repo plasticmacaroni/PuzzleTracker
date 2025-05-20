@@ -248,6 +248,17 @@ class Storage {
         return results.some(result => result.date === today);
     }
 
+    getLatestGameResult(gameId, dateString) {
+        const results = this.getGameResults(gameId);
+        if (!results || results.length === 0) {
+            return null;
+        }
+        // Assuming one result per day, find the one matching the dateString.
+        // If multiple results for the same day were possible, this would need more logic
+        // to determine which is truly the "latest". For now, simple date match.
+        return results.find(result => result.date === dateString) || null;
+    }
+
     exportData() {
         // Enhanced export that includes both user data and custom games
         const exportData = {

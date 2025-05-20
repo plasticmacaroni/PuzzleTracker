@@ -73,6 +73,11 @@ window.GAMES = [
                             target_field_name: "Correct Guesses",
                             group_index: 1,
                             type: "number"
+                        },
+                        {
+                            target_field_name: "CompletionState",
+                            type: "boolean",
+                            value: true
                         }
                     ]
                 }
@@ -364,6 +369,11 @@ window.GAMES = [
                             target_field_name: "Score",
                             group_index: 1,
                             type: "number"
+                        },
+                        {
+                            target_field_name: "CompletionState",
+                            type: "boolean",
+                            value: true
                         }
                     ]
                 }

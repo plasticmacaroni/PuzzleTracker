@@ -609,14 +609,14 @@ class App {
         let requiresFullListReRender = false;
 
         // Presumed IDs for the elements to be hidden/shown
-        const completedGamesHeader = document.getElementById('completed-games-header');
+        const completedGamesHeader = document.getElementById('completed-puzzles-header');
         const addGameButton = document.getElementById('add-game-btn');
 
         // Check if any game's hidden status has changed compared to what's displayed
         const currentlyDisplayedGameIds = new Set([...activeList.children, ...completedList.children].map(card => card.dataset.gameId));
-        const allGamesFromStorage = window.storage.getGames(); // Includes hidden status
+        const allGameSchemas = window.GAMES || []; // Correct: Use the global GAMES array
 
-        allGamesFromStorage.forEach(game => {
+        allGameSchemas.forEach(game => {
             const isCurrentlyDisplayed = currentlyDisplayedGameIds.has(game.id);
             const shouldBeDisplayed = !window.storage.isGameHidden(game.id);
 
@@ -629,7 +629,7 @@ class App {
         if (requiresFullListReRender) {
             activeList.innerHTML = '';
             completedList.innerHTML = '';
-            const gamesToDisplay = allGamesFromStorage.filter(game => !window.storage.isGameHidden(game.id));
+            const gamesToDisplay = allGameSchemas.filter(game => !window.storage.isGameHidden(game.id));
             gamesToDisplay.forEach(game => {
                 const card = this.createGameCard(game);
                 // Initial placement logic (will be refined below)
@@ -645,15 +645,83 @@ class App {
         // Iterate over all cards in both lists (active and completed)
         [...activeList.children, ...completedList.children].forEach(card => {
             const gameId = card.getAttribute('data-game-id');
-            // Ensure we only check cards that are supposed to be visible (should be true if we passed the first block)
-            if (!currentlyDisplayedGameIds.has(gameId)) return;
+            if (!currentlyDisplayedGameIds.has(gameId)) return; // Card is already gone or shouldn't be there
+
+            const gameSchema = allGameSchemas.find(g => g.id === gameId);
+
+            // ---- Start: Update average display text and structure ----
+            if (gameSchema && gameSchema.average_display) {
+                const avgValue = storage.getGameAverage(
+                    gameSchema.id,
+                    gameSchema.average_display.field,
+                    gameSchema.average_display.days
+                );
+
+                let displayText = '';
+                if (avgValue) { // If getGameAverage returned a value
+                    const template = gameSchema.average_display.template;
+                    if (template.includes('{avg:')) {
+                        displayText = template.replace(/{avg:[^}]+}/, avgValue);
+                    } else {
+                        displayText = template.replace('{avg}', avgValue);
+                    }
+                }
+
+                let averageDisplayElement = card.querySelector('.average-display');
+                let cardDividerElement = card.querySelector('.card-divider');
+                const cardTopRow = card.querySelector('.card-top-row');
+
+                if (displayText) { // If there's an average to display
+                    if (!averageDisplayElement && cardTopRow) { // If section doesn't exist, create it
+                        // Create divider if it doesn't exist
+                        if (!cardDividerElement) {
+                            cardDividerElement = document.createElement('div');
+                            cardDividerElement.className = 'card-divider';
+                            cardTopRow.after(cardDividerElement); // Insert divider after top row
+                        }
+
+                        // Create average display div (should be after divider)
+                        averageDisplayElement = document.createElement('div');
+                        averageDisplayElement.className = 'average-display';
+                        if (cardDividerElement) {
+                            cardDividerElement.after(averageDisplayElement);
+                        } else { // Should not happen if divider is created, but as fallback
+                            cardTopRow.after(averageDisplayElement);
+                        }
+                    }
+                    // Update text content if the element exists (it should by now)
+                    if (averageDisplayElement) {
+                        averageDisplayElement.textContent = displayText;
+                    }
+                } else { // No average to display, remove the section
+                    if (averageDisplayElement) averageDisplayElement.remove();
+                    // Also remove divider if it's tied to the average display's existence
+                    if (cardDividerElement) cardDividerElement.remove();
+                }
+            }
+            // ---- End: Update average display ----
 
             const isInCompletedList = card.parentElement === completedList;
-            const shouldBeInCompletedList = allGamesFromStorage.some(g => g.id === gameId && !window.storage.isGameHidden(g.id));
+            let gameShouldBeInCompleted = false;
 
-            if (isInCompletedList !== shouldBeInCompletedList) {
-                cardsToReRender.add(gameId);
+            if (gameSchema && !window.storage.isGameHidden(gameId)) {
+                const latestResultToday = window.storage.getLatestGameResult(gameId, today);
+                if (latestResultToday) {
+                    gameShouldBeInCompleted = true;
+                }
             }
+
+            if (isInCompletedList !== gameShouldBeInCompleted) {
+                if (gameShouldBeInCompleted) {
+                    completedList.appendChild(card);
+                    card.classList.add('completed');
+                } else {
+                    activeList.appendChild(card);
+                    card.classList.remove('completed');
+                }
+            }
+            // Always call applyCardColors to update styles based on completion, dark mode, and new average text/colors
+            this.applyCardColors(card);
         });
 
         // After all cards are processed and potentially moved:
@@ -661,32 +729,21 @@ class App {
         // 1. Visibility for "Completed Games" header
         if (completedGamesHeader) {
             if (completedList.children.length === 0) {
-                completedGamesHeader.style.display = 'none';
+                completedGamesHeader.style.display = 'none'; // Hide if empty
             } else {
-                completedGamesHeader.style.display = ''; // Restore default display
+                completedGamesHeader.style.display = ''; // Show if not empty (restore default)
             }
         }
 
-        // 2. Visibility for "New Game" button
-        // "Hide 'New Game' unless 'Completed' (header) is visible"
-        if (addGameButton && completedGamesHeader) {
-            if (completedGamesHeader.style.display === 'none') {
-                // If Completed section is hidden, hide New Game button
-                addGameButton.style.display = 'none';
-            } else {
-                // Otherwise (Completed section is visible), show New Game button
-                addGameButton.style.display = ''; // Restore default display
-            }
-        } else if (addGameButton && !completedGamesHeader) {
-            // If there's no completedGamesHeader element, assume New Game button should always be visible
-            // or handle based on other logic if needed. For now, keep it visible by default if header is missing.
-            addGameButton.style.display = '';
+        // 2. Visibility for "New Game" button - Ensure it's always visible
+        if (addGameButton) {
+            addGameButton.style.display = ''; // Restore default display (always visible)
         }
 
         // If any cards were marked for re-render, do it now (simplified)
-        cardsToReRender.forEach(gameId => {
-            this.updateCardPositions();
-        });
+        // cardsToReRender.forEach(gameId => {  // This loop is no longer needed as cards are moved directly
+        //     this.updateCardPositions();
+        // });
     }
 
     createGameCard(game) {
@@ -702,7 +759,7 @@ class App {
         this.addRandomPuzzleDecoration(card);
 
         // Get average if configured
-        let averageDisplay = '';
+        let averageDisplayHtml = ''; // Initialize to empty string
         if (game.average_display) {
             const avg = storage.getGameAverage(
                 game.id,
@@ -710,19 +767,22 @@ class App {
                 game.average_display.days
             );
 
-            if (avg) {
-                // Handle any format specifiers in the template
+            if (avg) { // Only if avg is not null or empty (or a non-empty string)
                 const template = game.average_display.template;
+                let displayText = '';
                 if (template.includes('{avg:')) {
                     // The getGameAverage method already returns formatted value for format specifiers
-                    averageDisplay = template.replace(/{avg:[^}]+}/, avg);
+                    displayText = template.replace(/{avg:[^}]+}/, avg);
                 } else {
                     // Simple {avg} replacement
-                    averageDisplay = template.replace('{avg}', avg);
+                    displayText = template.replace('{avg}', avg);
                 }
-            } else {
-                averageDisplay = 'New Game!';
+                averageDisplayHtml = `
+                    <div class="card-divider"></div>
+                    <div class="average-display">${displayText}</div>
+                `;
             }
+            // If avg is null/undefined/empty, averageDisplayHtml remains '', so "New Game!" and its div won't be rendered.
         }
 
         card.innerHTML = `
@@ -732,10 +792,7 @@ class App {
                 </div>
                 <h3 class="card-title">${game.name}</h3>
             </div>
-            ${averageDisplay ? `
-            <div class="card-divider"></div>
-            <div class="average-display">${averageDisplay}</div>
-            ` : ''}
+            ${averageDisplayHtml}
             <div class="game-actions">
                 <button class="btn play-btn" data-url="${game.url}">Play</button>
                 <button class="btn stats-btn" data-game="${game.id}">Stats</button>
@@ -1343,10 +1400,13 @@ class App {
         // Show banner after a short delay
         setTimeout(() => {
             const banner = document.getElementById('reminderBanner');
-            banner.classList.remove('hidden');
-
-            // Mark as shown today
-            localStorage.setItem('reminderBannerLastShown', today);
+            if (banner) { // Check if the banner element exists
+                banner.classList.remove('hidden');
+                // Mark as shown today
+                localStorage.setItem('reminderBannerLastShown', today);
+            } else {
+                console.warn("Reminder banner element with ID 'reminderBanner' not found.");
+            }
         }, 1000);
     }
 
@@ -1370,7 +1430,9 @@ class App {
 
     hideBanner() {
         const banner = document.getElementById('reminderBanner');
-        banner.classList.add('hidden');
+        if (banner) { // Check if the banner element exists
+            banner.classList.add('hidden');
+        }
     }
 }
 

@@ -127,6 +127,14 @@ class Parser {
             failureMatch = failurePatterns.some(pattern => pattern.test(rawOutput));
         }
 
+        // if (gameId === 'wordle') {
+        //     console.log(`[Parser Debug wordle] hasSuccessPatterns: ${hasSuccessPatterns}, successMatch: ${successMatch}`);
+        //     console.log(`[Parser Debug wordle] successPatterns:`, successPatterns.map(p=>p.source));
+        //     console.log(`[Parser Debug wordle] hasFailurePatterns: ${hasFailurePatterns}, failureMatch: ${failureMatch}`);
+        //     console.log(`[Parser Debug wordle] failurePatterns:`, failurePatterns.map(p=>p.source));
+        //     console.log(`[Parser Debug wordle] Raw output (first 30 chars): "${rawOutput.substring(0, 30)}"`);
+        // }
+
         if (hasSuccessPatterns && hasFailurePatterns) { // Both success and failure patterns defined
             if (successMatch) {
                 completionStateValue = true;
