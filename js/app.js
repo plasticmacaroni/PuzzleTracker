@@ -605,86 +605,87 @@ class App {
         const activeList = document.getElementById('gameList');
         const completedList = document.getElementById('completedGameList');
         const today = this.getLocalDateString();
+        let cardsToReRender = new Set(); // Game IDs that need full re-render
+        let requiresFullListReRender = false;
 
-        let needsUpdate = false;
+        // Presumed IDs for the elements to be hidden/shown
+        const completedGamesHeader = document.getElementById('completed-games-header');
+        const addGameButton = document.getElementById('add-game-btn');
 
-        // 1. Check if the set of currently rendered game cards matches the set of games that should be visible.
-        const expectedVisibleGameIds = new Set();
-        window.GAMES.forEach(game => {
-            if (!storage.isGameHidden(game.id)) {
-                expectedVisibleGameIds.add(game.id);
+        // Check if any game's hidden status has changed compared to what's displayed
+        const currentlyDisplayedGameIds = new Set([...activeList.children, ...completedList.children].map(card => card.dataset.gameId));
+        const allGamesFromStorage = window.storage.getGames(); // Includes hidden status
+
+        allGamesFromStorage.forEach(game => {
+            const isCurrentlyDisplayed = currentlyDisplayedGameIds.has(game.id);
+            const shouldBeDisplayed = !window.storage.isGameHidden(game.id);
+
+            if (isCurrentlyDisplayed !== shouldBeDisplayed) {
+                requiresFullListReRender = true;
             }
         });
 
-        const renderedCardElements = document.querySelectorAll('#gameList > .game-card, #completedGameList > .game-card');
-        const renderedGameIds = new Set(Array.from(renderedCardElements).map(card => card.getAttribute('data-game-id')));
-
-        if (expectedVisibleGameIds.size !== renderedGameIds.size) {
-            needsUpdate = true;
-        } else {
-            // Sizes are the same, check if all expected IDs are present.
-            // If an expected ID is missing, it means a rendered ID is there that shouldn't be (or vice-versa for an unhide operation if counts were same due to a coincidental hide+unhide of different games).
-            for (const id of expectedVisibleGameIds) {
-                if (!renderedGameIds.has(id)) {
-                    needsUpdate = true;
-                    break;
-                }
-            }
-        }
-
-        // 2. If the correct set of cards is already rendered, then check if any are in the wrong list (active/completed).
-        if (!needsUpdate) {
-            const gameCompletionStatus = new Map(); // Map gameId to hasTodayResult for visible games
-            window.GAMES.forEach(game => {
-                if (!storage.isGameHidden(game.id)) { // Only for visible games
-                    const results = storage.getGameResults(game.id);
-                    const hasTodayResult = results.some(result => result.date === today);
-                    gameCompletionStatus.set(game.id, hasTodayResult);
-                }
-            });
-
-            renderedCardElements.forEach(card => {
-                const gameId = card.getAttribute('data-game-id');
-                // Ensure we only check cards that are supposed to be visible (should be true if we passed the first block)
-                if (!expectedVisibleGameIds.has(gameId)) return;
-
-                const isInCompletedList = card.parentElement === completedList;
-                const shouldBeInCompletedList = gameCompletionStatus.get(gameId);
-
-                if (isInCompletedList !== shouldBeInCompletedList) {
-                    needsUpdate = true;
-                    // No need to break early, allow loop to finish in case of multiple changes,
-                    // though one is enough to trigger full re-render.
+        // If a full re-render is needed (e.g. game unhidden), clear lists and rebuild
+        if (requiresFullListReRender) {
+            activeList.innerHTML = '';
+            completedList.innerHTML = '';
+            const gamesToDisplay = allGamesFromStorage.filter(game => !window.storage.isGameHidden(game.id));
+            gamesToDisplay.forEach(game => {
+                const card = this.createGameCard(game);
+                // Initial placement logic (will be refined below)
+                const lastResult = window.storage.getLatestGameResult(game.id, today);
+                if (lastResult && lastResult.CompletionState === true) {
+                    completedList.appendChild(card);
+                } else {
+                    activeList.appendChild(card);
                 }
             });
         }
 
-        // console.log('Needs update:', needsUpdate); // For debugging, can be removed
-        if (!needsUpdate) return;
+        // Iterate over all cards in both lists (active and completed)
+        [...activeList.children, ...completedList.children].forEach(card => {
+            const gameId = card.getAttribute('data-game-id');
+            // Ensure we only check cards that are supposed to be visible (should be true if we passed the first block)
+            if (!currentlyDisplayedGameIds.has(gameId)) return;
 
-        // --- Full re-render logic if needsUpdate is true ---
-        activeList.innerHTML = '';
-        completedList.innerHTML = '';
+            const isInCompletedList = card.parentElement === completedList;
+            const shouldBeInCompletedList = allGamesFromStorage.some(g => g.id === gameId && !window.storage.isGameHidden(g.id));
 
-        const gamesToProcess = window.GAMES.filter(game => !storage.isGameHidden(game.id));
-
-        // Determine completion status for all games to process *once*
-        const finalGameCompletionStatus = new Map();
-        gamesToProcess.forEach(game => {
-            const results = storage.getGameResults(game.id);
-            const hasTodayResult = results.some(result => result.date === today);
-            finalGameCompletionStatus.set(game.id, hasTodayResult);
+            if (isInCompletedList !== shouldBeInCompletedList) {
+                cardsToReRender.add(gameId);
+            }
         });
 
-        gamesToProcess.forEach(game => {
-            const card = this.createGameCard(game); // createGameCard sets 'completed' class based on storage
-            const hasTodayResult = finalGameCompletionStatus.get(game.id);
+        // After all cards are processed and potentially moved:
 
-            if (hasTodayResult) {
-                completedList.appendChild(card);
+        // 1. Visibility for "Completed Games" header
+        if (completedGamesHeader) {
+            if (completedList.children.length === 0) {
+                completedGamesHeader.style.display = 'none';
             } else {
-                activeList.appendChild(card);
+                completedGamesHeader.style.display = ''; // Restore default display
             }
+        }
+
+        // 2. Visibility for "New Game" button
+        // "Hide 'New Game' unless 'Completed' (header) is visible"
+        if (addGameButton && completedGamesHeader) {
+            if (completedGamesHeader.style.display === 'none') {
+                // If Completed section is hidden, hide New Game button
+                addGameButton.style.display = 'none';
+            } else {
+                // Otherwise (Completed section is visible), show New Game button
+                addGameButton.style.display = ''; // Restore default display
+            }
+        } else if (addGameButton && !completedGamesHeader) {
+            // If there's no completedGamesHeader element, assume New Game button should always be visible
+            // or handle based on other logic if needed. For now, keep it visible by default if header is missing.
+            addGameButton.style.display = '';
+        }
+
+        // If any cards were marked for re-render, do it now (simplified)
+        cardsToReRender.forEach(gameId => {
+            this.updateCardPositions();
         });
     }
 
