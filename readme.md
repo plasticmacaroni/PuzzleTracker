@@ -118,55 +118,132 @@ To track stats, add a `result_parsing_rules` object with `extractors`:
 
 #### Parser Types
 
-The app supports these data types:
+The app supports these data types for `capture_groups_mapping` entries:
 
-1. **boolean**: Checks if a pattern exists (returns true/false)
+1.  **`number`**: Extracts numeric values from text. The extracted value (from `group_index` or the full match of the extractor's `regex` if `group_index` is omitted) is parsed into a floating-point number. Commas are removed before parsing.
 
-   ```json
-   {
-     "name": "completion_state",
-     "regex": "\\d/6",
-     "capture_groups_mapping": [
-       {
-         "target_field_name": "CompletionState",
-         "group_index": 0,
-         "type": "boolean"
-       }
-     ]
-   }
-   ```
+    ```json
+    {
+      "name": "attempts_parser", // Extractor name
+      "regex": "Attempts: (\\\\d+)", // Main regex for the extractor
+      "capture_groups_mapping": [
+        {
+          "target_field_name": "Attempts", // Field to store the result
+          "group_index": 1, // Use the first captured group from "regex"
+          "type": "number"
+        }
+      ]
+    }
+    ```
 
-2. **number**: Extracts numeric values from text (e.g., "3/6" → 3)
+2.  **`boolean`**: Determines a true/false value. Its behavior depends on whether it's used for the special `CompletionState` field or a regular field.
 
-   ```json
-   {
-     "name": "attempts",
-     "regex": "(\\d)/6",
-     "capture_groups_mapping": [
-       {
-         "target_field_name": "Attempts",
-         "group_index": 1,
-         "type": "number"
-       }
-     ]
-   }
-   ```
+    - **For `CompletionState` field:**
 
-3. **count**: Counts occurrences of specific patterns or emojis
-   ```json
-   {
-     "name": "tries",
-     "regex": "🎮",
-     "capture_groups_mapping": [
-       {
-         "target_field_name": "Tries",
-         "group_index": 0,
-         "type": "count",
-         "count_emojis": ["🟥", "🟩"]
-       }
-     ]
-   }
-   ```
+      - The mapping **must** include an explicit `value: true` or `value: false` property.
+      - The `parser.js` will look for all `CompletionState` boolean extractors.
+      - If an extractor's `regex` matches and its mapping has `value: true`, it's a "success pattern."
+      - If an extractor's `regex` matches and its mapping has `value: false`, it's a "failure pattern."
+      - `CompletionState` is then determined as follows:
+        - If both success and failure patterns are defined: `true` if a success pattern matches, `false` if a failure pattern matches. If neither matches, `CompletionState` is `undefined`.
+        - If only success patterns are defined: `true` if a success pattern matches, otherwise `false`.
+        - If only failure patterns are defined: `false` if a failure pattern matches, otherwise `true`.
+        - If no `CompletionState` boolean extractors are defined, `CompletionState` remains `undefined` from parsing.
+      - The `group_index` property is typically not needed for `CompletionState` boolean mappings, as the match of the extractor's `regex` itself is the condition.
+
+      ```json
+      // Example: Wordle-like success
+      {
+        "name": "wordle_success_state",
+        "regex": "\\\\b[1-6]/6\\\\b", // e.g., "3/6"
+        "capture_groups_mapping": [
+          {
+            "target_field_name": "CompletionState",
+            "type": "boolean",
+            "value": true // Explicitly true on match
+          }
+        ]
+      },
+      // Example: Wordle-like failure
+      {
+        "name": "wordle_failure_state",
+        "regex": "\\\\bX/6\\\\b", // e.g., "X/6"
+        "capture_groups_mapping": [
+          {
+            "target_field_name": "CompletionState",
+            "type": "boolean",
+            "value": false // Explicitly false on match
+          }
+        ]
+      }
+      ```
+
+    - **For other boolean fields (not `CompletionState`):**
+
+      - If the main extractor's `regex` matches:
+        - If the mapping includes an explicit `value: true` or `value: false`, that value is used.
+        - If the mapping does _not_ include an explicit `value` property, the result defaults to `true`.
+      - If the main extractor's `regex` does not match, the field is not set (remains undefined).
+
+      ```json
+      {
+        "name": "feature_active_parser",
+        "regex": "Feature: ENABLED", // Main regex for the extractor
+        "capture_groups_mapping": [
+          {
+            "target_field_name": "IsFeatureActive",
+            // "group_index" could be used if checking a part of the match
+            "type": "boolean"
+            // Defaults to true if "Feature: ENABLED" is found
+            // Or, add "value: true" for clarity, or "value: some_condition" if needed
+          }
+        ]
+      }
+      ```
+
+3.  **`count`**: Counts occurrences of patterns.
+
+    - If `count_emojis` (an array of strings/emojis) is provided in the mapping:
+      - It counts all occurrences of each specified emoji/string globally within the entire raw output.
+      - The extractor's main `regex` is _not_ used for counting in this case.
+    - If `count_emojis` is _not_ provided:
+      - It counts all global occurrences of the extractor's main `regex` pattern within the entire raw output (using a global flag `g` and Unicode flag `u`).
+    - The `group_index` property is not used for `count` type.
+
+    ```json
+    // Example: Counting specific emojis
+    {
+      "name": "reaction_counter",
+      "regex": "Reactions:", // This regex is informational if count_emojis is used
+      "capture_groups_mapping": [
+        {
+          "target_field_name": "ThumbsUpCount",
+          "type": "count",
+          "count_emojis": ["👍", "👍🏻", "👍🏼", "👍🏽", "👍🏾", "👍🏿"]
+        }
+      ]
+    }
+    ```
+
+    ```json
+    // Example: Counting regex pattern matches
+    {
+      "name": "mistake_counter",
+      "regex": "Mistake Found", // This regex IS used for counting
+      "capture_groups_mapping": [
+        {
+          "target_field_name": "TotalMistakes",
+          "type": "count"
+          // Counts occurrences of "Mistake Found"
+        }
+      ]
+    }
+    ```
+
+**Important Notes on Extractor Logic:**
+
+- For all mapping types **except `count`**, the main `regex` of the extractor **must match** somewhere in the raw output for its `capture_groups_mapping` to be processed. If the extractor's `regex` doesn't match, the fields defined in its mapping will not be set.
+- For `count` type, the counting happens globally on the raw output, either based on `count_emojis` or the extractor's `regex`.
 
 ### Display Configuration
 
@@ -186,7 +263,7 @@ The `average_display` property controls how averages are shown on game cards:
 
 ### Complete Game Example
 
-Here's a full example for Wordle:
+Here's a full example for Wordle, reflecting the detailed `CompletionState` logic:
 
 ```json
 {
@@ -196,19 +273,30 @@ Here's a full example for Wordle:
   "result_parsing_rules": {
     "extractors": [
       {
-        "name": "completion_state",
-        "regex": "\\d/6",
+        "name": "completion_state_success",
+        "regex": "\\\\b[1-6]/6\\\\b", // Matches "X/6" where X is 1-6
         "capture_groups_mapping": [
           {
             "target_field_name": "CompletionState",
-            "group_index": 0,
-            "type": "boolean"
+            "type": "boolean",
+            "value": true
           }
         ]
       },
       {
-        "name": "attempts",
-        "regex": "(\\d)/6",
+        "name": "completion_state_failure",
+        "regex": "\\\\bX/6\\\\b", // Matches "X/6" (loss)
+        "capture_groups_mapping": [
+          {
+            "target_field_name": "CompletionState",
+            "type": "boolean",
+            "value": false
+          }
+        ]
+      },
+      {
+        "name": "attempts_parser",
+        "regex": "\\\\b(\\\\d)/6\\\\b", // Captures the number of attempts if not X/6
         "capture_groups_mapping": [
           {
             "target_field_name": "Attempts",
@@ -237,25 +325,27 @@ And for a game with emoji counting (like Framed):
   "result_parsing_rules": {
     "extractors": [
       {
-        "name": "completion_state",
-        "regex": "🟩",
+        "name": "completion_state_success_green_square",
+        "regex": "🟩", // Green square indicates a successful guess/completion
         "capture_groups_mapping": [
           {
             "target_field_name": "CompletionState",
-            "group_index": 0,
-            "type": "boolean"
+            // "group_index": 0, // Not strictly needed if just checking regex match
+            "type": "boolean",
+            "value": true
           }
         ]
       },
       {
-        "name": "tries",
-        "regex": "🎥",
+        "name": "tries_counter_emojis",
+        // This regex is mainly for context if count_emojis is used,
+        // but it could also be a broader pattern that contains the emojis.
+        "regex": "Framed #\\\\d+",
         "capture_groups_mapping": [
           {
             "target_field_name": "Tries",
-            "group_index": 0,
             "type": "count",
-            "count_emojis": ["🟥", "🟩"]
+            "count_emojis": ["🟥", "🟩"] // Counts red and green squares
           }
         ]
       }

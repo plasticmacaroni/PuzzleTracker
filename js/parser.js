@@ -80,17 +80,6 @@ class Parser {
                                 value = parseFloat(String(value).replace(/,/g, ''));
                                 break;
                             // 'count' is handled above
-                            case 'enum':
-                                let foundEnum = false;
-                                for (const [pattern, enumValue] of Object.entries(mapping.values)) {
-                                    if (new RegExp(pattern).test(String(value))) {
-                                        value = enumValue;
-                                        foundEnum = true;
-                                        break;
-                                    }
-                                }
-                                if (!foundEnum) value = undefined; // No enum pattern matched
-                                break;
                             case 'boolean': // For non-CompletionState booleans
                                 if (mapping.value === undefined) { // If no explicit value, mainMatch itself means true
                                     value = true;
