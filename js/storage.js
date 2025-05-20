@@ -1,34 +1,34 @@
 class Storage {
-    constructor() {
+    constructor(localStorageOverride = null) {
+        console.log("[[[[[ Storage Constructor Called ]]]]]");
+        this.localStorage = localStorageOverride || window.localStorage;
+        console.log("[[[[[ Storage Constructor: this.localStorage is mock?", this.localStorage.getItem.toString().includes("VIA SPY"), "]]]]]");
         this.data = {
             gameResults: {},
             hiddenGames: [],
             lastUpdated: new Date().toISOString()
         };
-        this.initialize();
+        // DO NOT CALL initialize() here directly for instances meant to be fully initialized via create()
 
         // Wait for DOM content loaded to ensure GAMES is defined
+        // This might still be relevant for a globally created instance, but less so for test instances.
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                // Try to load games schema after page is fully loaded
                 setTimeout(() => this.loadGamesSchema(), 100);
             });
         } else {
-            // If DOM is already loaded, try after a short delay
             setTimeout(() => this.loadGamesSchema(), 100);
         }
     }
 
-    // Helper function to get today's date in local timezone
-    getLocalDateString() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+    static async create(localStorageOverride = null) {
+        const instance = new Storage(localStorageOverride);
+        await instance._initialize();
+        return instance;
     }
 
-    async initialize() {
+    // Renamed from initialize to _initialize
+    async _initialize() {
         try {
             this.data = await this.loadData();
         } catch (error) {
@@ -39,7 +39,7 @@ class Storage {
     async loadData() {
         console.log('Loading data...');
         // Load from localStorage
-        const savedData = localStorage.getItem('guessrTrackerData');
+        const savedData = this.localStorage.getItem('guessrTrackerData');
         if (savedData) {
             console.log('Data loaded from localStorage');
             return JSON.parse(savedData);
@@ -58,17 +58,17 @@ class Storage {
         this.data.lastUpdated = new Date().toISOString();
 
         // Save to localStorage
-        localStorage.setItem('guessrTrackerData', JSON.stringify(this.data));
+        this.localStorage.setItem('guessrTrackerData', JSON.stringify(this.data));
         console.log('Data saved to localStorage');
     }
 
     saveGamesSchema(games) {
-        localStorage.setItem('guessrTrackerGames', JSON.stringify(games));
+        this.localStorage.setItem('guessrTrackerGames', JSON.stringify(games));
         console.log('Games schema saved to localStorage');
     }
 
     loadGamesSchema() {
-        const savedGames = localStorage.getItem('guessrTrackerGames');
+        const savedGames = this.localStorage.getItem('guessrTrackerGames');
         if (savedGames) {
             try {
                 const parsedGames = JSON.parse(savedGames);
@@ -86,7 +86,7 @@ class Storage {
         return false;
     }
 
-    addGameResult(gameId, rawOutput) {
+    async addGameResult(gameId, rawOutput) {
         if (!this.data.gameResults[gameId]) {
             this.data.gameResults[gameId] = [];
         }
@@ -108,7 +108,7 @@ class Storage {
             });
         }
 
-        this.saveData();
+        await this.saveData();
     }
 
     updateGameResult(gameId, oldDate, rawOutput, newDate = oldDate) {
@@ -153,9 +153,11 @@ class Storage {
 
     getGameAverage(gameId, field, days = 30) {
         const results = this.getGameResults(gameId);
-        if (results.length === 0) return null;
 
-        // Get the last N days of results
+        if (results.length === 0) {
+            return null;
+        }
+
         const today = new Date();
         const cutoffDate = new Date(today);
         cutoffDate.setDate(today.getDate() - days);
@@ -170,14 +172,16 @@ class Storage {
                 console.error(`[STATS ERROR] Invalid average field: ${field} for game ${gameId}`);
             }
 
-            // Parse and filter results
-            const validResults = results
-                .filter(result => new Date(result.date) >= cutoffDate)
+            const resultsAfterDateFilter = results.filter(result => {
+                const resultDate = new Date(result.date);
+                const comparison = resultDate >= cutoffDate;
+                return comparison;
+            });
+
+            const validResults = resultsAfterDateFilter
                 .map(result => {
                     try {
                         const parsed = parser.parse(gameId, result.rawOutput);
-                        // Only exclude results that were explicitly failures
-                        // If there's no CompletionState, include the result
                         if (parsed.CompletionState === false) {
                             console.log(`[STATS] Excluding failed result for ${gameId} on ${result.date}`);
                             return null;
@@ -196,40 +200,33 @@ class Storage {
                 })
                 .filter(value => value !== null);
 
-            // Handle even single results for games that are just starting 
             if (validResults.length === 0) {
                 console.warn(`[STATS] No valid results for ${gameId} with field ${field}`);
                 return null;
             }
 
-            // For games with just one result, still show the average
-            if (validResults.length === 1) return validResults[0];
+            if (validResults.length === 1) {
+                return validResults[0];
+            }
 
-            // Calculate average
             const sum = validResults.reduce((a, b) => a + b, 0);
             const avg = sum / validResults.length;
 
-            // Get the game's average display template
             if (game && game.average_display && game.average_display.template) {
-                // Check if the template has a format specifier like {avg:([^}]+)}
                 const formatMatch = game.average_display.template.match(/{avg:([^}]+)}/);
                 if (formatMatch) {
                     const formatStr = formatMatch[1];
-                    // Handle common format specifiers
                     if (formatStr.includes(',.0f')) {
-                        // Format with commas and no decimal places
                         return avg.toLocaleString(undefined, {
                             minimumFractionDigits: 0,
                             maximumFractionDigits: 0
                         });
                     } else if (formatStr.includes(',.1f')) {
-                        // Format with commas and one decimal place
                         return avg.toLocaleString(undefined, {
                             minimumFractionDigits: 1,
                             maximumFractionDigits: 1
                         });
                     } else if (formatStr.includes(',.2f')) {
-                        // Format with commas and two decimal places
                         return avg.toLocaleString(undefined, {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2
@@ -238,7 +235,6 @@ class Storage {
                 }
             }
 
-            // Default format: trim trailing zeros
             return Number(avg.toFixed(1)).toString();
         } catch (error) {
             console.error(`[STATS ERROR] Fatal error calculating average for ${gameId}:`, error);
@@ -517,7 +513,17 @@ class Storage {
             reader.readAsText(file);
         });
     }
+
+    // Helper function to get today's date in local timezone
+    getLocalDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
 }
 
 // Create a global instance
-const storage = new Storage(); 
+// const storage = new Storage(); // Commented out for testing to ensure test-specific instances are used 
+// const storage = new Storage(); // Commented out for testing to ensure test-specific instances are used 

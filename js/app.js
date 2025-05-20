@@ -1,481 +1,17 @@
 // Game configuration - define as global variable by attaching to window
-window.GAMES = [
-    {
-        id: 'wordle',
-        name: 'Wordle',
-        url: 'https://www.nytimes.com/games/wordle/index.html',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "completion_state",
-                    regex: "\\d/6",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "CompletionState",
-                            group_index: 0,
-                            type: "boolean"
-                        }
-                    ]
-                },
-                {
-                    name: "attempts",
-                    regex: "(\\d)/6",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Attempts",
-                            group_index: 1,
-                            type: "number"
-                        }
-                    ]
-                },
-                {
-                    name: "attempts_calculator",
-                    regex: "Puzzle #\\d+",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Attempts",
-                            type: "boolean",
-                            value: true
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Attempts",
-            template: "30-day avg: {avg}/6",
-            days: 30
-        }
-    },
-    {
-        id: 'oec-pick-5',
-        name: 'OEC Pick-5',
-        url: 'https://oec.world/en/games/pick-5',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "completion_state",
-                    regex: "\\d/5",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "CompletionState",
-                            group_index: 0,
-                            type: "boolean"
-                        }
-                    ]
-                },
-                {
-                    name: "percentage",
-                    regex: "(\\d+\\.\\d+)%",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Percentage",
-                            group_index: 1,
-                            type: "number"
-                        }
-                    ]
-                },
-                {
-                    name: "correct_guesses",
-                    regex: "(\\d)/5",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Correct Guesses",
-                            group_index: 1,
-                            type: "number"
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Percentage",
-            template: "30-day avg: {avg}%",
-            days: 30
-        }
-    },
-    {
-        id: 'pokedoku',
-        name: 'PokeDoku',
-        url: 'https://pokedoku.com'
-    },
-    {
-        id: 'framed',
-        name: 'Framed',
-        url: 'https://framed.wtf',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "completion_state",
-                    regex: "🟩",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "CompletionState",
-                            group_index: 0,
-                            type: "boolean"
-                        }
-                    ]
-                },
-                {
-                    name: "tries",
-                    regex: "🎥",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Tries",
-                            group_index: 0,
-                            type: "count",
-                            count_emojis: ["🟥", "🟩"]
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Tries",
-            template: "30-day avg: {avg} tries",
-            days: 30
-        }
-    },
-    {
-        id: 'daily-dozen-trivia',
-        name: 'Daily Dozen Trivia',
-        url: 'https://dailydozentrivia.com',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "score",
-                    regex: "Score: (\\d+)",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Score",
-                            group_index: 1,
-                            type: "number"
-                        }
-                    ]
-                },
-                {
-                    name: "correct",
-                    regex: "(\\d+) Correct",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Correct",
-                            group_index: 1,
-                            type: "number"
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Score",
-            template: "30-day avg: {avg} pts",
-            days: 30
-        }
-    },
-    {
-        id: 'nyt-connections',
-        name: 'NYT Connections',
-        url: 'https://www.nytimes.com/games/connections',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "completion_state",
-                    regex: "🟨🟨🟨🟨.*?🟩🟩🟩🟩.*?🟦🟦🟦🟦.*?🟪🟪🟪🟪",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "CompletionState",
-                            group_index: 0,
-                            type: "boolean"
-                        }
-                    ]
-                },
-                {
-                    name: "attempts_extractor",
-                    regex: "Puzzle #\\d+",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Attempts",
-                            type: "count",
-                            count_emojis: ["[🟨🟩🟦🟪]{1,4}\\s*(?:\\r?\\n|$)"],
-                            group_index: 0
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Attempts",
-            template: "30-day avg: {avg} attempts",
-            days: 30
-        }
-    },
-    {
-        id: 'globle',
-        name: 'Globle',
-        url: 'https://globle-game.com'
-    },
-    {
-        id: 'box-office-game',
-        name: 'Box Office Game',
-        url: 'https://boxofficega.me'
-    },
-    {
-        id: 'tradle',
-        name: 'Tradle',
-        url: 'https://games.oec.world/en/tradle/'
-    },
-    {
-        id: 'costcodle',
-        name: 'Costcodle',
-        url: 'https://costcodle.com',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "attempts",
-                    regex: "(\\d)/6",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Attempts",
-                            group_index: 1,
-                            type: "number"
-                        },
-                        {
-                            target_field_name: "CompletionState",
-                            type: "boolean",
-                            value: true
-                        }
-                    ]
-                },
-                {
-                    name: "failures",
-                    regex: "X/6",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "CompletionState",
-                            type: "boolean",
-                            value: false
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Attempts",
-            template: "30-day avg: {avg}/6",
-            days: 30
-        }
-    },
-    {
-        id: 'movie-to-movie',
-        name: 'Movie to Movie',
-        url: 'https://movietomovie.com'
-    },
-    {
-        id: 'guessthe-game',
-        name: 'GuessThe.Game',
-        url: 'https://guessthe.game',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "completion_state",
-                    regex: "🟩",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "CompletionState",
-                            group_index: 0,
-                            type: "boolean"
-                        }
-                    ]
-                },
-                {
-                    name: "tries",
-                    regex: "🎮",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Tries",
-                            group_index: 0,
-                            type: "count",
-                            count_emojis: ["🟥", "🟩"]
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Tries",
-            template: "30-day avg: {avg} tries",
-            days: 30
-        }
-    },
-    {
-        id: 'gamedle',
-        name: 'Gamedle',
-        url: 'https://gamedle.wtf',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "completion_state",
-                    regex: "🟩",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "CompletionState",
-                            group_index: 0,
-                            type: "boolean"
-                        }
-                    ]
-                },
-                {
-                    name: "tries",
-                    regex: "🕹️",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Tries",
-                            group_index: 0,
-                            type: "count",
-                            count_emojis: ["🟥", "🟨", "🟩"]
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Tries",
-            template: "30-day avg: {avg} tries",
-            days: 30
-        }
-    },
-    {
-        id: 'puckdoku',
-        name: 'Puckdoku',
-        url: 'https://puckdoku.com'
-    },
-    {
-        id: 'moviegrid',
-        name: 'MovieGrid.io',
-        url: 'https://moviegrid.io'
-    },
-    {
-        id: 'spellcheck-game',
-        name: 'Spellcheck Game',
-        url: 'https://spellcheckgame.com/'
-    },
-    {
-        id: 'foodguessr',
-        name: 'FoodGuessr',
-        url: 'https://foodguessr.com',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "completion_state",
-                    regex: "Total score:",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "CompletionState",
-                            group_index: 0,
-                            type: "boolean"
-                        }
-                    ]
-                },
-                {
-                    name: "score",
-                    regex: "Total score: ([\\d,]+) / 15,000",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Score",
-                            group_index: 1,
-                            type: "number"
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Score",
-            template: "30-day avg: {avg:,.0f}/15,000",
-            days: 30
-        }
-    },
-    {
-        id: 'thrice',
-        name: 'Thrice',
-        url: 'https://thrice.geekswhodrink.com',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "points",
-                    regex: "(\\d+) points",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Points",
-                            group_index: 1,
-                            type: "number"
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Points",
-            template: "30-day avg: {avg}/15",
-            days: 30
-        }
-    },
-    {
-        id: 'relatle',
-        name: 'Relatle.io',
-        url: 'https://relatle.io/'
-    },
-    {
-        id: 'disorderly',
-        name: 'Disorderly',
-        url: 'https://playdisorderly.com/'
-    },
-    {
-        id: 'harmonies',
-        name: 'Harmonies',
-        url: 'https://harmonies.io'
-    },
-    {
-        id: 'bandle',
-        name: 'Bandle',
-        url: 'https://bandle.app'
-    },
-    {
-        id: 'juxtastat',
-        name: 'Juxtastat',
-        url: 'https://urbanstats.org/quiz.html'
-    },
-    {
-        id: 'scrandle',
-        name: 'Scrandle',
-        url: 'https://scrandle.com/',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "score",
-                    regex: "(\\d+)/10",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Score",
-                            group_index: 1,
-                            type: "number"
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Score",
-            template: "30-day avg: {avg}/10",
-            days: 30
-        }
-    },
-    {
-        id: 'starwars-guessr',
-        name: 'Star Wars Guessr',
-        url: 'https://starwarsguessr.com/'
-    }
-];
+// window.GAMES = [...] // This large array is now in js/game_schemas.js
+
+// Ensure window.GAMES_DEFAULT is initialized with a deep copy of the initial GAMES array
+// This should be done early, after js/game_schemas.js has loaded and before any potential modification to window.GAMES (e.g., by loading from storage).
+if (window.GAMES && (!window.GAMES_DEFAULT || window.GAMES_DEFAULT.length === 0)) {
+    window.GAMES_DEFAULT = JSON.parse(JSON.stringify(window.GAMES));
+    console.log('app.js: Initialized window.GAMES_DEFAULT from js/game_schemas.js. Default games count:', window.GAMES_DEFAULT.length);
+} else if (!window.GAMES) {
+    console.warn('app.js: window.GAMES was not defined when attempting to initialize window.GAMES_DEFAULT. This usually means js/game_schemas.js did not load correctly.');
+    window.GAMES_DEFAULT = []; // Initialize to empty array to prevent errors, though this indicates a problem.
+} else if (window.GAMES_DEFAULT && window.GAMES_DEFAULT.length > 0) {
+    console.log('app.js: window.GAMES_DEFAULT was already populated. Count:', window.GAMES_DEFAULT.length);
+}
 
 class App {
     constructor() {
@@ -497,7 +33,7 @@ class App {
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
         const dateStr = `${year}-${month}-${day}`;
-        console.log('Using local date:', dateStr, '(Browser time)');
+        // console.log('Using local date:', dateStr, '(Browser time)'); // Commented out for polling
         return dateStr;
     }
 
@@ -986,7 +522,7 @@ class App {
         hiddenGamesList.innerHTML = '';
 
         // Process all games
-        GAMES.forEach(game => {
+        window.GAMES.forEach(game => {
             const isHidden = storage.isGameHidden(game.id);
             const gameItem = this.createGameListItem(game, isHidden);
 
@@ -1007,22 +543,23 @@ class App {
     }
 
     closeModals() {
-        // Save any changes that might have been made in the manage games modal
-        const modal = document.getElementById('schemaModal');
-        const manageSection = document.getElementById('manageSection');
-
-        if (modal.style.display === 'block' && manageSection.style.display === 'block') {
-            // Refresh the main game lists to reflect changes
-            this.updateCardPositions();
-        }
+        let schemaModalWasOpen = false;
+        const schemaModalElement = document.getElementById('schemaModal');
 
         document.querySelectorAll('.modal').forEach(modal => {
+            if (modal === schemaModalElement && modal.style.display === 'block') {
+                schemaModalWasOpen = true;
+            }
             modal.style.display = 'none';
         });
+
+        if (schemaModalWasOpen) {
+            this.updateCardPositions();
+        }
     }
 
     hideGame(gameId) {
-        const game = GAMES.find(g => g.id === gameId);
+        const game = window.GAMES.find(g => g.id === gameId);
         if (!game) return;
 
         if (confirm(`Are you sure you want to hide ${game.name}? It can be restored later.`)) {
@@ -1068,62 +605,84 @@ class App {
         const activeList = document.getElementById('gameList');
         const completedList = document.getElementById('completedGameList');
         const today = this.getLocalDateString();
-        // console.log('Today\'s date:', today);
 
-        // Track current positions
-        const currentPositions = new Map();
-        GAMES.forEach(game => {
-            // Skip hidden games
-            if (storage.isGameHidden(game.id)) return;
-
-            const results = storage.getGameResults(game.id);
-            // console.log(`Game ${game.id} results:`, results);
-
-            const hasTodayResult = results.some(result => result.date === today);
-            // console.log(`Game ${game.id} has today\'s result:`, hasTodayResult);
-
-            currentPositions.set(game.id, hasTodayResult);
-        });
-
-        // Only update if positions have changed
         let needsUpdate = false;
-        GAMES.forEach(game => {
-            // Skip hidden games
-            if (storage.isGameHidden(game.id)) return;
 
-            const card = document.querySelector(`[data-game-id="${game.id}"]`);
-            if (!card) {
-                needsUpdate = true;
-                return;
-            }
-            const isInCompleted = card.closest('#completedGameList') !== null;
-            const shouldBeCompleted = currentPositions.get(game.id);
-            if (isInCompleted !== shouldBeCompleted) {
-                // console.log(`Game ${game.id} position needs update: currently in completed=${isInCompleted}, should be in completed=${shouldBeCompleted}`);
-                needsUpdate = true;
+        // 1. Check if the set of currently rendered game cards matches the set of games that should be visible.
+        const expectedVisibleGameIds = new Set();
+        window.GAMES.forEach(game => {
+            if (!storage.isGameHidden(game.id)) {
+                expectedVisibleGameIds.add(game.id);
             }
         });
 
-        // console.log('Needs update:', needsUpdate);
+        const renderedCardElements = document.querySelectorAll('#gameList > .game-card, #completedGameList > .game-card');
+        const renderedGameIds = new Set(Array.from(renderedCardElements).map(card => card.getAttribute('data-game-id')));
+
+        if (expectedVisibleGameIds.size !== renderedGameIds.size) {
+            needsUpdate = true;
+        } else {
+            // Sizes are the same, check if all expected IDs are present.
+            // If an expected ID is missing, it means a rendered ID is there that shouldn't be (or vice-versa for an unhide operation if counts were same due to a coincidental hide+unhide of different games).
+            for (const id of expectedVisibleGameIds) {
+                if (!renderedGameIds.has(id)) {
+                    needsUpdate = true;
+                    break;
+                }
+            }
+        }
+
+        // 2. If the correct set of cards is already rendered, then check if any are in the wrong list (active/completed).
+        if (!needsUpdate) {
+            const gameCompletionStatus = new Map(); // Map gameId to hasTodayResult for visible games
+            window.GAMES.forEach(game => {
+                if (!storage.isGameHidden(game.id)) { // Only for visible games
+                    const results = storage.getGameResults(game.id);
+                    const hasTodayResult = results.some(result => result.date === today);
+                    gameCompletionStatus.set(game.id, hasTodayResult);
+                }
+            });
+
+            renderedCardElements.forEach(card => {
+                const gameId = card.getAttribute('data-game-id');
+                // Ensure we only check cards that are supposed to be visible (should be true if we passed the first block)
+                if (!expectedVisibleGameIds.has(gameId)) return;
+
+                const isInCompletedList = card.parentElement === completedList;
+                const shouldBeInCompletedList = gameCompletionStatus.get(gameId);
+
+                if (isInCompletedList !== shouldBeInCompletedList) {
+                    needsUpdate = true;
+                    // No need to break early, allow loop to finish in case of multiple changes,
+                    // though one is enough to trigger full re-render.
+                }
+            });
+        }
+
+        // console.log('Needs update:', needsUpdate); // For debugging, can be removed
         if (!needsUpdate) return;
 
-        // Clear both lists
+        // --- Full re-render logic if needsUpdate is true ---
         activeList.innerHTML = '';
         completedList.innerHTML = '';
 
-        // Sort games into appropriate lists based only on today's date
-        GAMES.forEach(game => {
-            // Skip hidden games
-            if (storage.isGameHidden(game.id)) return;
+        const gamesToProcess = window.GAMES.filter(game => !storage.isGameHidden(game.id));
 
-            const card = this.createGameCard(game);
-            const hasTodayResult = currentPositions.get(game.id);
+        // Determine completion status for all games to process *once*
+        const finalGameCompletionStatus = new Map();
+        gamesToProcess.forEach(game => {
+            const results = storage.getGameResults(game.id);
+            const hasTodayResult = results.some(result => result.date === today);
+            finalGameCompletionStatus.set(game.id, hasTodayResult);
+        });
+
+        gamesToProcess.forEach(game => {
+            const card = this.createGameCard(game); // createGameCard sets 'completed' class based on storage
+            const hasTodayResult = finalGameCompletionStatus.get(game.id);
 
             if (hasTodayResult) {
-                // console.log(`Moving ${game.id} to completed list`);
                 completedList.appendChild(card);
             } else {
-                // console.log(`Keeping ${game.id} in active list`);
                 activeList.appendChild(card);
             }
         });
@@ -1292,7 +851,7 @@ class App {
 
         const modal = document.getElementById('statsModal');
         const chartContainer = document.querySelector('.chart-container');
-        const game = GAMES.find(g => g.id === gameId);
+        const game = window.GAMES.find(g => g.id === gameId);
 
         // Parse all results for visualization
         const parsedResults = results.map(result => {
@@ -1455,7 +1014,7 @@ class App {
         const input = document.getElementById('resultInput').value.trim();
         if (!input) return;
 
-        const game = GAMES.find(g => g.id === this.currentGameId);
+        const game = window.GAMES.find(g => g.id === this.currentGameId);
         storage.addGameResult(this.currentGameId, input);
         this.closeModals();
         this.updateCardPositions();
@@ -1484,7 +1043,7 @@ class App {
         }
 
         // Set the content
-        this.schemaEditor.setValue(JSON.stringify(GAMES, null, 2));
+        this.schemaEditor.setValue(JSON.stringify(window.GAMES, null, 2));
     }
 
     hideSchemaEditor() {
@@ -1516,7 +1075,7 @@ class App {
             const id = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
 
             // Check if game with this ID already exists
-            if (GAMES.some(game => game.id === id)) {
+            if (window.GAMES.some(game => game.id === id)) {
                 this.showToast('Error', 'A game with a similar name already exists', 'error');
                 return;
             }
@@ -1529,10 +1088,10 @@ class App {
             };
 
             // Add to games array
-            GAMES.push(newGame);
+            window.GAMES.push(newGame);
 
             // Save to localStorage for persistence
-            storage.saveGamesSchema(GAMES);
+            storage.saveGamesSchema(window.GAMES);
 
             // Clear form inputs
             nameInput.value = '';
@@ -1561,11 +1120,11 @@ class App {
             });
 
             // Update the games array
-            GAMES.length = 0;
-            GAMES.push(...newSchema);
+            window.GAMES.length = 0;
+            window.GAMES.push(...newSchema);
 
             // Save to localStorage for persistence
-            storage.saveGamesSchema(GAMES);
+            storage.saveGamesSchema(window.GAMES);
 
             // Refresh the display
             this.updateCardPositions();
@@ -1699,7 +1258,7 @@ class App {
     }
 
     restoreGame(gameId) {
-        const game = GAMES.find(g => g.id === gameId);
+        const game = window.GAMES.find(g => g.id === gameId);
         if (!game) return;
 
         if (storage.unhideGame(gameId)) {
@@ -1719,20 +1278,20 @@ class App {
     }
 
     removeGame(gameId) {
-        const game = GAMES.find(g => g.id === gameId);
+        const game = window.GAMES.find(g => g.id === gameId);
         if (!game) return;
 
         // Double confirmation for removing a game since it's destructive
         if (confirm(`Are you sure you want to REMOVE ${game.name}? This cannot be undone and will delete the game definition.`)) {
             if (confirm(`⚠️ FINAL WARNING: Remove ${game.name} permanently?`)) {
                 // Find the game index
-                const index = GAMES.findIndex(g => g.id === gameId);
+                const index = window.GAMES.findIndex(g => g.id === gameId);
                 if (index !== -1) {
                     // Remove the game
-                    GAMES.splice(index, 1);
+                    window.GAMES.splice(index, 1);
 
                     // Save the updated games schema
-                    storage.saveGamesSchema(GAMES);
+                    storage.saveGamesSchema(window.GAMES);
 
                     // Remove item from the active list
                     const activeItem = document.querySelector(`#activeGamesList [data-game-id="${gameId}"]`);
@@ -1793,7 +1352,7 @@ class App {
     // Check if there are any games with tracked statistics
     hasAnyTrackedStatistics() {
         // Check all games that have average_display configuration
-        const gamesWithStats = GAMES.filter(game => game.average_display);
+        const gamesWithStats = window.GAMES.filter(game => game.average_display);
 
         // For each game, check if there's at least one result
         for (const game of gamesWithStats) {
@@ -1814,18 +1373,28 @@ class App {
     }
 }
 
-// Store default games for reference
-window.GAMES_DEFAULT = JSON.parse(JSON.stringify(window.GAMES));
+// Initialize and run the application
+(async () => {
+    try {
+        // Create and initialize the storage instance first, making it globally available
+        window.storage = await Storage.create();
 
-// Store default games for reference and create app instance
-document.addEventListener('DOMContentLoaded', () => {
-    // Store default games for reference
-    // Important: This must happen BEFORE Storage tries to load games
-    window.GAMES_DEFAULT = JSON.parse(JSON.stringify(window.GAMES));
+        // Now that window.storage is initialized, create the App instance
+        window.app = new App();
 
-    // Create the App instance
-    window.app = new App();
+        // If there was other setup code that ran after `new App()` that might also
+        // rely on `window.app` or `window.storage`, ensure it's here or called from here.
+        // For example, if event listeners were attached outside the App class based on these globals.
+        // Based on the provided code, the App constructor handles its own event listeners.
 
-    // Add version info in console for debugging
-    console.info('GuessrTracker v1.2.0');
-}); 
+        console.log("Application initialized successfully.");
+
+    } catch (error) {
+        console.error("Failed to initialize application:", error);
+        // Optionally, display a user-friendly error message on the page
+        const body = document.querySelector('body');
+        if (body) {
+            body.innerHTML = '<div style="padding: 20px; text-align: center; font-family: sans-serif;"><h1>Application Error</h1><p>Could not initialize the application. Please try again later or check the console for details.</p></div>';
+        }
+    }
+})(); 
