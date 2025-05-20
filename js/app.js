@@ -658,7 +658,7 @@ class App {
                 );
 
                 let displayText = '';
-                if (avgValue) { // If getGameAverage returned a value
+                if (avgValue !== null) { // Check against null explicitly to allow "0" or "0.0"
                     const template = gameSchema.average_display.template;
                     if (template.includes('{avg:')) {
                         displayText = template.replace(/{avg:[^}]+}/, avgValue);

@@ -183,7 +183,7 @@ class Storage {
                     try {
                         const parsed = parser.parse(gameId, result.rawOutput);
                         if (parsed.CompletionState === false) {
-                            console.log(`[STATS] Excluding failed result for ${gameId} on ${result.date}`);
+                            // console.log(`[STATS] Excluding failed result for ${gameId} on ${result.date}`);
                             return null;
                         }
 
@@ -201,12 +201,32 @@ class Storage {
                 .filter(value => value !== null);
 
             if (validResults.length === 0) {
-                console.warn(`[STATS] No valid results for ${gameId} with field ${field}`);
+                // console.warn(`[STATS] No valid results for ${gameId} with field ${field}`);
                 return null;
             }
 
             if (validResults.length === 1) {
-                return validResults[0];
+                // Ensure single results are also formatted according to template if possible, or default to string
+                const singleValue = validResults[0];
+                if (game && game.average_display && game.average_display.template) {
+                    const formatMatch = game.average_display.template.match(/{avg:([^}]+)}/);
+                    if (formatMatch) {
+                        const formatStr = formatMatch[1];
+                        // Apply specific formatting if rules match (e.g., for decimals)
+                        if (formatStr.includes(',.0f')) {
+                            return Number(singleValue).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+                        } else if (formatStr.includes(',.1f')) {
+                            return Number(singleValue).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+                        } else if (formatStr.includes(',.2f')) {
+                            return Number(singleValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        }
+                        // If no specific decimal format in template like {avg:0.0}, but a general {avg:format} exists,
+                        // we might need a more general formatting function here based on formatStr if other formats are introduced.
+                        // For now, if it's not one of the specific decimal ones, fall through to default string conversion for single value.
+                    }
+                }
+                // Default for single value if no specific template format matched for it:
+                return String(singleValue); // Convert to string, e.g., 0 becomes "0"
             }
 
             const sum = validResults.reduce((a, b) => a + b, 0);

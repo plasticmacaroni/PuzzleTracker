@@ -578,5 +578,52 @@ window.GAMES = [
         id: 'starwars-guessr',
         name: 'Star Wars Guessr',
         url: 'https://starwarsguessr.com/'
+    },
+    {
+        id: 'waffle',
+        name: 'Waffle',
+        url: 'https://wafflegame.net/daily',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "stars_awarded",
+                    regex: "#waffle\\d+ (\\d)/5", // Captures the digit in D/5
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Stars",
+                            group_index: 1,
+                            type: "number"
+                        }
+                    ]
+                },
+                {
+                    name: "completion_state_success",
+                    regex: "#waffle\\d+ \\d/5",    // Matches if format is D/5 (success, regardless of star count)
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            type: "boolean",
+                            value: true
+                        }
+                    ]
+                },
+                {
+                    name: "completion_state_failure",
+                    regex: "#waffle\\d+ X/5",    // Matches if format is X/5 (failure)
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            type: "boolean",
+                            value: false
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Stars",
+            template: "Avg Stars: {avg}/5",
+            days: 30
+        }
     }
 ]; 
