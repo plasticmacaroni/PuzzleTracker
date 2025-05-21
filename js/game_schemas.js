@@ -532,7 +532,28 @@ window.GAMES = [
     {
         id: 'disorderly',
         name: 'Disorderly',
-        url: 'https://playdisorderly.com/'
+        url: 'https://playdisorderly.com/',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "attempts_row_counter",
+                    // Regex to match lines starting with a number emoji (e.g., 1️⃣, 2️⃣, ... 🔟, etc.)
+                    // This will be used with type: "count" to count the number of attempt rows.
+                    regex: "^\\s*\\d{1,2}\\uFE0F?\\u20E3", // Matches lines starting with 1 or 2 digits + keycap emoji
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Attempts",
+                            type: "count"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Attempts",
+            template: "Avg Attempts: {avg:0.1}", // Display with one decimal place
+            days: 30
+        }
     },
     {
         id: 'harmonies',
@@ -575,8 +596,8 @@ window.GAMES = [
         }
     },
     {
-        id: 'starwars-guessr',
-        name: 'Star Wars Guessr',
+        id: 'starwars-guessr-guess',
+        name: 'Star Wars Guessr (Guess)',
         url: 'https://starwarsguessr.com/'
     },
     {
@@ -622,7 +643,7 @@ window.GAMES = [
         },
         average_display: {
             field: "Stars",
-            template: "Avg Stars: {avg}/5",
+            template: "Avg Stars: {avg:0.0}/5",
             days: 30
         }
     }

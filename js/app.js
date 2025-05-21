@@ -838,7 +838,11 @@ class App {
         if (document.body.classList.contains('dark-mode')) {
             puzzlePiece1.style.backgroundColor = `rgba(255, 255, 255, ${(0.12 + Math.random() * 0.08).toFixed(2)})`;
         } else {
-            const color = this.stringToColor(card.querySelector('.card-title').textContent);
+            const cardTitleElement = card.querySelector('.card-title');
+            let color = '#808080'; // Default grey color
+            if (cardTitleElement && cardTitleElement.textContent) {
+                color = this.stringToColor(cardTitleElement.textContent);
+            }
             const colorRgb = this.hexToRgb(color);
             puzzlePiece1.style.backgroundColor = `rgba(${colorRgb.r}, ${colorRgb.g}, ${colorRgb.b}, ${(0.15 + Math.random() * 0.1).toFixed(2)})`;
         }
@@ -873,7 +877,11 @@ class App {
             puzzlePiece2.style.backgroundColor = `rgba(255, 255, 255, ${(0.12 + Math.random() * 0.08).toFixed(2)})`;
         } else {
             // Use a different color variant for the second piece
-            const color = this.stringToColor(card.querySelector('.card-title').textContent + '1');
+            const cardTitleElement = card.querySelector('.card-title');
+            let color = '#A9A9A9'; // Default dark grey color
+            if (cardTitleElement && cardTitleElement.textContent) {
+                color = this.stringToColor(cardTitleElement.textContent + '1');
+            }
             const colorRgb = this.hexToRgb(color);
             puzzlePiece2.style.backgroundColor = `rgba(${colorRgb.r}, ${colorRgb.g}, ${colorRgb.b}, ${(0.15 + Math.random() * 0.1).toFixed(2)})`;
         }
