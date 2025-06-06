@@ -283,6 +283,113 @@ Puzzle #711
         });
     });
 
+    describe("Star Wars Guessr Parsing (starwars-guessr-guess)", function () {
+        const gameId = 'starwars-guessr-guess';
+
+        beforeEach(function () {
+            if (!window.GAMES_DEFAULT || window.GAMES_DEFAULT.length === 0) {
+                throw new Error(`[parser.spec.js] CRITICAL: window.GAMES_DEFAULT is not available. Cannot run tests for ${gameId}.`);
+            }
+            const liveSchema = window.GAMES_DEFAULT.find(g => g.id === gameId);
+            if (!liveSchema) {
+                throw new Error(`[parser.spec.js] CRITICAL: Live schema for '${gameId}' not found in GAMES_DEFAULT.`);
+            }
+
+            window.GAMES = []; // Start with a clean slate
+            const testSchema = JSON.parse(JSON.stringify(liveSchema));
+            window.GAMES.push(testSchema);
+        });
+
+        it("should parse tries from the example outputs", function () {
+            const examples = [
+                {
+                    input: `STAR WARS GUESSR - May 26th 2025
+🎮 : Guess
+📋 : 7 tries
+🟩🟩🟩🟩🟩🟩🟩
+🟩🟩🟩🟩🟥🟥🟥
+🟩🟩🟥🟩🟥🟥🟩
+🟩🟥🟥🟩🟥🟥🟥
+🟩🟥🟥🟩🟥🟥🟥
++ 2 rows
+🔗 : https://starwarsguessr.com`,
+                    expectedTries: 7
+                },
+                {
+                    input: `STAR WARS GUESSR - May 25th 2025
+🎮 : Guess
+📋 : 10 tries
+🟩🟩🟩🟩🟩🟩🟩
+🟩🟩🟩🟩🟨🟥🟩
+🟩🟩🟥🟥🟨🟨🟥
+🟩🟨🟥🟩🟨🟨🟨
+🟩🟩🟥🟩🟨🟥🟨
++ 5 rows
+🔗 : https://starwarsguessr.com`,
+                    expectedTries: 10
+                },
+                {
+                    input: `STAR WARS GUESSR - May 23rd 2025
+🎮 : Guess
+📋 : 7 tries
+🟩🟩🟩🟩🟩🟩🟩
+🟩🟩🟩🟩🟥🟥🟥
+🟩🟩🟥🟩🟥🟥🟥
+🟩🟩🟩🟥🟨🟥🟥
+🟩🟩🟩🟩🟨🟥🟥
++ 2 rows
+🔗 : https://starwarsguessr.com`,
+                    expectedTries: 7
+                },
+                {
+                    input: `STAR WARS GUESSR - May 22nd 2025
+🎮 : Guess
+📋 : 4 tries
+🟩🟩🟩🟩🟩🟩🟩
+🟩🟥🟩🟩🟥🟨🟨
+🟩🟥🟩🟩🟨🟨🟨
+🟩🟥🟥🟩🟥🟥🟥
+🔗 : https://starwarsguessr.com`,
+                    expectedTries: 4
+                },
+                {
+                    input: `STAR WARS GUESSR - May 20th 2025
+🎮 : Guess
+📋 : 9 tries
+🟩🟩🟩🟩🟩🟩🟩
+🟩🟨🟩🟩🟥🟥🟩
+🟥🟨🟩🟩🟥🟨🟩
+🟩🟨🟥🟩🟥🟥🟥
+🟩🟨🟥🟩🟥🟥🟨
++ 4 rows
+🔗 : https://starwarsguessr.com`,
+                    expectedTries: 9
+                }
+            ];
+
+            examples.forEach((example, index) => {
+                const result = testParser.parse(gameId, example.input);
+                expect(result.Tries).toBe(example.expectedTries,
+                    `Example ${index + 1} should parse ${example.expectedTries} tries`);
+            });
+        });
+
+        it("should handle variations in whitespace around the tries count", function () {
+            const variations = [
+                "📋 : 7 tries",
+                "📋: 7 tries",
+                "📋 :7 tries",
+                "📋:7 tries"
+            ];
+
+            variations.forEach((input, index) => {
+                const result = testParser.parse(gameId, input);
+                expect(result.Tries).toBe(7,
+                    `Variation ${index + 1} should parse 7 tries regardless of whitespace`);
+            });
+        });
+    });
+
 });
 
 describe("Schema Integrity Checks", function () {

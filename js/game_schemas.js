@@ -780,7 +780,7 @@ window.GAMES = [
             extractors: [
                 {
                     name: "tries",
-                    regex: "📋 : (\\d+) tries",
+                    regex: "📋\\s*:\\s*(\\d+)\\s*tries",
                     capture_groups_mapping: [
                         {
                             target_field_name: "Tries",
