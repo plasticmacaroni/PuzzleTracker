@@ -844,4 +844,48 @@ window.GAMES = [
             days: 30
         }
     }
-]; 
+];
+
+function mergeStatsFromStandardImports(localSchema, standardSchema) {
+    // Handle edge cases
+    if (!localSchema || !standardSchema) {
+        return localSchema;
+    }
+    if (localSchema.id !== standardSchema.id) {
+        return localSchema;
+    }
+
+    // Create a deep copy of the local schema to avoid modifying the original
+    const mergedSchema = JSON.parse(JSON.stringify(localSchema));
+
+    // If the standard schema has stats, merge them into the local schema
+    if (standardSchema.stats) {
+        if (!mergedSchema.stats) {
+            mergedSchema.stats = [];
+        }
+
+        // Create a map of existing stats by name for quick lookup
+        const existingStatsMap = new Map(mergedSchema.stats.map(stat => [stat.name, stat]));
+
+        // Add new stats from standard schema that don't exist in local schema
+        // Preserve the order by adding new stats at the end
+        standardSchema.stats.forEach(standardStat => {
+            if (!existingStatsMap.has(standardStat.name)) {
+                mergedSchema.stats.push(JSON.parse(JSON.stringify(standardStat)));
+            }
+        });
+    }
+
+    return mergedSchema;
+}
+
+// Store the original GAMES array as GAMES_DEFAULT
+window.GAMES_DEFAULT = JSON.parse(JSON.stringify(window.GAMES));
+
+// If there are any local schemas (GAMES_LOCAL), merge stats from GAMES_DEFAULT
+if (window.GAMES_LOCAL && window.GAMES_LOCAL.length > 0) {
+    window.GAMES = window.GAMES_LOCAL.map(localSchema => {
+        const standardSchema = window.GAMES_DEFAULT.find(g => g.id === localSchema.id);
+        return mergeStatsFromStandardImports(localSchema, standardSchema);
+    });
+} 

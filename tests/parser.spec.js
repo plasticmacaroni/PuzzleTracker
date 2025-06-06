@@ -503,4 +503,194 @@ describe("Schema Integrity Checks", function () {
         // If no misconfiguredGames were found, the test passes implicitly.
         expect(misconfiguredGames.length).toBe(0, "Expected no CompletionState boolean misconfigurations in loaded game schemas.");
     });
+});
+
+describe("Schema Merging", function () {
+    beforeEach(function () {
+        // Reset GAMES_DEFAULT and GAMES_LOCAL before each test
+        window.GAMES_DEFAULT = [];
+        window.GAMES_LOCAL = [];
+        window.GAMES = [];
+    });
+
+    it("should merge stats from standard schema into local schema", function () {
+        const standardSchema = {
+            id: 'test-game',
+            name: 'Test Game',
+            stats: [
+                { name: 'Wins', value: 10 },
+                { name: 'Losses', value: 5 }
+            ]
+        };
+
+        const localSchema = {
+            id: 'test-game',
+            name: 'Test Game',
+            stats: [
+                { name: 'Wins', value: 15 }  // Different value, should be preserved
+            ]
+        };
+
+        window.GAMES_DEFAULT = [standardSchema];
+        window.GAMES_LOCAL = [localSchema];
+
+        // Trigger the merge
+        window.GAMES = window.GAMES_LOCAL.map(localSchema => {
+            const standardSchema = window.GAMES_DEFAULT.find(g => g.id === localSchema.id);
+            return mergeStatsFromStandardImports(localSchema, standardSchema);
+        });
+
+        const mergedSchema = window.GAMES[0];
+        expect(mergedSchema.stats.length).toBe(2);
+        expect(mergedSchema.stats.find(s => s.name === 'Wins').value).toBe(15);  // Local value preserved
+        expect(mergedSchema.stats.find(s => s.name === 'Losses').value).toBe(5); // Standard value added
+    });
+
+    it("should handle complex nested stat objects", function () {
+        const standardSchema = {
+            id: 'test-game',
+            name: 'Test Game',
+            stats: [
+                {
+                    name: 'Complex Stat',
+                    value: {
+                        total: 100,
+                        details: {
+                            wins: 80,
+                            losses: 20
+                        }
+                    }
+                }
+            ]
+        };
+
+        const localSchema = {
+            id: 'test-game',
+            name: 'Test Game',
+            stats: [
+                {
+                    name: 'Complex Stat',
+                    value: {
+                        total: 150,
+                        details: {
+                            wins: 120,
+                            losses: 30
+                        }
+                    }
+                }
+            ]
+        };
+
+        window.GAMES_DEFAULT = [standardSchema];
+        window.GAMES_LOCAL = [localSchema];
+
+        window.GAMES = window.GAMES_LOCAL.map(localSchema => {
+            const standardSchema = window.GAMES_DEFAULT.find(g => g.id === localSchema.id);
+            return mergeStatsFromStandardImports(localSchema, standardSchema);
+        });
+
+        const mergedSchema = window.GAMES[0];
+        expect(mergedSchema.stats.length).toBe(1);
+        expect(mergedSchema.stats[0].value.total).toBe(150);  // Local value preserved
+    });
+
+    it("should preserve stat order from local schema", function () {
+        const standardSchema = {
+            id: 'test-game',
+            name: 'Test Game',
+            stats: [
+                { name: 'Stat A', value: 1 },
+                { name: 'Stat B', value: 2 },
+                { name: 'Stat C', value: 3 }
+            ]
+        };
+
+        const localSchema = {
+            id: 'test-game',
+            name: 'Test Game',
+            stats: [
+                { name: 'Stat B', value: 20 },
+                { name: 'Stat A', value: 10 }
+            ]
+        };
+
+        window.GAMES_DEFAULT = [standardSchema];
+        window.GAMES_LOCAL = [localSchema];
+
+        window.GAMES = window.GAMES_LOCAL.map(localSchema => {
+            const standardSchema = window.GAMES_DEFAULT.find(g => g.id === localSchema.id);
+            return mergeStatsFromStandardImports(localSchema, standardSchema);
+        });
+
+        const mergedSchema = window.GAMES[0];
+        expect(mergedSchema.stats.length).toBe(3);
+        expect(mergedSchema.stats[0].name).toBe('Stat B');  // Local order preserved
+        expect(mergedSchema.stats[1].name).toBe('Stat A');  // Local order preserved
+        expect(mergedSchema.stats[2].name).toBe('Stat C');  // New stat added at end
+    });
+
+    it("should handle edge cases", function () {
+        const testCases = [
+            {
+                name: "null local schema",
+                localSchema: null,
+                standardSchema: { id: 'test', stats: [{ name: 'Stat', value: 1 }] },
+                expected: null
+            },
+            {
+                name: "undefined local schema",
+                localSchema: undefined,
+                standardSchema: { id: 'test', stats: [{ name: 'Stat', value: 1 }] },
+                expected: undefined
+            },
+            {
+                name: "mismatched IDs",
+                localSchema: { id: 'local', stats: [{ name: 'Stat', value: 1 }] },
+                standardSchema: { id: 'standard', stats: [{ name: 'Stat', value: 2 }] },
+                expected: { id: 'local', stats: [{ name: 'Stat', value: 1 }] }
+            },
+            {
+                name: "no stats in either schema",
+                localSchema: { id: 'test', name: 'Test' },
+                standardSchema: { id: 'test', name: 'Test' },
+                expected: { id: 'test', name: 'Test' }
+            }
+        ];
+
+        testCases.forEach(testCase => {
+            const result = mergeStatsFromStandardImports(testCase.localSchema, testCase.standardSchema);
+            expect(result).toEqual(testCase.expected, `Failed on test case: ${testCase.name}`);
+        });
+    });
+
+    it("should not modify other schema properties", function () {
+        const standardSchema = {
+            id: 'test-game',
+            name: 'Standard Game',
+            url: 'https://standard.com',
+            stats: [{ name: 'Stat', value: 1 }],
+            result_parsing_rules: { extractors: [] }
+        };
+
+        const localSchema = {
+            id: 'test-game',
+            name: 'Local Game',
+            url: 'https://local.com',
+            stats: [{ name: 'Stat', value: 2 }],
+            result_parsing_rules: { extractors: [] }
+        };
+
+        window.GAMES_DEFAULT = [standardSchema];
+        window.GAMES_LOCAL = [localSchema];
+
+        window.GAMES = window.GAMES_LOCAL.map(localSchema => {
+            const standardSchema = window.GAMES_DEFAULT.find(g => g.id === localSchema.id);
+            return mergeStatsFromStandardImports(localSchema, standardSchema);
+        });
+
+        const mergedSchema = window.GAMES[0];
+        expect(mergedSchema.name).toBe('Local Game');  // Local name preserved
+        expect(mergedSchema.url).toBe('https://local.com');  // Local URL preserved
+        expect(mergedSchema.result_parsing_rules).toEqual(localSchema.result_parsing_rules);  // Local rules preserved
+    });
 }); 
