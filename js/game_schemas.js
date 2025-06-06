@@ -92,7 +92,39 @@ window.GAMES = [
     {
         id: 'pokedoku',
         name: 'PokeDoku',
-        url: 'https://pokedoku.com'
+        url: 'https://pokedoku.com',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "score",
+                    regex: "Score: (\\d+)/9",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Score",
+                            group_index: 1,
+                            type: "number"
+                        }
+                    ]
+                },
+                {
+                    name: "uniqueness",
+                    regex: "Uniqueness: (\\d+)/(\\d+)",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "UniquenessPercent",
+                            group_index: 1,
+                            type: "number",
+                            transform: "value / parseFloat(capture_groups[2]) * 100"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Score",
+            template: "30-day avg: {avg}/9",
+            days: 30
+        }
     },
     {
         id: 'framed',
@@ -206,7 +238,27 @@ window.GAMES = [
     {
         id: 'globle',
         name: 'Globle',
-        url: 'https://globle-game.com'
+        url: 'https://globle-game.com',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "guesses",
+                    regex: "= (\\d+)",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Guesses",
+                            group_index: 1,
+                            type: "number"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Guesses",
+            template: "30-day avg: {avg:0.1} guesses",
+            days: 30
+        }
     },
     {
         id: 'box-office-game',
@@ -462,7 +514,28 @@ window.GAMES = [
     {
         id: 'moviegrid',
         name: 'MovieGrid.io',
-        url: 'https://moviegrid.io'
+        url: 'https://moviegrid.io',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "score",
+                    regex: "(\\d+|X|\\?|0)/9",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Score",
+                            group_index: 1,
+                            type: "number",
+                            transform: "['X', '?', '0'].includes(value) ? 0 : parseInt(value)"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Score",
+            template: "30-day avg: {avg}/9",
+            days: 30
+        }
     },
     {
         id: 'spellcheck-game',
@@ -527,7 +600,38 @@ window.GAMES = [
     {
         id: 'relatle',
         name: 'Relatle.io',
-        url: 'https://relatle.io/'
+        url: 'https://relatle.io/',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "completion_state",
+                    regex: "Solved 🥳",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            type: "boolean",
+                            value: true
+                        }
+                    ]
+                },
+                {
+                    name: "guesses",
+                    regex: "(\\d+) guesses",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Guesses",
+                            group_index: 1,
+                            type: "number"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Guesses",
+            template: "30-day avg: {avg:0.1} guesses",
+            days: 30
+        }
     },
     {
         id: 'disorderly',
@@ -536,22 +640,22 @@ window.GAMES = [
         result_parsing_rules: {
             extractors: [
                 {
-                    name: "attempts_row_counter",
-                    // Regex to match lines starting with a number emoji (e.g., 1️⃣, 2️⃣, ... 🔟, etc.)
-                    // This will be used with type: "count" to count the number of attempt rows.
-                    regex: "^\\s*\\d{1,2}\\uFE0F?\\u20E3", // Matches lines starting with 1 or 2 digits + keycap emoji
+                    name: "columns",
+                    regex: "^\\s*\\d{1,2}\\uFE0F?\\u20E3\\s*([🟢🔴]+)",
                     capture_groups_mapping: [
                         {
-                            target_field_name: "Attempts",
-                            type: "count"
+                            target_field_name: "Columns",
+                            group_index: 1,
+                            type: "count",
+                            count_chars: ["🟢", "🔴"]
                         }
                     ]
                 }
             ]
         },
         average_display: {
-            field: "Attempts",
-            template: "Avg Attempts: {avg:0.1}", // Display with one decimal place
+            field: "Columns",
+            template: "Avg Columns: {avg:0.0}",
             days: 30
         }
     },
@@ -563,12 +667,59 @@ window.GAMES = [
     {
         id: 'bandle',
         name: 'Bandle',
-        url: 'https://bandle.app'
+        url: 'https://bandle.app',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "attempts",
+                    regex: "(\\d+|x)/6",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Attempts",
+                            group_index: 1,
+                            type: "number",
+                            transform: "value === 'x' ? 0 : parseInt(value)"
+                        },
+                        {
+                            target_field_name: "CompletionState",
+                            type: "boolean",
+                            value: true,
+                            transform: "value !== 'x'"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Attempts",
+            template: "30-day avg: {avg}/6",
+            days: 30
+        }
     },
     {
         id: 'juxtastat',
         name: 'Juxtastat',
-        url: 'https://urbanstats.org/quiz.html'
+        url: 'https://urbanstats.org/quiz.html',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "score",
+                    regex: "(\\d)/5",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Score",
+                            group_index: 1,
+                            type: "number"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Score",
+            template: "30-day avg: {avg}/5",
+            days: 30
+        }
     },
     {
         id: 'scrandle',
@@ -596,9 +747,55 @@ window.GAMES = [
         }
     },
     {
+        id: 'bonkle',
+        name: 'Bonkle',
+        url: 'https://bonkle.maskofdestiny.com',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "score",
+                    regex: "(\\d+|X|\\?|0)/7",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Score",
+                            group_index: 1,
+                            type: "number",
+                            transform: "['X', '?', '0'].includes(value) ? 0 : parseInt(value)"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Score",
+            template: "30-day avg: {avg}/7",
+            days: 30
+        }
+    },
+    {
         id: 'starwars-guessr-guess',
         name: 'Star Wars Guessr (Guess)',
-        url: 'https://starwarsguessr.com/'
+        url: 'https://starwarsguessr.com/',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "tries",
+                    regex: "📋 : (\\d+) tries",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Tries",
+                            group_index: 1,
+                            type: "number"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Tries",
+            template: "30-day avg: {avg:0.1} tries",
+            days: 30
+        }
     },
     {
         id: 'waffle',
