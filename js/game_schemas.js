@@ -80,7 +80,7 @@ window.GAMES_DEFAULT = [
         },
         average_display: {
             field: "Attempts",
-            template: "30-day avg: {avg}/6 attempts",
+            template: "30-day avg: {avg} attempts",
             days: 30
         }
     },
