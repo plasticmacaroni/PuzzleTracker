@@ -844,6 +844,31 @@ window.GAMES_DEFAULT = [
             template: "Avg Stars: {avg:0.0}/5",
             days: 30
         }
+    },
+    {
+        id: 'timeguessr',
+        name: 'TimeGuessr',
+        url: 'https://timeguessr.com/finalscoredaily',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "score",
+                    regex: "TimeGuessr #\\d+ (\\d+)/50,000",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Score",
+                            group_index: 1,
+                            type: "number"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Score",
+            template: "30-day avg: {avg:,.0f}/50,000",
+            days: 30
+        }
     }
 ];
 
