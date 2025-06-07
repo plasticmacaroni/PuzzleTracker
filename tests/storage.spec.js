@@ -78,6 +78,18 @@ describe("Storage", function () {
 
     describe("Game Results Management", function () {
         const testGameId = 'wordle-test'; // Define testGameId for this suite
+        const liveGameId = 'wordle';
+
+        beforeEach(function () {
+            // Create test schema from live schema
+            const liveSchema = window.GAMES_DEFAULT.find(g => g.id === liveGameId);
+            if (!liveSchema) {
+                throw new Error(`[storage.spec.js] Live schema for '${liveGameId}' not found in GAMES_DEFAULT.`);
+            }
+            const testSchema = JSON.parse(JSON.stringify(liveSchema));
+            testSchema.id = testGameId;
+            window.GAMES = [testSchema];
+        });
 
         it("should add a new game result for today's local date", async function () {
             console.log("[Test Run GRM1] STARTING TEST - localDateToday:", localDateToday);
@@ -161,30 +173,32 @@ describe("Storage", function () {
     });
 
     describe("Game Average Calculation", function () {
-        const gameIdForAvg = 'nyt-connections-test'; // This ID should exist in GAMES_DEFAULT
+        const testGameId = 'nyt-connections-test';
+        const liveGameId = 'nyt-connections';
 
         beforeEach(async function () {
-            // Ensure window.GAMES is set for this specific suite, using the correct test schema
-            const testSchema = window.GAMES_DEFAULT.find(g => g.id === gameIdForAvg);
-            if (!testSchema) {
-                throw new Error(`[storage.spec.js Game Average] Schema for ${gameIdForAvg} not found in window.GAMES_DEFAULT.`);
+            // Create test schema from live schema
+            const liveSchema = window.GAMES_DEFAULT.find(g => g.id === liveGameId);
+            if (!liveSchema) {
+                throw new Error(`[storage.spec.js] Live schema for '${liveGameId}' not found in GAMES_DEFAULT.`);
             }
-            window.GAMES = [JSON.parse(JSON.stringify(testSchema))]; // Isolate to only this schema
-            // console.log(`[Game Avg BeforeEach] window.GAMES set for ${gameIdForAvg}`);
+            const testSchema = JSON.parse(JSON.stringify(liveSchema));
+            testSchema.id = testGameId;
+            window.GAMES = [testSchema];
 
             const baseDate = new Date(testStorage.getLocalDateString());
 
             // Clear any existing results for this gameId to ensure test isolation
-            if (testStorage.data.gameResults[gameIdForAvg]) {
-                testStorage.data.gameResults[gameIdForAvg] = [];
+            if (testStorage.data.gameResults[testGameId]) {
+                testStorage.data.gameResults[testGameId] = [];
             } else {
-                testStorage.data.gameResults[gameIdForAvg] = [];
+                testStorage.data.gameResults[testGameId] = [];
             }
 
             const date1 = new Date(baseDate); date1.setDate(baseDate.getDate() - 2);
             const date2 = new Date(baseDate); date2.setDate(baseDate.getDate() - 1);
 
-            testStorage.data.gameResults[gameIdForAvg].push(
+            testStorage.data.gameResults[testGameId].push(
                 { date: date1.toISOString().split('T')[0], rawOutput: "Puzzle #1\n🟨🟨🟨🟨\n🟩🟩🟩🟩\n🟦🟦🟦🟦\n🟪🟪🟪🟪" }, // 4 attempts
                 { date: date2.toISOString().split('T')[0], rawOutput: "Puzzle #2\n🟨🟨🟨🟨\n🟩🟩🟩🟩\n🟦🟦🟦🟦\n🟪🟪🟪🟪\n🟨🟨🟨🟨" }  // 5 attempts
             );
@@ -192,27 +206,71 @@ describe("Storage", function () {
         });
 
         it("getGameAverage should calculate the average for the specified field and days", function () {
-            const avg = testStorage.getGameAverage(gameIdForAvg, 'Attempts', 30);
-            expect(avg).toBe("4.5"); // Based on nyt-connections-test schema and data
+            const avg = testStorage.getGameAverage(testGameId, 'Attempts', 30);
+            expect(avg).toBe("4.5"); // Based on test data
         });
 
         it("getGameAverage should return null if no valid results for the field", function () {
-            // For this test, we need a game that exists but might not have 'Attempts' or its 'average_display'
-            // Let's use wordle-test if available, or any other game ID
-            const anotherGameId = 'wordle-test';
-            const wordleTestSchema = window.GAMES_DEFAULT.find(g => g.id === anotherGameId);
-            if (!wordleTestSchema) {
-                throw new Error(`[storage.spec.js Game Average] Schema for ${anotherGameId} not found in window.GAMES_DEFAULT for null average test.`);
-            }
-            window.GAMES = [JSON.parse(JSON.stringify(wordleTestSchema))]; // Isolate
+            const avg = testStorage.getGameAverage(testGameId, 'NonExistentField', 30);
+            expect(avg).toBeNull();
+        });
+    });
 
-            const avg = testStorage.getGameAverage(anotherGameId, 'NonExistentField', 30);
+    describe("Disorderly Average Calculation", function () {
+        const testGameId = 'disorderly';
+
+        beforeEach(async function () {
+            // Create test schema from live schema
+            const liveSchema = window.GAMES_DEFAULT.find(g => g.id === testGameId);
+            if (!liveSchema) {
+                throw new Error(`[storage.spec.js] Live schema for '${testGameId}' not found in GAMES_DEFAULT.`);
+            }
+            window.GAMES = [JSON.parse(JSON.stringify(liveSchema))];
+
+            const baseDate = new Date(testStorage.getLocalDateString());
+
+            // Clear any existing results for this gameId to ensure test isolation
+            if (testStorage.data.gameResults[testGameId]) {
+                testStorage.data.gameResults[testGameId] = [];
+            } else {
+                testStorage.data.gameResults[testGameId] = [];
+            }
+
+            const date1 = new Date(baseDate); date1.setDate(baseDate.getDate() - 2);
+            const date2 = new Date(baseDate); date2.setDate(baseDate.getDate() - 1);
+
+            testStorage.data.gameResults[testGameId].push(
+                { date: date1.toISOString().split('T')[0], rawOutput: "1️⃣ 🟢🟢🟢\n2️⃣ 🟢🟢🔴\n3️⃣ 🟢🔴🔴" }, // 3 columns
+                { date: date2.toISOString().split('T')[0], rawOutput: "1️⃣ 🟢🟢🟢\n2️⃣ 🟢🟢🔴\n3️⃣ 🟢🔴🔴" }  // 3 columns
+            );
+            await testStorage.saveData();
+        });
+
+        it("getGameAverage should calculate the average for the specified field and days", function () {
+            const avg = testStorage.getGameAverage(testGameId, 'Columns', 30);
+            expect(avg).toBe("3"); // Based on test data - both entries have 3 columns
+        });
+
+        it("getGameAverage should return null if no valid results for the field", function () {
+            const avg = testStorage.getGameAverage(testGameId, 'NonExistentField', 30);
             expect(avg).toBeNull();
         });
     });
 
     describe("Hidden Games Management", function () {
         const testGameId = 'wordle-test'; // Define testGameId for this suite
+        const liveGameId = 'wordle';
+
+        beforeEach(function () {
+            // Create test schema from live schema
+            const liveSchema = window.GAMES_DEFAULT.find(g => g.id === liveGameId);
+            if (!liveSchema) {
+                throw new Error(`[storage.spec.js] Live schema for '${liveGameId}' not found in GAMES_DEFAULT.`);
+            }
+            const testSchema = JSON.parse(JSON.stringify(liveSchema));
+            testSchema.id = testGameId;
+            window.GAMES = [testSchema];
+        });
 
         it("should hide a game", async function () {
             expect(testStorage.isGameHidden(testGameId)).toBe(false);

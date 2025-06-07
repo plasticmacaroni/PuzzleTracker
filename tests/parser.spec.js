@@ -21,7 +21,7 @@ describe("Parser", function () {
         const liveSchemaId = 'nyt-connections'; // ID in game_schemas.js
 
         beforeEach(function () {
-            if (!window.GAMES_DEFAULT || window.GAMES_DEFAULT.length === 0) { // Check should ideally be caught by main beforeEach
+            if (!window.GAMES_DEFAULT || window.GAMES_DEFAULT.length === 0) {
                 throw new Error(`[parser.spec.js] CRITICAL: window.GAMES_DEFAULT is not available. Cannot run tests for ${gameId}.`);
             }
             const liveSchema = window.GAMES_DEFAULT.find(g => g.id === liveSchemaId);
@@ -33,7 +33,6 @@ describe("Parser", function () {
             const testSchema = JSON.parse(JSON.stringify(liveSchema));
             testSchema.id = gameId; // Use the test-specific ID
             window.GAMES.push(testSchema);
-            // console.log(`[parser.spec.js] Configured to use live schema '${liveSchemaId}' as '${gameId}' for NYT Connections tests.`);
         });
 
         // Test for the original behavior - ensure CompletionState: true requires explicit value in schema
@@ -114,7 +113,6 @@ Puzzle #711
             const testSchema = JSON.parse(JSON.stringify(liveSchema));
             testSchema.id = gameId;
             window.GAMES.push(testSchema);
-            // console.log(`[parser.spec.js] Configured to use live schema '${liveSchemaId}' as '${gameId}' for Wordle tests.`);
         });
 
         // These tests also rely on G_TEST_CONFIG being updated for Wordle's
@@ -250,7 +248,6 @@ Puzzle #711
             const testSchema = JSON.parse(JSON.stringify(liveSchema));
             testSchema.id = gameId;
             window.GAMES.push(testSchema);
-            // console.log(`[parser.spec.js] Configured to use live schema '${liveSchemaId}' as '${gameId}' for Costcodle tests.`);
         });
 
         it("should correctly parse a successful Costcodle result (e.g., 1/6) including Attempts and CompletionState", function () {
@@ -387,6 +384,47 @@ Puzzle #711
                 expect(result.Tries).toBe(7,
                     `Variation ${index + 1} should parse 7 tries regardless of whitespace`);
             });
+        });
+    });
+
+    describe("Disorderly Parsing", function () {
+        const gameId = 'disorderly';
+
+        beforeEach(function () {
+            if (!window.GAMES_DEFAULT || window.GAMES_DEFAULT.length === 0) {
+                throw new Error(`[parser.spec.js] CRITICAL: window.GAMES_DEFAULT is not available. Cannot run tests for ${gameId}.`);
+            }
+            const liveSchema = window.GAMES_DEFAULT.find(g => g.id === gameId);
+            if (!liveSchema) {
+                throw new Error(`[parser.spec.js] CRITICAL: Live schema for '${gameId}' not found in GAMES_DEFAULT. Cannot run tests for ${gameId}.`);
+            }
+
+            window.GAMES = []; // Start with a clean slate
+            window.GAMES.push(JSON.parse(JSON.stringify(liveSchema)));
+        });
+
+        it("should correctly count columns from Disorderly output", function () {
+            const rawOutput = `1️⃣ 🟢🟢🟢
+2️⃣ 🟢🟢🔴
+3️⃣ 🟢🔴🔴`;
+            const result = testParser.parse(gameId, rawOutput);
+            expect(result.Columns).toBe(3, "Should count 3 columns of 🟢 and 🔴");
+        });
+
+        it("should handle Disorderly output with varying whitespace", function () {
+            const rawOutput = `1️⃣  🟢🟢🟢  
+2️⃣ 🟢🟢🔴
+3️⃣  🟢🔴🔴  `;
+            const result = testParser.parse(gameId, rawOutput);
+            expect(result.Columns).toBe(3, "Should count 3 columns despite varying whitespace");
+        });
+
+        it("should handle Disorderly output with emoji variations", function () {
+            const rawOutput = `1️⃣ 🟢🟢🟢
+2️⃣ 🟢🟢🔴
+3️⃣ 🟢🔴🔴`;
+            const result = testParser.parse(gameId, rawOutput);
+            expect(result.Columns).toBe(3, "Should count 3 columns with emoji variations");
         });
     });
 

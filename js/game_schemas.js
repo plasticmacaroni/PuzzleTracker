@@ -1,4 +1,5 @@
-window.GAMES = [
+// Store the original GAMES array as GAMES_DEFAULT immediately
+window.GAMES_DEFAULT = [
     {
         id: 'wordle',
         name: 'Wordle',
@@ -37,6 +38,82 @@ window.GAMES = [
                             target_field_name: "Attempts",
                             group_index: 1,
                             type: "number"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Attempts",
+            template: "30-day avg: {avg}/6",
+            days: 30
+        }
+    },
+    {
+        id: 'nyt-connections',
+        name: 'NYT Connections',
+        url: 'https://www.nytimes.com/games/connections',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "completion_state_success",
+                    regex: "^(?=.*🟨🟨🟨🟨)(?=.*🟩🟩🟩🟩)(?=.*🟦🟦🟦🟦)(?=.*🟪🟪🟪🟪).*",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            type: "boolean",
+                            value: true
+                        }
+                    ]
+                },
+                {
+                    name: "attempts_extractor",
+                    regex: "[🟨🟩🟦🟪]{1,4}\\s*(?:\\r?\\n|$)",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Attempts",
+                            type: "count"
+                        }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: "Attempts",
+            template: "30-day avg: {avg} attempts",
+            days: 30
+        }
+    },
+    {
+        id: 'costcodle',
+        name: 'Costcodle',
+        url: 'https://costcodle.com',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: "attempts",
+                    regex: "(\\d)/6",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Attempts",
+                            group_index: 1,
+                            type: "number"
+                        },
+                        {
+                            target_field_name: "CompletionState",
+                            type: "boolean",
+                            value: true
+                        }
+                    ]
+                },
+                {
+                    name: "failures",
+                    regex: "X/6",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "CompletionState",
+                            type: "boolean",
+                            value: false
                         }
                     ]
                 }
@@ -201,41 +278,6 @@ window.GAMES = [
         }
     },
     {
-        id: 'nyt-connections',
-        name: 'NYT Connections',
-        url: 'https://www.nytimes.com/games/connections',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "completion_state_success",
-                    regex: "^(?=.*🟨🟨🟨🟨)(?=.*🟩🟩🟩🟩)(?=.*🟦🟦🟦🟦)(?=.*🟪🟪🟪🟪).*",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "CompletionState",
-                            type: "boolean",
-                            value: true
-                        }
-                    ]
-                },
-                {
-                    name: "attempts_extractor",
-                    regex: "[🟨🟩🟦🟪]{1,4}\\s*(?:\\r?\\n|$)",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Attempts",
-                            type: "count"
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Attempts",
-            template: "30-day avg: {avg} attempts",
-            days: 30
-        }
-    },
-    {
         id: 'globle',
         name: 'Globle',
         url: 'https://globle-game.com',
@@ -269,47 +311,6 @@ window.GAMES = [
         id: 'tradle',
         name: 'Tradle',
         url: 'https://games.oec.world/en/tradle/'
-    },
-    {
-        id: 'costcodle',
-        name: 'Costcodle',
-        url: 'https://costcodle.com',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "attempts",
-                    regex: "(\\d)/6",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Attempts",
-                            group_index: 1,
-                            type: "number"
-                        },
-                        {
-                            target_field_name: "CompletionState",
-                            type: "boolean",
-                            value: true
-                        }
-                    ]
-                },
-                {
-                    name: "failures",
-                    regex: "X/6",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "CompletionState",
-                            type: "boolean",
-                            value: false
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Attempts",
-            template: "30-day avg: {avg}/6",
-            days: 30
-        }
     },
     {
         id: 'movie-to-movie',
@@ -641,7 +642,7 @@ window.GAMES = [
             extractors: [
                 {
                     name: "columns",
-                    regex: "^\\s*\\d{1,2}\\uFE0F?\\u20E3\\s*([🟢🔴]+)",
+                    regex: "\\d{1,2}\\uFE0F?\\u20E3\\s*([🟢🔴]+)",
                     capture_groups_mapping: [
                         {
                             target_field_name: "Columns",
@@ -846,6 +847,9 @@ window.GAMES = [
     }
 ];
 
+// Initialize GAMES with GAMES_DEFAULT
+window.GAMES = JSON.parse(JSON.stringify(window.GAMES_DEFAULT));
+
 function mergeStatsFromStandardImports(localSchema, standardSchema) {
     // Handle edge cases
     if (!localSchema || !standardSchema) {
@@ -878,9 +882,6 @@ function mergeStatsFromStandardImports(localSchema, standardSchema) {
 
     return mergedSchema;
 }
-
-// Store the original GAMES array as GAMES_DEFAULT
-window.GAMES_DEFAULT = JSON.parse(JSON.stringify(window.GAMES));
 
 // If there are any local schemas (GAMES_LOCAL), merge stats from GAMES_DEFAULT
 if (window.GAMES_LOCAL && window.GAMES_LOCAL.length > 0) {
