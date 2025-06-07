@@ -80,7 +80,7 @@ window.GAMES_DEFAULT = [
         },
         average_display: {
             field: "Attempts",
-            template: "30-day avg: {avg} attempts",
+            template: "30-day avg: {avg}/6 attempts",
             days: 30
         }
     },
@@ -237,7 +237,7 @@ window.GAMES_DEFAULT = [
         },
         average_display: {
             field: "Tries",
-            template: "30-day avg: {avg} tries",
+            template: "30-day avg: {avg}/6 tries",
             days: 30
         }
     },
@@ -273,7 +273,7 @@ window.GAMES_DEFAULT = [
         },
         average_display: {
             field: "Score",
-            template: "30-day avg: {avg} pts",
+            template: "30-day avg: {avg}/9 pts",
             days: 30
         }
     },
@@ -351,7 +351,7 @@ window.GAMES_DEFAULT = [
         },
         average_display: {
             field: "Tries",
-            template: "30-day avg: {avg} tries",
+            template: "30-day avg: {avg}/6 tries",
             days: 30
         }
     },
@@ -637,28 +637,7 @@ window.GAMES_DEFAULT = [
     {
         id: 'disorderly',
         name: 'Disorderly',
-        url: 'https://playdisorderly.com/',
-        result_parsing_rules: {
-            extractors: [
-                {
-                    name: "columns",
-                    regex: "1️⃣\\s*([🟢🔴]+)",
-                    capture_groups_mapping: [
-                        {
-                            target_field_name: "Columns",
-                            group_index: 1,
-                            type: "count",
-                            count_chars: ["🟢", "🔴"]
-                        }
-                    ]
-                }
-            ]
-        },
-        average_display: {
-            field: "Columns",
-            template: "Columns: {avg:0.0}",
-            days: 30
-        }
+        url: 'https://playdisorderly.com/'
     },
     {
         id: 'harmonies',
