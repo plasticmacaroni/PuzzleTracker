@@ -908,10 +908,21 @@ function mergeStatsFromStandardImports(localSchema, standardSchema) {
     return mergedSchema;
 }
 
-// If there are any local schemas (GAMES_LOCAL), merge stats from GAMES_DEFAULT
+// If there are any local schemas (GAMES_LOCAL), merge them with GAMES_DEFAULT
 if (window.GAMES_LOCAL && window.GAMES_LOCAL.length > 0) {
-    window.GAMES = window.GAMES_LOCAL.map(localSchema => {
-        const standardSchema = window.GAMES_DEFAULT.find(g => g.id === localSchema.id);
-        return mergeStatsFromStandardImports(localSchema, standardSchema);
+    // Start with a copy of GAMES_DEFAULT
+    window.GAMES = JSON.parse(JSON.stringify(window.GAMES_DEFAULT));
+
+    // For each local schema, either merge it with its default counterpart or add it as new
+    window.GAMES_LOCAL.forEach(localSchema => {
+        const existingIndex = window.GAMES.findIndex(g => g.id === localSchema.id);
+        if (existingIndex >= 0) {
+            // Merge with existing schema
+            const standardSchema = window.GAMES_DEFAULT.find(g => g.id === localSchema.id);
+            window.GAMES[existingIndex] = mergeStatsFromStandardImports(localSchema, standardSchema);
+        } else {
+            // Add as new schema
+            window.GAMES.push(JSON.parse(JSON.stringify(localSchema)));
+        }
     });
 } 
