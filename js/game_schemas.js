@@ -810,8 +810,8 @@ window.GAMES_DEFAULT = [
         result_parsing_rules: {
             extractors: [
                 {
-                    name: "stars_awarded",
-                    regex: "#waffle\\d+ (\\d)/5", // Captures the digit in D/5
+                    name: "stars_awarded_success",
+                    regex: "#waffle\\d+ (\\d)/5",
                     capture_groups_mapping: [
                         {
                             target_field_name: "Stars",
@@ -821,8 +821,19 @@ window.GAMES_DEFAULT = [
                     ]
                 },
                 {
+                    name: "stars_awarded_failure",
+                    regex: "#waffle\\d+ X/5",
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: "Stars",
+                            type: "number",
+                            value: 0
+                        }
+                    ]
+                },
+                {
                     name: "completion_state_success",
-                    regex: "#waffle\\d+ \\d/5",    // Matches if format is D/5 (success, regardless of star count)
+                    regex: "#waffle\\d+ \\d/5",
                     capture_groups_mapping: [
                         {
                             target_field_name: "CompletionState",
@@ -833,7 +844,7 @@ window.GAMES_DEFAULT = [
                 },
                 {
                     name: "completion_state_failure",
-                    regex: "#waffle\\d+ X/5",    // Matches if format is X/5 (failure)
+                    regex: "#waffle\\d+ X/5",
                     capture_groups_mapping: [
                         {
                             target_field_name: "CompletionState",
