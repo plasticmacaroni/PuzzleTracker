@@ -642,7 +642,7 @@ window.GAMES_DEFAULT = [
             extractors: [
                 {
                     name: "columns",
-                    regex: "\\d{1,2}\\uFE0F?\\u20E3\\s*([🟢🔴]+)",
+                    regex: "1️⃣\\s*([🟢🔴]+)",
                     capture_groups_mapping: [
                         {
                             target_field_name: "Columns",
@@ -656,7 +656,7 @@ window.GAMES_DEFAULT = [
         },
         average_display: {
             field: "Columns",
-            template: "Avg Columns: {avg:0.0}",
+            template: "Columns: {avg:0.0}",
             days: 30
         }
     },
