@@ -1,16 +1,11 @@
 class Storage {
     constructor(localStorageOverride = null) {
-        console.log("[[[[[ Storage Constructor Called ]]]]]");
         this.localStorage = localStorageOverride || window.localStorage;
-        console.log("[[[[[ Storage Constructor: this.localStorage is mock?", this.localStorage.getItem.toString().includes("VIA SPY"), "]]]]]");
         this.data = {
             gameResults: {},
             hiddenGames: [],
             lastUpdated: new Date().toISOString()
         };
-
-        // Remove the automatic loading of games schema
-        // We'll do this explicitly after GAMES_DEFAULT is ready
     }
 
     static async create(localStorageOverride = null) {
@@ -19,7 +14,6 @@ class Storage {
         return instance;
     }
 
-    // Renamed from initialize to _initialize
     async _initialize() {
         try {
             this.data = await this.loadData();
@@ -29,16 +23,11 @@ class Storage {
     }
 
     async loadData() {
-        console.log('Loading data...');
-        // Load from localStorage
         const savedData = this.localStorage.getItem('guessrTrackerData');
         if (savedData) {
-            console.log('Data loaded from localStorage');
             return JSON.parse(savedData);
         }
 
-        // If no data found, return empty data
-        console.log('No data found, using empty data');
         return {
             gameResults: {},
             hiddenGames: [],
@@ -48,15 +37,11 @@ class Storage {
 
     async saveData() {
         this.data.lastUpdated = new Date().toISOString();
-
-        // Save to localStorage
         this.localStorage.setItem('guessrTrackerData', JSON.stringify(this.data));
-        console.log('Data saved to localStorage');
     }
 
     saveGamesSchema(games) {
         this.localStorage.setItem('guessrTrackerGames', JSON.stringify(games));
-        console.log('Games schema saved to localStorage');
     }
 
     mergeGameSchemas(baseGames, newGames) {
@@ -217,9 +202,7 @@ class Storage {
                 .map(result => {
                     try {
                         const parsed = parser.parse(gameId, result.rawOutput);
-                        console.log(`[DEBUG] Parsed result for ${gameId}:`, parsed);
                         if (parsed.CompletionState === false) {
-                            // console.log(`[STATS] Excluding failed result for ${gameId} on ${result.date}`);
                             return null;
                         }
 
@@ -237,7 +220,6 @@ class Storage {
                 .filter(value => value !== null);
 
             if (validResults.length === 0) {
-                // console.warn(`[STATS] No valid results for ${gameId} with field ${field}`);
                 return null;
             }
 
@@ -256,9 +238,6 @@ class Storage {
                         } else if (formatStr.includes(',.2f')) {
                             return Number(singleValue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                         }
-                        // If no specific decimal format in template like {avg:0.0}, but a general {avg:format} exists,
-                        // we might need a more general formatting function here based on formatStr if other formats are introduced.
-                        // For now, if it's not one of the specific decimal ones, fall through to default string conversion for single value.
                     }
                 }
                 // Default for single value if no specific template format matched for it:

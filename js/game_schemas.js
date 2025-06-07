@@ -896,22 +896,14 @@ if (!window.GAMES) {
 function mergeStatsFromStandardImports(localSchema, standardSchema) {
     // Handle edge cases
     if (!localSchema || !standardSchema) {
-        console.log('Edge case hit:', { localSchema, standardSchema });
         return localSchema;
     }
     if (localSchema.id !== standardSchema.id) {
-        console.log('ID mismatch:', { localId: localSchema.id, standardId: standardSchema.id });
         return localSchema;
     }
 
     // Create a deep copy of the standard schema as the base
     const mergedSchema = JSON.parse(JSON.stringify(standardSchema));
-    console.log('Merging schemas for:', localSchema.id, {
-        hasLocalStats: !!localSchema.stats,
-        hasStandardStats: !!standardSchema.stats,
-        localStatsCount: localSchema.stats?.length,
-        standardStatsCount: standardSchema.stats?.length
-    });
 
     // Override with local schema values, but preserve stats merging logic
     Object.keys(localSchema).forEach(key => {
@@ -930,11 +922,6 @@ function mergeStatsFromStandardImports(localSchema, standardSchema) {
                     mergedSchema.stats.push(JSON.parse(JSON.stringify(localStat)));
                 }
             });
-            console.log('After stats merge:', {
-                gameId: localSchema.id,
-                finalStatsCount: mergedSchema.stats.length,
-                stats: mergedSchema.stats
-            });
         } else {
             // For all other fields, use the local value if it exists
             mergedSchema[key] = JSON.parse(JSON.stringify(localSchema[key]));
@@ -946,11 +933,6 @@ function mergeStatsFromStandardImports(localSchema, standardSchema) {
 
 // Handle local schemas if they exist
 if (window.GAMES_LOCAL) {
-    console.log('Loading local schemas:', {
-        defaultGamesCount: window.GAMES_DEFAULT.length,
-        localGamesCount: window.GAMES_LOCAL.length
-    });
-
     // Create a map of local schemas by ID for quick lookup
     const localSchemasMap = new Map(window.GAMES_LOCAL.map(schema => [schema.id, schema]));
 
@@ -958,7 +940,6 @@ if (window.GAMES_LOCAL) {
     window.GAMES = window.GAMES.map(game => {
         const localSchema = localSchemasMap.get(game.id);
         if (localSchema) {
-            console.log('Merging game:', game.id);
             return mergeStatsFromStandardImports(localSchema, game);
         }
         return game;
@@ -967,13 +948,7 @@ if (window.GAMES_LOCAL) {
     // Add any new games from GAMES_LOCAL that don't exist in GAMES_DEFAULT
     window.GAMES_LOCAL.forEach(localSchema => {
         if (!window.GAMES.some(g => g.id === localSchema.id)) {
-            console.log('Adding new game:', localSchema.id);
             window.GAMES.push(JSON.parse(JSON.stringify(localSchema)));
         }
-    });
-
-    console.log('Final games state:', {
-        totalGames: window.GAMES.length,
-        gamesWithStats: window.GAMES.filter(g => g.stats && g.stats.length > 0).length
     });
 } 

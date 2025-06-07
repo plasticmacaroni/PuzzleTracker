@@ -5,7 +5,6 @@
 // This should be done early, after js/game_schemas.js has loaded and before any potential modification to window.GAMES (e.g., by loading from storage).
 if (window.GAMES && (!window.GAMES_DEFAULT || window.GAMES_DEFAULT.length === 0)) {
     window.GAMES_DEFAULT = JSON.parse(JSON.stringify(window.GAMES));
-    console.log('app.js: Initialized window.GAMES_DEFAULT from js/game_schemas.js. Default games count:', window.GAMES_DEFAULT.length);
 } else if (!window.GAMES) {
     console.warn('app.js: window.GAMES was not defined when attempting to initialize window.GAMES_DEFAULT. This usually means js/game_schemas.js did not load correctly.');
     window.GAMES_DEFAULT = []; // Initialize to empty array to prevent errors, though this indicates a problem.
