@@ -787,6 +787,11 @@ window.GAMES_DEFAULT = [
                             target_field_name: "Tries",
                             group_index: 1,
                             type: "number"
+                        },
+                        {
+                            target_field_name: "CompletionState",
+                            type: "boolean",
+                            value: true
                         }
                     ]
                 }
@@ -872,57 +877,92 @@ window.GAMES_DEFAULT = [
     }
 ];
 
-// Initialize GAMES with GAMES_DEFAULT
-window.GAMES = JSON.parse(JSON.stringify(window.GAMES_DEFAULT));
+// Initialize GAMES with GAMES_DEFAULT only if it hasn't been initialized yet
+if (!window.GAMES) {
+    window.GAMES = JSON.parse(JSON.stringify(window.GAMES_DEFAULT));
+}
 
 function mergeStatsFromStandardImports(localSchema, standardSchema) {
     // Handle edge cases
     if (!localSchema || !standardSchema) {
+        console.log('Edge case hit:', { localSchema, standardSchema });
         return localSchema;
     }
     if (localSchema.id !== standardSchema.id) {
+        console.log('ID mismatch:', { localId: localSchema.id, standardId: standardSchema.id });
         return localSchema;
     }
 
-    // Create a deep copy of the local schema to avoid modifying the original
-    const mergedSchema = JSON.parse(JSON.stringify(localSchema));
+    // Create a deep copy of the standard schema as the base
+    const mergedSchema = JSON.parse(JSON.stringify(standardSchema));
+    console.log('Merging schemas for:', localSchema.id, {
+        hasLocalStats: !!localSchema.stats,
+        hasStandardStats: !!standardSchema.stats,
+        localStatsCount: localSchema.stats?.length,
+        standardStatsCount: standardSchema.stats?.length
+    });
 
-    // If the standard schema has stats, merge them into the local schema
-    if (standardSchema.stats) {
-        if (!mergedSchema.stats) {
-            mergedSchema.stats = [];
-        }
-
-        // Create a map of existing stats by name for quick lookup
-        const existingStatsMap = new Map(mergedSchema.stats.map(stat => [stat.name, stat]));
-
-        // Add new stats from standard schema that don't exist in local schema
-        // Preserve the order by adding new stats at the end
-        standardSchema.stats.forEach(standardStat => {
-            if (!existingStatsMap.has(standardStat.name)) {
-                mergedSchema.stats.push(JSON.parse(JSON.stringify(standardStat)));
+    // Override with local schema values, but preserve stats merging logic
+    Object.keys(localSchema).forEach(key => {
+        if (key === 'stats') {
+            // Special handling for stats array
+            if (!mergedSchema.stats) {
+                mergedSchema.stats = [];
             }
-        });
-    }
+
+            // Create a map of existing stats by name for quick lookup
+            const existingStatsMap = new Map(mergedSchema.stats.map(stat => [stat.name, stat]));
+
+            // Add new stats from local schema that don't exist in standard schema
+            localSchema.stats.forEach(localStat => {
+                if (!existingStatsMap.has(localStat.name)) {
+                    mergedSchema.stats.push(JSON.parse(JSON.stringify(localStat)));
+                }
+            });
+            console.log('After stats merge:', {
+                gameId: localSchema.id,
+                finalStatsCount: mergedSchema.stats.length,
+                stats: mergedSchema.stats
+            });
+        } else {
+            // For all other fields, use the local value if it exists
+            mergedSchema[key] = JSON.parse(JSON.stringify(localSchema[key]));
+        }
+    });
 
     return mergedSchema;
 }
 
-// If there are any local schemas (GAMES_LOCAL), merge them with GAMES_DEFAULT
-if (window.GAMES_LOCAL && window.GAMES_LOCAL.length > 0) {
-    // Start with a copy of GAMES_DEFAULT
-    window.GAMES = JSON.parse(JSON.stringify(window.GAMES_DEFAULT));
+// Handle local schemas if they exist
+if (window.GAMES_LOCAL) {
+    console.log('Loading local schemas:', {
+        defaultGamesCount: window.GAMES_DEFAULT.length,
+        localGamesCount: window.GAMES_LOCAL.length
+    });
 
-    // For each local schema, either merge it with its default counterpart or add it as new
+    // Create a map of local schemas by ID for quick lookup
+    const localSchemasMap = new Map(window.GAMES_LOCAL.map(schema => [schema.id, schema]));
+
+    // For each game in GAMES, merge with local schema if it exists
+    window.GAMES = window.GAMES.map(game => {
+        const localSchema = localSchemasMap.get(game.id);
+        if (localSchema) {
+            console.log('Merging game:', game.id);
+            return mergeStatsFromStandardImports(localSchema, game);
+        }
+        return game;
+    });
+
+    // Add any new games from GAMES_LOCAL that don't exist in GAMES_DEFAULT
     window.GAMES_LOCAL.forEach(localSchema => {
-        const existingIndex = window.GAMES.findIndex(g => g.id === localSchema.id);
-        if (existingIndex >= 0) {
-            // Merge with existing schema
-            const standardSchema = window.GAMES_DEFAULT.find(g => g.id === localSchema.id);
-            window.GAMES[existingIndex] = mergeStatsFromStandardImports(localSchema, standardSchema);
-        } else {
-            // Add as new schema
+        if (!window.GAMES.some(g => g.id === localSchema.id)) {
+            console.log('Adding new game:', localSchema.id);
             window.GAMES.push(JSON.parse(JSON.stringify(localSchema)));
         }
+    });
+
+    console.log('Final games state:', {
+        totalGames: window.GAMES.length,
+        gamesWithStats: window.GAMES.filter(g => g.stats && g.stats.length > 0).length
     });
 } 

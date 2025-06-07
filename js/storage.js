@@ -8,17 +8,9 @@ class Storage {
             hiddenGames: [],
             lastUpdated: new Date().toISOString()
         };
-        // DO NOT CALL initialize() here directly for instances meant to be fully initialized via create()
 
-        // Wait for DOM content loaded to ensure GAMES is defined
-        // This might still be relevant for a globally created instance, but less so for test instances.
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                setTimeout(() => this.loadGamesSchema(), 100);
-            });
-        } else {
-            setTimeout(() => this.loadGamesSchema(), 100);
-        }
+        // Remove the automatic loading of games schema
+        // We'll do this explicitly after GAMES_DEFAULT is ready
     }
 
     static async create(localStorageOverride = null) {
@@ -67,16 +59,59 @@ class Storage {
         console.log('Games schema saved to localStorage');
     }
 
+    mergeGameSchemas(baseGames, newGames) {
+        // Start with a deep copy of base games
+        const mergedGames = JSON.parse(JSON.stringify(baseGames));
+        const mergedGamesMap = new Map(mergedGames.map(game => [game.id, game]));
+
+        // Process each game in the new schema
+        newGames.forEach(newGame => {
+            const existingGame = mergedGamesMap.get(newGame.id);
+            if (existingGame) {
+                // Merge existing game with new game
+                const merged = { ...existingGame };
+
+                // Preserve specific fields from new game if they exist
+                Object.keys(newGame).forEach(key => {
+                    if (key === 'stats' && newGame.stats) {
+                        // Merge stats arrays
+                        merged.stats = merged.stats || [];
+                        const existingStatsMap = new Map(merged.stats.map(stat => [stat.name, stat]));
+                        newGame.stats.forEach(stat => {
+                            if (!existingStatsMap.has(stat.name)) {
+                                merged.stats.push(JSON.parse(JSON.stringify(stat)));
+                            }
+                        });
+                    } else if (newGame[key] !== undefined) {
+                        // For non-stats fields, prefer the new value if it exists
+                        merged[key] = JSON.parse(JSON.stringify(newGame[key]));
+                    }
+                });
+
+                mergedGamesMap.set(newGame.id, merged);
+            } else {
+                // Add new game
+                mergedGamesMap.set(newGame.id, JSON.parse(JSON.stringify(newGame)));
+            }
+        });
+
+        return Array.from(mergedGamesMap.values());
+    }
+
     loadGamesSchema() {
+        // Ensure GAMES_DEFAULT exists
+        if (!window.GAMES_DEFAULT || !Array.isArray(window.GAMES_DEFAULT)) {
+            console.error('GAMES_DEFAULT not available');
+            return false;
+        }
+
         const savedGames = this.localStorage.getItem('guessrTrackerGames');
         if (savedGames) {
             try {
                 const parsedGames = JSON.parse(savedGames);
-                if (Array.isArray(parsedGames) && parsedGames.length > 0 && typeof window.GAMES !== 'undefined') {
-                    // Clear existing games and replace with saved ones
-                    window.GAMES.length = 0;
-                    window.GAMES.push(...parsedGames);
-                    console.log('Games schema loaded from localStorage');
+                if (Array.isArray(parsedGames) && parsedGames.length > 0) {
+                    // Merge saved games with defaults
+                    window.GAMES = this.mergeGameSchemas(window.GAMES_DEFAULT, parsedGames);
                     return true;
                 }
             } catch (error) {
@@ -182,13 +217,14 @@ class Storage {
                 .map(result => {
                     try {
                         const parsed = parser.parse(gameId, result.rawOutput);
+                        console.log(`[DEBUG] Parsed result for ${gameId}:`, parsed);
                         if (parsed.CompletionState === false) {
                             // console.log(`[STATS] Excluding failed result for ${gameId} on ${result.date}`);
                             return null;
                         }
 
                         if (parsed[field] === undefined) {
-                            console.error(`[STATS ERROR] Field ${field} not found in parsed result for ${gameId} on ${result.date}`);
+                            console.error(`[STATS ERROR] Field ${field} not found in parsed result for ${gameId} on ${result.date}. Available fields:`, Object.keys(parsed));
                             return null;
                         }
 
@@ -307,56 +343,34 @@ class Storage {
                 try {
                     const importedData = JSON.parse(e.target.result);
 
-                    // Check for new export format (with userData and gameSchemaState)
                     if (importedData.userData && importedData.gameSchemaState && Array.isArray(importedData.gameSchemaState)) {
-                        // Handle new format
-                        if (!importedData.userData.gameResults || !importedData.userData.lastUpdated) {
-                            throw new Error('Invalid user data format in new export structure');
-                        }
-
                         // Import user data
                         this.data = importedData.userData;
-
-                        // Ensure hiddenGames exists
                         if (!this.data.hiddenGames) {
                             this.data.hiddenGames = [];
                         }
 
-                        // Replace current game schemas with the imported state
-                        window.GAMES.length = 0; // Clear current games
-                        window.GAMES.push(...importedData.gameSchemaState);
-                        this.saveGamesSchema(window.GAMES); // Save the new complete schema
-
-                        // Update GAMES_DEFAULT to reflect the imported state as the new baseline
-                        // This assumes the imported schema is the new source of truth.
-                        window.GAMES_DEFAULT = JSON.parse(JSON.stringify(window.GAMES));
-
-                    }
-                    // Check for old export format (direct data, or userData + customGames)
-                    else if ((importedData.userData && importedData.customGames) || (importedData.gameResults && importedData.lastUpdated)) {
+                        // Merge imported game schema with current schema
+                        window.GAMES = this.mergeGameSchemas(window.GAMES_DEFAULT, importedData.gameSchemaState);
+                        this.saveGamesSchema(window.GAMES);
+                    } else if ((importedData.userData && importedData.customGames) || (importedData.gameResults && importedData.lastUpdated)) {
+                        // Handle legacy formats...
                         console.warn("Importing data from a legacy format.");
-                        // Handle legacy format (userData + customGames)
                         if (importedData.userData && importedData.customGames) {
                             this.data = importedData.userData;
                             if (!this.data.hiddenGames) this.data.hiddenGames = [];
-                            // Attempt to merge custom games from this older format if present
-                            // This requires mergeCustomGames to still exist if we want to support this path fully.
-                            // For now, we will log that these custom games might not be fully integrated as before.
-                            console.warn("Legacy import had customGames; these are not automatically merged with the new full schema import. Full schema should come from 'gameSchemaState'.");
-                            // If mergeCustomGames was vital for this path, it would need careful re-evaluation
-                            // or this specific legacy path might only restore userData.
-                        }
-                        // Handle even older legacy format (direct data)
-                        else if (importedData.gameResults && importedData.lastUpdated) {
+                            // Merge custom games with current schema
+                            window.GAMES = this.mergeGameSchemas(window.GAMES_DEFAULT, importedData.customGames);
+                            this.saveGamesSchema(window.GAMES);
+                        } else if (importedData.gameResults && importedData.lastUpdated) {
                             this.data = importedData;
                             if (!this.data.hiddenGames) this.data.hiddenGames = [];
                         }
-                    }
-                    else {
+                    } else {
                         throw new Error('Invalid or unrecognized data format for import');
                     }
 
-                    this.saveData(); // Save user data (gameResults, hiddenGames)
+                    this.saveData();
                     app.showToast('Success', 'Data imported successfully!', 'success');
                     resolve();
                 } catch (error) {
@@ -381,41 +395,6 @@ class Storage {
         const defaultGameIds = new Set(window.GAMES_DEFAULT.map(game => game.id));
         return window.GAMES.filter(game => !defaultGameIds.has(game.id));
     }
-
-    // Merge imported custom games with existing games
-    // This method is being deprecated/removed as the new import logic replaces the entire schema.
-    /*
-    mergeCustomGames(customGames) {
-        if (!Array.isArray(customGames) || customGames.length === 0) {
-            return;
-        }
-
-        // Get current custom games
-        const currentCustomGames = this.getCustomGames();
-        const currentCustomGameIds = new Set(currentCustomGames.map(game => game.id));
-
-        // Start with default games
-        const newGames = [...window.GAMES_DEFAULT];
-
-        // Add current custom games
-        currentCustomGames.forEach(game => {
-            newGames.push(game);
-        });
-
-        // Add imported custom games that don't already exist
-        customGames.forEach(importedGame => {
-            if (!currentCustomGameIds.has(importedGame.id)) {
-                newGames.push(importedGame);
-            }
-        });
-
-        // Update window.GAMES and save
-        window.GAMES.length = 0;
-        window.GAMES.push(...newGames);
-
-        this.saveGamesSchema(window.GAMES);
-    }
-    */
 
     // Enhanced method to safely update game schema
     updateGameSchema(newDefaultGames) {
