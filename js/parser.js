@@ -50,16 +50,29 @@ class Parser {
                 if (mapping.type === 'count') {
                     if (mapping.count_emojis) {
                         // Emoji counting is independent of mainMatch
-                        value = mapping.count_emojis.reduce((count, emoji) => {
-                            const escapedEmoji = String(emoji).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                            return count + (rawOutput.match(new RegExp(escapedEmoji, 'gu')) || []).length;
-                        }, 0);
+                        if (Array.isArray(mapping.count_emojis) && mapping.count_emojis.length > 0) {
+                            value = mapping.count_emojis.reduce((count, emoji) => {
+                                const escapedEmoji = String(emoji).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                return count + (rawOutput.match(new RegExp(escapedEmoji, 'gu')) || []).length;
+                            }, 0);
+                        } else {
+                            value = 0;
+                        }
                     } else {
                         // Regex-based count is also independent of mainMatch, uses extractor.regex globally
                         const countRegexStr = extractor.regex; // Get the regex string from the schema
                         const countRegex = new RegExp(countRegexStr, 'gu'); // Added 'u' flag for Unicode correctness
                         const matches = rawOutput.match(countRegex);
                         value = matches ? matches.length : 0; // Ensures 0 if no matches
+                    }
+                    // Optional transform for count results
+                    if (mapping.transform) {
+                        try {
+                            const fn = new Function('value', 'rawOutput', `return (${mapping.transform});`);
+                            value = fn(value, rawOutput);
+                        } catch (e) {
+                            console.warn(`[PARSER TRANSFORM ERROR] ${gameId} count mapping transform failed:`, e);
+                        }
                     }
                 } else if (mainMatch) {
                     // For all other types, we proceed only if the main extractor regex matched something
@@ -77,6 +90,15 @@ class Parser {
                     if (value !== undefined) {
                         switch (mapping.type) {
                             case 'number':
+                                // Apply optional transform before numeric coercion
+                                if (mapping.transform) {
+                                    try {
+                                        const fn = new Function('value', 'capture_groups', 'rawOutput', `return (${mapping.transform});`);
+                                        value = fn(value, mainMatch, rawOutput);
+                                    } catch (e) {
+                                        console.warn(`[PARSER TRANSFORM ERROR] ${gameId} mapping transform failed:`, e);
+                                    }
+                                }
                                 value = parseFloat(String(value).replace(/,/g, ''));
                                 break;
                             // 'count' is handled above

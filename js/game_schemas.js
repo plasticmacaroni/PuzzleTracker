@@ -50,6 +50,31 @@ window.GAMES_DEFAULT = [
         }
     },
     {
+        id: 'disorderly',
+        name: 'Disorderly',
+        url: 'https://playdisorderly.com/',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: 'guesses',
+                    // Count total feedback emojis (greens or reds) across all rows; each row is one guess left-to-right
+                    regex: '[🟢🔴]',
+                    capture_groups_mapping: [
+                        { target_field_name: 'Guesses', type: 'count', transform: 'value / 6' }
+                    ]
+                }
+            ]
+        },
+        stats: [
+            { name: 'Guesses', label: 'Guesses', description: 'Number of guesses (sum of left-to-right feedback across rows)' }
+        ],
+        average_display: {
+            field: 'Guesses',
+            template: '30-day avg: {avg:,.1f} guesses',
+            days: 30
+        }
+    },
+    {
         id: 'nyt-connections',
         name: 'NYT Connections',
         url: 'https://www.nytimes.com/games/connections',
@@ -124,6 +149,31 @@ window.GAMES_DEFAULT = [
             template: "30-day avg: {avg}/6",
             days: 30
         }
+    },
+    {
+        id: 'worldle',
+        name: 'Worldle',
+        url: 'https://worldle.teuteuf.fr',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: 'attempts',
+                    regex: '(?:WORLDLE|Worldle).*?(\d)/6',
+                    capture_groups_mapping: [
+                        { target_field_name: 'Attempts', group_index: 1, type: 'number' },
+                        { target_field_name: 'CompletionState', type: 'boolean', value: true }
+                    ]
+                },
+                {
+                    name: 'fail',
+                    regex: '(?:WORLDLE|Worldle).*?X/6',
+                    capture_groups_mapping: [
+                        { target_field_name: 'CompletionState', type: 'boolean', value: false }
+                    ]
+                }
+            ]
+        },
+        average_display: { field: 'Attempts', template: '30-day avg: {avg}/6', days: 30 }
     },
     {
         id: 'oec-pick-5',
@@ -284,14 +334,31 @@ window.GAMES_DEFAULT = [
         result_parsing_rules: {
             extractors: [
                 {
-                    name: "guesses",
-                    regex: "= (\\d+)",
+                    name: "guesses_equals",
+                    regex: "=\\s*(\\d+)",
                     capture_groups_mapping: [
-                        {
-                            target_field_name: "Guesses",
-                            group_index: 1,
-                            type: "number"
-                        }
+                        { target_field_name: "Guesses", group_index: 1, type: "number" }
+                    ]
+                },
+                {
+                    name: "guesses_in_wording",
+                    regex: "in\\s+(\\d+)\\s+guess(?:es)?",
+                    capture_groups_mapping: [
+                        { target_field_name: "Guesses", group_index: 1, type: "number" }
+                    ]
+                },
+                {
+                    name: "guesses_label_colon",
+                    regex: "Guesses?:\\s*(\\d+)",
+                    capture_groups_mapping: [
+                        { target_field_name: "Guesses", group_index: 1, type: "number" }
+                    ]
+                },
+                {
+                    name: "guesses_standalone",
+                    regex: "(?:^|\n)(?:\\D|^)(\\d+)\\s+guesses(?:\\D|$)",
+                    capture_groups_mapping: [
+                        { target_field_name: "Guesses", group_index: 1, type: "number" }
                     ]
                 }
             ]
@@ -305,17 +372,131 @@ window.GAMES_DEFAULT = [
     {
         id: 'box-office-game',
         name: 'Box Office Game',
-        url: 'https://boxofficega.me'
+        url: 'https://boxofficega.me',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: 'score',
+                    // Match trophy line with optional variation selector and capture the number
+                    regex: '(?:^|\\r?\\n)🏆(?:\\uFE0F)?\\s*([\\d,]+)',
+                    capture_groups_mapping: [
+                        { target_field_name: 'Score', group_index: 1, type: 'number' }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: 'Score',
+            template: '30-day avg: {avg:,.0f} pts',
+            days: 30
+        }
     },
     {
         id: 'tradle',
         name: 'Tradle',
-        url: 'https://games.oec.world/en/tradle/'
+        url: 'https://games.oec.world/en/tradle/',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: 'attempts_anywhere',
+                    regex: '([1-6])/6',
+                    capture_groups_mapping: [
+                        { target_field_name: 'Attempts', group_index: 1, type: 'number' }
+                    ]
+                },
+                {
+                    name: 'completion_state_failure',
+                    regex: '[Xx]/6',
+                    capture_groups_mapping: [
+                        { target_field_name: 'CompletionState', type: 'boolean', value: false }
+                    ]
+                },
+                {
+                    name: 'completion_state_success',
+                    regex: '([1-6])/6',
+                    capture_groups_mapping: [
+                        { target_field_name: 'CompletionState', type: 'boolean', value: true }
+                    ]
+                }
+            ]
+        },
+        average_display: {
+            field: 'Attempts',
+            template: '30-day avg: {avg}/6',
+            days: 30
+        }
     },
     {
         id: 'movie-to-movie',
         name: 'Movie to Movie',
-        url: 'https://movietomovie.com'
+        url: 'https://movietomovie.com',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: 'hops_emojis',
+                    // Count alternating movie/person emojis as hops
+                    regex: '[🎬🧑]',
+                    capture_groups_mapping: [
+                        { target_field_name: 'Hops', type: 'count' }
+                    ]
+                },
+                {
+                    name: 'hops_arrows',
+                    // Prefer number of arrows if present; only set when > 0
+                    regex: '[➡️➡]',
+                    capture_groups_mapping: [
+                        { target_field_name: 'Hops', type: 'count', count_emojis: ['➡', '➡️'], transform: 'value > 0 ? value : undefined' }
+                    ]
+                }
+            ]
+        },
+        stats: [
+            { name: 'Hops', label: 'Hops', description: 'Number of hops in the connection path' }
+        ],
+        average_display: {
+            field: 'Hops',
+            template: '30-day avg: {avg} hops',
+            days: 30
+        }
+    },
+    {
+        id: 'queens',
+        name: 'Queens',
+        url: 'https://www.linkedin.com/games/queens',
+        result_parsing_rules: {
+            extractors: [
+                {
+                    name: 'time_mmss',
+                    regex: '(?:^|[\n\r\s|])([0-9]+):([0-5][0-9])(?:\b|\s)',
+                    capture_groups_mapping: [
+                        {
+                            target_field_name: 'TimeSeconds',
+                            group_index: 1,
+                            type: 'number',
+                            transform: 'parseInt(capture_groups[1], 10) * 60 + parseInt(capture_groups[2], 10)'
+                        }
+                    ]
+                }
+            ]
+        },
+        stats: [
+            { name: 'TimeSeconds', label: 'Time (s)', description: 'Completion time in seconds' }
+        ],
+        average_display: {
+            field: 'TimeSeconds',
+            template: '30-day avg: {avg:,.0f}s',
+            days: 30
+        }
+    },
+    {
+        id: 'geogrid',
+        name: 'Geogrid',
+        url: 'https://www.geogridgame.com/'
+    },
+    {
+        id: 'emovi',
+        name: 'Emovi',
+        url: 'https://emovi.teuteuf.fr/'
     },
     {
         id: 'guessthe-game',
@@ -755,7 +936,7 @@ window.GAMES_DEFAULT = [
     {
         id: 'starwars-guessr-guess',
         name: 'Star Wars Guessr (Guess)',
-        url: 'https://starwarsguessr.com/',
+        url: 'https://starwarsguessr.com/#daily_guess',
         result_parsing_rules: {
             extractors: [
                 {
@@ -843,28 +1024,41 @@ window.GAMES_DEFAULT = [
     {
         id: 'timeguessr',
         name: 'TimeGuessr',
-        url: 'https://timeguessr.com/finalscoredaily',
+        url: 'https://timeguessr.com',
         result_parsing_rules: {
             extractors: [
                 {
-                    name: "score",
-                    regex: "TimeGuessr #\\d+ (\\d+)/50,000",
+                    name: "score_primary",
+                    // Prioritize the number immediately before the slash out of 50,000
+                    regex: "TimeGuessr\\s*#\\d+[^0-9]*([\\d,]+)\\s*/\\s*50,000",
                     capture_groups_mapping: [
-                        {
-                            target_field_name: "Score",
-                            group_index: 1,
-                            type: "number"
-                        }
+                        { target_field_name: "Score", group_index: 1, type: "number" }
+                    ]
+                },
+                {
+                    name: "score_fallback",
+                    // Fallback: anywhere in the text, capture the number before /50,000
+                    regex: "([\\d,]+)\\s*/\\s*50,000",
+                    capture_groups_mapping: [
+                        { target_field_name: "Score", group_index: 1, type: "number" }
                     ]
                 }
             ]
         },
+        stats: [
+            {
+                name: "Score",
+                label: "Score",
+                description: "Daily TimeGuessr score"
+            }
+        ],
         average_display: {
             field: "Score",
             template: "30-day avg: {avg:,.0f}/50,000",
             days: 30
         }
-    }
+    },
+    // Removed unsafe/obsolete games
 ];
 
 // Initialize GAMES with GAMES_DEFAULT only if it hasn't been initialized yet

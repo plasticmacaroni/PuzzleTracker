@@ -41,7 +41,11 @@ class Storage {
     }
 
     saveGamesSchema(games) {
-        this.localStorage.setItem('guessrTrackerGames', JSON.stringify(games));
+        // Persist only custom games; defaults are shipped with the app
+        if (!Array.isArray(games)) return;
+        const defaultIds = new Set((window.GAMES_DEFAULT || []).map(g => g.id));
+        const customOnly = games.filter(g => !defaultIds.has(g.id));
+        this.localStorage.setItem('guessrTrackerGames', JSON.stringify(customOnly));
     }
 
     mergeGameSchemas(baseGames, newGames) {
@@ -95,8 +99,10 @@ class Storage {
             try {
                 const parsedGames = JSON.parse(savedGames);
                 if (Array.isArray(parsedGames) && parsedGames.length > 0) {
-                    // Merge saved games with defaults
-                    window.GAMES = this.mergeGameSchemas(window.GAMES_DEFAULT, parsedGames);
+                    // Robust policy: defaults are authoritative; only keep custom games (not in defaults)
+                    const defaultIds = new Set(window.GAMES_DEFAULT.map(g => g.id));
+                    const customOnly = parsedGames.filter(g => !defaultIds.has(g.id));
+                    window.GAMES = [...window.GAMES_DEFAULT, ...customOnly];
                     return true;
                 }
             } catch (error) {
@@ -174,6 +180,7 @@ class Storage {
     getGameAverage(gameId, field, days = 30) {
         const results = this.getGameResults(gameId);
 
+        // Allow summaries to render placeholder when no results
         if (results.length === 0) {
             return null;
         }
@@ -192,11 +199,14 @@ class Storage {
                 console.error(`[STATS ERROR] Invalid average field: ${field} for game ${gameId}`);
             }
 
-            const resultsAfterDateFilter = results.filter(result => {
+            // Prefer last N days; if none, fallback to all results (so cards aren't blank)
+            let resultsAfterDateFilter = results.filter(result => {
                 const resultDate = new Date(result.date);
-                const comparison = resultDate >= cutoffDate;
-                return comparison;
+                return resultDate >= cutoffDate;
             });
+            if (resultsAfterDateFilter.length === 0) {
+                resultsAfterDateFilter = results;
+            }
 
             const validResults = resultsAfterDateFilter
                 .map(result => {
@@ -329,8 +339,10 @@ class Storage {
                             this.data.hiddenGames = [];
                         }
 
-                        // Merge imported game schema with current schema
-                        window.GAMES = this.mergeGameSchemas(window.GAMES_DEFAULT, importedData.gameSchemaState);
+                        // Robust policy: defaults authoritative; add only custom games from imported schema
+                        const defaultIds = new Set(window.GAMES_DEFAULT.map(g => g.id));
+                        const importedCustom = importedData.gameSchemaState.filter(g => !defaultIds.has(g.id));
+                        window.GAMES = [...window.GAMES_DEFAULT, ...importedCustom];
                         this.saveGamesSchema(window.GAMES);
                     } else if ((importedData.userData && importedData.customGames) || (importedData.gameResults && importedData.lastUpdated)) {
                         // Handle legacy formats...
@@ -338,8 +350,10 @@ class Storage {
                         if (importedData.userData && importedData.customGames) {
                             this.data = importedData.userData;
                             if (!this.data.hiddenGames) this.data.hiddenGames = [];
-                            // Merge custom games with current schema
-                            window.GAMES = this.mergeGameSchemas(window.GAMES_DEFAULT, importedData.customGames);
+                            // Add only custom games
+                            const defaultIds = new Set(window.GAMES_DEFAULT.map(g => g.id));
+                            const importedCustom = importedData.customGames.filter(g => !defaultIds.has(g.id));
+                            window.GAMES = [...window.GAMES_DEFAULT, ...importedCustom];
                             this.saveGamesSchema(window.GAMES);
                         } else if (importedData.gameResults && importedData.lastUpdated) {
                             this.data = importedData;
@@ -382,31 +396,10 @@ class Storage {
             return false;
         }
 
-        // Create map of default games by ID for easy access
-        const defaultGamesMap = new Map();
-        newDefaultGames.forEach(game => {
-            defaultGamesMap.set(game.id, game);
-        });
-
-        // Get custom (user-added) games
+        // Replace defaults authoritatively and append existing custom games
         const customGames = this.getCustomGames();
-
-        // Start with updated default games
-        const updatedGames = [...newDefaultGames];
-
-        // Add user's custom games
-        customGames.forEach(game => {
-            updatedGames.push(game);
-        });
-
-        // Update window.GAMES and save
-        window.GAMES.length = 0;
-        window.GAMES.push(...updatedGames);
-
-        // Update the default games reference
         window.GAMES_DEFAULT = JSON.parse(JSON.stringify(newDefaultGames));
-
-        // Save to localStorage
+        window.GAMES = [...newDefaultGames, ...customGames];
         this.saveGamesSchema(window.GAMES);
         return true;
     }
@@ -474,8 +467,9 @@ class Storage {
     // Export just the game schema (for sharing configurations)
     exportGameSchema() {
         const customGames = this.getCustomGames();
-
-        const dataStr = JSON.stringify(customGames, null, 2);
+        // Export wrapped under a `games` key to match the importer expectations
+        const payload = { games: customGames };
+        const dataStr = JSON.stringify(payload, null, 2);
         const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
 
         const exportFileDefaultName = `guessr-tracker-schema-${this.getLocalDateString()}.json`;
@@ -497,17 +491,21 @@ class Storage {
                 try {
                     const importedData = JSON.parse(e.target.result);
 
-                    // Validate the schema structure
-                    if (!importedData.games || !Array.isArray(importedData.games) || importedData.games.length === 0) {
+                    // Accept both wrapped `{ games: [...] }` and plain array legacy formats
+                    const importedGames = Array.isArray(importedData)
+                        ? importedData
+                        : importedData && Array.isArray(importedData.games)
+                            ? importedData.games
+                            : null;
+
+                    if (!importedGames || importedGames.length === 0) {
                         throw new Error('Invalid schema format');
                     }
 
-                    // Confirm with the user if they want to replace their game schema
-                    if (confirm(`This will import ${importedData.games.length} games and replace your current game schema. Your game history will be preserved. Continue?`)) {
-
+                    if (confirm(`This will import ${importedGames.length} games and replace your current game schema. Your game history will be preserved. Continue?`)) {
                         // Update the games array
                         window.GAMES.length = 0;
-                        window.GAMES.push(...importedData.games);
+                        window.GAMES.push(...importedGames);
 
                         // Save to localStorage
                         this.saveGamesSchema(window.GAMES);

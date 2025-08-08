@@ -8,8 +8,7 @@
     <meta name="description"
         content="Track and visualize your performance across various daily puzzle games like Wordle, Connections, and more.">
     <link rel="stylesheet" href="css/styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <!-- Chart.js duplicated includes removed from head; scripts are at the bottom -->
     <!-- Add CodeMirror CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
@@ -66,10 +65,10 @@
     <div id="resultModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Enter Puzzle Results</h2>
+            <h2 id="resultModalTitle">Enter Puzzle Results</h2>
             <div id="modalContent">
                 <textarea id="resultInput" placeholder="Paste your game results here..."></textarea>
-                <button id="submitResult" class="btn"><i class="fa-solid fa-paper-plane"></i> Submit</button>
+                <button id="submitResult" class="btn result-btn">Enter Result</button>
             </div>
         </div>
     </div>
@@ -80,6 +79,7 @@
             <span class="close">&times;</span>
             <h2><i class="fa-solid fa-chart-line"></i> Puzzle Statistics</h2>
             <div id="statsContent">
+                <!-- Quick entry bar is injected dynamically -->
                 <div class="chart-container">
                     <canvas id="statsChart"></canvas>
                 </div>
@@ -175,31 +175,7 @@
         </div>
     </div>
 
-    <!-- Manage Games Modal -->
-    <div id="manageGamesModal" class="modal">
-        <div class="modal-content manage-games-modal">
-            <span class="close">&times;</span>
-            <h2>Manage Games</h2>
-            <div class="manage-games-description">
-                <p>Here you can manage which games appear in your tracker:</p>
-                <ul>
-                    <li><strong>Hide</strong>: Default games can be hidden but not removed completely</li>
-                    <li><strong>Remove</strong>: Custom-added games can be completely removed</li>
-                    <li><strong>Unhide</strong>: Hidden games can be restored at any time</li>
-                </ul>
-            </div>
-            <div class="manage-games-container">
-                <div class="games-list-section">
-                    <h3>Active Games</h3>
-                    <div id="activeGamesList" class="games-list"></div>
-                </div>
-                <div class="games-list-section">
-                    <h3>Hidden Games</h3>
-                    <div id="hiddenGamesList" class="games-list"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Removed legacy Manage Games Modal (duplicate) -->
 
     <!-- Add CodeMirror JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>

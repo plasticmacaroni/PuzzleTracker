@@ -112,9 +112,9 @@ class GameCharts {
                             text: 'Value'
                         }
                     },
-                    percentage: {
+                    percentage: hasSuccessRate ? {
                         type: 'linear',
-                        display: hasSuccessRate,
+                        display: true,
                         position: 'right',
                         min: 0,
                         max: 100,
@@ -125,7 +125,7 @@ class GameCharts {
                         grid: {
                             drawOnChartArea: false
                         }
-                    }
+                    } : undefined
                 },
                 plugins: {
                     tooltip: {

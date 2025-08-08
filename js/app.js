@@ -17,6 +17,13 @@ class App {
         this.currentGameId = null;
         this.toastContainer = null;
         this.schemaEditor = null;
+        // Load any saved schema from storage before UI builds
+        try {
+            window.storage.loadGamesSchema();
+        } catch (e) {
+            console.warn('Failed to load saved game schema, continuing with defaults.', e);
+        }
+
         this.initializeDarkMode();
         this.initializeToastContainer();
         this.initializeEventListeners();
@@ -443,6 +450,7 @@ class App {
         document.getElementById('exportData').addEventListener('click', () => storage.exportData());
         document.getElementById('importData').addEventListener('click', () => document.getElementById('importFile').click());
         document.getElementById('importFile').addEventListener('change', (e) => this.handleImport(e));
+        // (Removed) global paste result CTA
 
         // Schema import/export buttons
         document.getElementById('exportSchemaOnly').addEventListener('click', () => storage.exportGameSchema());
@@ -460,6 +468,20 @@ class App {
         // Modal close buttons
         document.querySelectorAll('.close').forEach(btn => {
             btn.addEventListener('click', () => this.closeModals());
+        });
+
+        // Robust close handling: delegate clicks on any future `.close` elements
+        document.addEventListener('click', (e) => {
+            if (e.target && (e.target.classList && e.target.classList.contains('close') || (e.target.closest && e.target.closest('.close')))) {
+                this.closeModals();
+            }
+        });
+
+        // Allow Escape key to close any open modal
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                this.closeModals();
+            }
         });
 
         // Click outside modal to close
@@ -483,6 +505,8 @@ class App {
 
         // Result submit button
         document.getElementById('submitResult').addEventListener('click', () => this.handleResultSubmit());
+
+        // (Removed) global paste listener for auto-detect flow
     }
 
     // New method to switch between tabs
@@ -656,46 +680,31 @@ class App {
                     gameSchema.average_display.days
                 );
 
-                let displayText = '';
-                if (avgValue !== null) { // Check against null explicitly to allow "0" or "0.0"
-                    const template = gameSchema.average_display.template;
-                    if (template.includes('{avg:')) {
-                        displayText = template.replace(/{avg:[^}]+}/, avgValue);
-                    } else {
-                        displayText = template.replace('{avg}', avgValue);
-                    }
-                }
+                const template = gameSchema.average_display.template;
+                const replacement = (avgValue !== null) ? String(avgValue) : '—';
+                const formatted = template.replace(/\{avg(?::[^}]*)?\}/, replacement);
 
                 let averageDisplayElement = card.querySelector('.average-display');
                 let cardDividerElement = card.querySelector('.card-divider');
                 const cardTopRow = card.querySelector('.card-top-row');
 
-                if (displayText) { // If there's an average to display
-                    if (!averageDisplayElement && cardTopRow) { // If section doesn't exist, create it
-                        // Create divider if it doesn't exist
-                        if (!cardDividerElement) {
-                            cardDividerElement = document.createElement('div');
-                            cardDividerElement.className = 'card-divider';
-                            cardTopRow.after(cardDividerElement); // Insert divider after top row
-                        }
-
-                        // Create average display div (should be after divider)
-                        averageDisplayElement = document.createElement('div');
-                        averageDisplayElement.className = 'average-display';
-                        if (cardDividerElement) {
-                            cardDividerElement.after(averageDisplayElement);
-                        } else { // Should not happen if divider is created, but as fallback
-                            cardTopRow.after(averageDisplayElement);
-                        }
+                // Ensure elements exist
+                if (!cardDividerElement && cardTopRow) {
+                    cardDividerElement = document.createElement('div');
+                    cardDividerElement.className = 'card-divider';
+                    cardTopRow.after(cardDividerElement);
+                }
+                if (!averageDisplayElement && (cardDividerElement || cardTopRow)) {
+                    averageDisplayElement = document.createElement('div');
+                    averageDisplayElement.className = 'average-display';
+                    if (cardDividerElement) {
+                        cardDividerElement.after(averageDisplayElement);
+                    } else if (cardTopRow) {
+                        cardTopRow.after(averageDisplayElement);
                     }
-                    // Update text content if the element exists (it should by now)
-                    if (averageDisplayElement) {
-                        averageDisplayElement.textContent = displayText;
-                    }
-                } else { // No average to display, remove the section
-                    if (averageDisplayElement) averageDisplayElement.remove();
-                    // Also remove divider if it's tied to the average display's existence
-                    if (cardDividerElement) cardDividerElement.remove();
+                }
+                if (averageDisplayElement) {
+                    averageDisplayElement.textContent = formatted;
                 }
             }
             // ---- End: Update average display ----
@@ -766,22 +775,13 @@ class App {
                 game.average_display.days
             );
 
-            if (avg) { // Only if avg is not null or empty (or a non-empty string)
-                const template = game.average_display.template;
-                let displayText = '';
-                if (template.includes('{avg:')) {
-                    // The getGameAverage method already returns formatted value for format specifiers
-                    displayText = template.replace(/{avg:[^}]+}/, avg);
-                } else {
-                    // Simple {avg} replacement
-                    displayText = template.replace('{avg}', avg);
-                }
-                averageDisplayHtml = `
-                    <div class="card-divider"></div>
-                    <div class="average-display">${displayText}</div>
-                `;
-            }
-            // If avg is null/undefined/empty, averageDisplayHtml remains '', so "New Game!" and its div won't be rendered.
+            const template = game.average_display.template;
+            const replacement = (avg !== null) ? String(avg) : '—';
+            const displayText = template.replace(/\{avg(?::[^}]*)?\}/, replacement);
+            averageDisplayHtml = `
+                <div class="card-divider"></div>
+                <div class="average-display">${displayText}</div>
+            `;
         }
 
         card.innerHTML = `
@@ -800,7 +800,7 @@ class App {
         `;
 
         // Add event listeners
-        card.querySelector('.play-btn').addEventListener('click', () => window.open(game.url, '_blank'));
+        card.querySelector('.play-btn').addEventListener('click', () => this.openPlayFlow(game));
         card.querySelector('.stats-btn').addEventListener('click', () => this.showStats(game.id));
         card.querySelector('.result-btn').addEventListener('click', () => this.showResultInput(game.id));
 
@@ -808,6 +808,16 @@ class App {
         this.applyGameStyling(card, game);
 
         return card;
+    }
+
+    openPlayFlow(game) {
+        try { window.open(game.url, '_blank'); } catch (_) { }
+        const results = storage.getGameResults(game.id);
+        if (results && results.length > 0) {
+            this.showStats(game.id);
+        } else {
+            this.showResultInput(game.id);
+        }
     }
 
     // New method to add randomized puzzle decoration position
@@ -957,9 +967,28 @@ class App {
             `;
         }
 
-        // Display raw history
+        // Quick entry area + raw history
         const historyList = document.getElementById('historyList');
         historyList.innerHTML = '';
+
+        // Inject quick entry controls above history if not present
+        if (!document.getElementById('quickEntryBar')) {
+            const statsContent = document.getElementById('statsContent');
+            const quickBar = document.createElement('div');
+            quickBar.id = 'quickEntryBar';
+            quickBar.style.display = 'flex';
+            quickBar.style.gap = '10px';
+            quickBar.style.margin = '16px 0 20px';
+            quickBar.style.padding = '12px';
+            quickBar.style.border = '1px solid var(--border-color)';
+            quickBar.style.borderRadius = '10px';
+            quickBar.style.background = 'rgba(74, 144, 226, 0.06)';
+            quickBar.innerHTML = `
+                <textarea id="quickResultInput" placeholder="Paste today's result here..." style="flex:1; min-height: 110px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-background); color: var(--text-color); font-family: monospace; resize: vertical;"></textarea>
+                <button id="quickSubmitResult" class="btn result-btn">Enter Result</button>
+            `;
+            statsContent.prepend(quickBar);
+        }
 
         results.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(result => {
             const entry = document.createElement('div');
@@ -1071,19 +1100,55 @@ class App {
     showResultInput(gameId) {
         this.currentGameId = gameId;
         const modal = document.getElementById('resultModal');
+        const titleEl = document.getElementById('resultModalTitle');
+        const game = window.GAMES.find(g => g.id === gameId);
+        if (titleEl && game) {
+            titleEl.textContent = `Enter ${game.name} results`;
+        }
         document.getElementById('resultInput').value = '';
         modal.style.display = 'block';
     }
+
+    // (Removed) global paste handler
+
+    // (Removed) detectGameFromText
 
     async handleResultSubmit() {
         const input = document.getElementById('resultInput').value.trim();
         if (!input) return;
 
-        const game = window.GAMES.find(g => g.id === this.currentGameId);
-        storage.addGameResult(this.currentGameId, input);
-        this.closeModals();
-        this.updateCardPositions();
-        this.showToast('Nice job!', `Completed today's ${game.name}`, 'success');
+        // If a game is selected (manual entry), save to it. Otherwise auto-detect
+        if (this.currentGameId) {
+            const game = window.GAMES.find(g => g.id === this.currentGameId);
+            storage.addGameResult(this.currentGameId, input);
+            this.closeModals();
+            this.updateCardPositions();
+            this.showToast('Nice job!', `Completed today's ${game.name}`, 'success');
+            return;
+        }
+
+        const detection = this.detectGameFromText(input);
+        if (!detection || detection.candidates.length === 0) {
+            this.showToast('Not recognized', 'Could not detect the game from the pasted text.', 'warning');
+            return;
+        }
+        const top = detection.candidates[0];
+        if (detection.candidates.length === 1 || top.score >= 2) {
+            storage.addGameResult(top.game.id, input);
+            this.closeModals();
+            this.updateCardPositions();
+            this.showToast('Result Added', `Detected ${top.game.name} and saved.`, 'success');
+            return;
+        }
+
+        const pick = prompt(`Multiple games match your input. Type the number to save:\n${detection.candidates.map((c, i) => `${i + 1}. ${c.game.name}`).join('\n')}`);
+        const idx = parseInt(pick, 10) - 1;
+        if (!isNaN(idx) && detection.candidates[idx]) {
+            storage.addGameResult(detection.candidates[idx].game.id, input);
+            this.closeModals();
+            this.updateCardPositions();
+            this.showToast('Result Added', `Saved to ${detection.candidates[idx].game.name}.`, 'success');
+        }
     }
 
     showSchemaEditor() {
@@ -1249,11 +1314,12 @@ class App {
             restoreBtn.addEventListener('click', () => this.restoreGame(game.id));
             actions.appendChild(restoreBtn);
         } else {
-            // For visible games, show hide or remove based on if it's a default game
+            // For visible games, show hide or remove based on presence in defaults
             const isDefault = defaultGameIds.has(game.id);
+            const isCustom = !isDefault;
 
             const actionBtn = document.createElement('button');
-            if (isDefault) {
+            if (!isCustom) {
                 actionBtn.className = 'btn hide-btn';
                 actionBtn.textContent = 'Hide';
                 actionBtn.addEventListener('click', () => this.hideGame(game.id));
