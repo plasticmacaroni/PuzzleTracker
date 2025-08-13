@@ -165,8 +165,22 @@ window.GAMES_DEFAULT = [
                     ]
                 },
                 {
+                    name: 'attempts_simple',
+                    regex: '([1-6])/6',
+                    capture_groups_mapping: [
+                        { target_field_name: 'Attempts', group_index: 1, type: 'number' }
+                    ]
+                },
+                {
+                    name: 'completion_state_success_simple',
+                    regex: '([1-6])/6',
+                    capture_groups_mapping: [
+                        { target_field_name: 'CompletionState', type: 'boolean', value: true }
+                    ]
+                },
+                {
                     name: 'fail',
-                    regex: '(?:WORLDLE|Worldle).*?X/6',
+                    regex: '(?:WORLDLE|Worldle).*?X/6|X/6',
                     capture_groups_mapping: [
                         { target_field_name: 'CompletionState', type: 'boolean', value: false }
                     ]
