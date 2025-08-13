@@ -917,6 +917,8 @@ class App {
     }
 
     showStats(gameId) {
+        // Ensure subsequent submissions know the active game
+        this.currentGameId = gameId;
         const results = storage.getGameResults(gameId);
 
         if (results.length === 0) {
@@ -1132,38 +1134,16 @@ class App {
         const input = document.getElementById('resultInput').value.trim();
         if (!input) return;
 
-        // If a game is selected (manual entry), save to it. Otherwise auto-detect
-        if (this.currentGameId) {
-            const game = window.GAMES.find(g => g.id === this.currentGameId);
-            storage.addGameResult(this.currentGameId, input);
-            this.closeModals();
-            this.updateCardPositions();
-            this.showToast('Nice job!', `Completed today's ${game.name}`, 'success');
+        if (!this.currentGameId) {
+            this.showToast('Select a game', 'Open a game and paste the result from its card or stats screen.', 'warning');
             return;
         }
 
-        const detection = this.detectGameFromText(input);
-        if (!detection || detection.candidates.length === 0) {
-            this.showToast('Not recognized', 'Could not detect the game from the pasted text.', 'warning');
-            return;
-        }
-        const top = detection.candidates[0];
-        if (detection.candidates.length === 1 || top.score >= 2) {
-            storage.addGameResult(top.game.id, input);
-            this.closeModals();
-            this.updateCardPositions();
-            this.showToast('Result Added', `Detected ${top.game.name} and saved.`, 'success');
-            return;
-        }
-
-        const pick = prompt(`Multiple games match your input. Type the number to save:\n${detection.candidates.map((c, i) => `${i + 1}. ${c.game.name}`).join('\n')}`);
-        const idx = parseInt(pick, 10) - 1;
-        if (!isNaN(idx) && detection.candidates[idx]) {
-            storage.addGameResult(detection.candidates[idx].game.id, input);
-            this.closeModals();
-            this.updateCardPositions();
-            this.showToast('Result Added', `Saved to ${detection.candidates[idx].game.name}.`, 'success');
-        }
+        const game = window.GAMES.find(g => g.id === this.currentGameId);
+        storage.addGameResult(this.currentGameId, input);
+        this.closeModals();
+        this.updateCardPositions();
+        this.showToast('Nice job!', `Completed today's ${game.name}`, 'success');
     }
 
     showSchemaEditor() {
