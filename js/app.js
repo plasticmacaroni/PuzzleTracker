@@ -990,6 +990,21 @@ class App {
             statsContent.prepend(quickBar);
         }
 
+        // Wire quick entry to reuse the existing modal submit flow
+        const quickInputEl = document.getElementById('quickResultInput');
+        const quickBtnEl = document.getElementById('quickSubmitResult');
+        if (quickBtnEl) {
+            quickBtnEl.onclick = () => {
+                const value = quickInputEl ? quickInputEl.value.trim() : '';
+                if (!value) return;
+                const modalInput = document.getElementById('resultInput');
+                if (modalInput) {
+                    modalInput.value = value;
+                }
+                this.handleResultSubmit();
+            };
+        }
+
         results.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(result => {
             const entry = document.createElement('div');
             entry.className = 'history-entry';
