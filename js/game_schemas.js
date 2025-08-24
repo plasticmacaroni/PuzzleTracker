@@ -1072,6 +1072,16 @@ window.GAMES_DEFAULT = [
             days: 30
         }
     },
+    {
+        id: 'marveldle-comics',
+        name: 'MarvelDle Comics',
+        url: 'https://marveldle.com/character/comics/guess',
+    },
+    {
+        id: 'marveldle-mcu',
+        name: 'MarvelDle MCU',
+        url: 'https://marveldle.com/character/audiovisual/guess',
+    },
     // Removed unsafe/obsolete games
 ];
 
