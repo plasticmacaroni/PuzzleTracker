@@ -1082,6 +1082,16 @@ window.GAMES_DEFAULT = [
         name: 'MarvelDle MCU',
         url: 'https://marveldle.com/character/audiovisual/guess',
     },
+    {
+        id: 'tolkiendle',
+        name: 'Tolkiendle',
+        url: 'https://tolkiendle.com'
+    },
+    {
+        id: 'faces',
+        name: 'Faces',
+        url: 'https://faces.wtf'
+    },
     // Removed unsafe/obsolete games
 ];
 
