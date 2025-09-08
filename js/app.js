@@ -995,6 +995,12 @@ class App {
         // Wire quick entry to reuse the existing modal submit flow
         const quickInputEl = document.getElementById('quickResultInput');
         const quickBtnEl = document.getElementById('quickSubmitResult');
+
+        // Clear the textarea every time stats screen opens for a fresh experience
+        if (quickInputEl) {
+            quickInputEl.value = '';
+        }
+
         if (quickBtnEl) {
             quickBtnEl.onclick = () => {
                 const value = quickInputEl ? quickInputEl.value.trim() : '';
