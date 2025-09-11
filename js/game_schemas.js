@@ -1092,6 +1092,11 @@ window.GAMES_DEFAULT = [
         name: 'Faces',
         url: 'https://faces.wtf'
     },
+    {
+        id: 'moreorless-imdb',
+        name: 'MoreOrLess IMDB Ratings',
+        url: 'https://moreorless.io/game/imdb-ratings'
+    },
     // Removed unsafe/obsolete games
 ];
 
