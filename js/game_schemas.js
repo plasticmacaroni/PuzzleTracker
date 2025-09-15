@@ -1097,6 +1097,11 @@ window.GAMES_DEFAULT = [
         name: 'MoreOrLess IMDB Ratings',
         url: 'https://moreorless.io/game/imdb-ratings'
     },
+    {
+        id: 'catfishing',
+        name: 'Catfishing',
+        url: 'https://catfishing.net/'
+    },
     // Removed unsafe/obsolete games
 ];
 
