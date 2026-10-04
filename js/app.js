@@ -1,1537 +1,614 @@
-// Game configuration - define as global variable by attaching to window
-// window.GAMES = [...] // This large array is now in js/game_schemas.js
-
-// Ensure window.GAMES_DEFAULT is initialized with a deep copy of the initial GAMES array
-// This should be done early, after js/game_schemas.js has loaded and before any potential modification to window.GAMES (e.g., by loading from storage).
-if (window.GAMES && (!window.GAMES_DEFAULT || window.GAMES_DEFAULT.length === 0)) {
-    window.GAMES_DEFAULT = JSON.parse(JSON.stringify(window.GAMES));
-} else if (!window.GAMES) {
-    console.warn('app.js: window.GAMES was not defined when attempting to initialize window.GAMES_DEFAULT. This usually means js/game_schemas.js did not load correctly.');
-    window.GAMES_DEFAULT = []; // Initialize to empty array to prevent errors, though this indicates a problem.
-} else if (window.GAMES_DEFAULT && window.GAMES_DEFAULT.length > 0) {
-    console.log('app.js: window.GAMES_DEFAULT was already populated. Count:', window.GAMES_DEFAULT.length);
-}
-
-class App {
-    constructor() {
-        this.currentGameId = null;
-        this.toastContainer = null;
-        this.schemaEditor = null;
-        // Load any saved schema from storage before UI builds
-        try {
-            window.storage.loadGamesSchema();
-        } catch (e) {
-            console.warn('Failed to load saved game schema, continuing with defaults.', e);
-        }
-
-        this.initializeDarkMode();
-        this.initializeToastContainer();
-        this.initializeEventListeners();
-        this.showDailyReminderBanner();
-        this.updateCardPositions();
-        this.startCardPolling();
-    }
-
-    // Helper function to get today's date in local timezone
-    getLocalDateString() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const dateStr = `${year}-${month}-${day}`;
-        // console.log('Using local date:', dateStr, '(Browser time)'); // Commented out for polling
-        return dateStr;
-    }
-
-    initializeDarkMode() {
-        // Check if user has already set a preference
-        const darkModePreference = localStorage.getItem('darkModePreference');
-
-        // If there's a preference, apply it
-        if (darkModePreference === 'dark') {
-            document.body.classList.add('dark-mode');
-        } else if (darkModePreference === 'light') {
-            document.body.classList.remove('dark-mode');
-        } else {
-            // If no preference, check system preference
-            const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (prefersDarkMode) {
-                document.body.classList.add('dark-mode');
-            }
-        }
-
-        // Create dark mode toggle button
-        const darkModeToggle = document.createElement('button');
-        darkModeToggle.id = 'darkModeToggle';
-        darkModeToggle.className = 'btn dark-mode-toggle';
-        darkModeToggle.innerHTML = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-        darkModeToggle.title = document.body.classList.contains('dark-mode') ? 'Switch to Light Mode' : 'Switch to Dark Mode';
-
-        // Add event listener to toggle button
-        darkModeToggle.addEventListener('click', () => this.toggleDarkMode());
-
-        // Add to header
-        const headerActions = document.querySelector('.header-actions');
-        headerActions.prepend(darkModeToggle);
-    }
-
-    toggleDarkMode() {
-        const isDarkMode = document.body.classList.toggle('dark-mode');
-
-        // Update button
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        darkModeToggle.innerHTML = isDarkMode ? '☀️' : '🌙';
-        darkModeToggle.title = isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode';
-
-        // Save preference
-        localStorage.setItem('darkModePreference', isDarkMode ? 'dark' : 'light');
-
-        // Update card colors for all games
-        document.querySelectorAll('.game-card').forEach(card => {
-            this.applyCardColors(card);
-        });
-    }
-
-    initializeToastContainer() {
-        const container = document.createElement('div');
-        container.className = 'toast-container';
-        document.body.appendChild(container);
-    }
-
-    showToast(title, message, type = 'info', duration = 5000) {
-        const container = document.querySelector('.toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-
-        toast.innerHTML = `
-            <div class="toast-content">
-                <div class="toast-title">${title}</div>
-                <div class="toast-message">${message}</div>
-            </div>
-            <button class="toast-close">&times;</button>
-        `;
-
-        const closeBtn = toast.querySelector('.toast-close');
-        closeBtn.addEventListener('click', () => this.removeToast(toast));
-
-        container.appendChild(toast);
-
-        if (duration > 0) {
-            setTimeout(() => this.removeToast(toast), duration);
-        }
-
-        return toast;
-    }
-
-    removeToast(toast) {
-        if (toast.classList.contains('removing')) return;
-
-        toast.classList.add('removing');
-        toast.addEventListener('animationend', () => {
-            toast.remove();
-        });
-    }
-
-    // Apply styling to a game card
-    applyGameStyling(card, game) {
-        try {
-            // Extract domain for favicon
-            const domain = new URL(game.url).hostname;
-
-            // Create consistent favicon container
-            const iconWrapper = card.querySelector('.card-icon-wrapper');
-            iconWrapper.style.width = '48px';
-            iconWrapper.style.height = '48px';
-            iconWrapper.style.display = 'flex';
-            iconWrapper.style.justifyContent = 'center';
-            iconWrapper.style.alignItems = 'center';
-            iconWrapper.style.overflow = 'hidden';
-
-            // Generate direct colors for fallback instead of using string hash
-            const initialColors = {
-                primary: chroma.random().desaturate(0.5).hex(),
-                background: '#f0f0f0',
-                darkBackground: '#222222',
-                lightModeText: '#000000',
-                darkModeText: '#ffffff'
-            };
-
-            // Apply initial colors
-            card.style.borderColor = initialColors.primary;
-            card.style.backgroundColor = initialColors.background;
-
-            // Set data attributes for colors
-            card.dataset.primaryColor = initialColors.primary;
-            card.dataset.lightBackground = initialColors.background;
-            card.dataset.darkBackground = initialColors.darkBackground;
-            card.dataset.lightModeText = initialColors.lightModeText;
-            card.dataset.darkModeText = initialColors.darkModeText;
-
-            // Apply initial colors
-            this.applyCardColors(card);
-
-            // Start with fallback icon
-            this.createFallbackIcon(card, game);
-
-            // Try to load the favicon 
-            this.loadFavicon(card, game, domain);
-
-        } catch (error) {
-            console.error(`Error styling card for ${game.name}:`, error);
-            this.createFallbackIcon(card, game);
-        }
-    }
-
-    // Create a simple fallback icon when an image can't be loaded
-    createFallbackIcon(card, game) {
-        try {
-            // Clear current content
-            const iconWrapper = card.querySelector('.card-icon-wrapper');
-            while (iconWrapper && iconWrapper.firstChild) {
-                iconWrapper.removeChild(iconWrapper.firstChild);
-            }
-
-            // Create a simple colored circle with the first letter
-            const iconDiv = document.createElement('div');
-            iconDiv.className = 'fallback-icon';
-            iconDiv.style.width = '48px';
-            iconDiv.style.height = '48px';
-            iconDiv.style.borderRadius = '50%';
-            iconDiv.style.backgroundColor = card.dataset.primaryColor || '#cccccc';
-            iconDiv.style.display = 'flex';
-            iconDiv.style.justifyContent = 'center';
-            iconDiv.style.alignItems = 'center';
-            iconDiv.style.fontWeight = 'bold';
-            iconDiv.style.fontSize = '24px';
-            iconDiv.style.color = '#ffffff';
-            iconDiv.textContent = game.name.charAt(0).toUpperCase();
-
-            if (iconWrapper) {
-                iconWrapper.appendChild(iconDiv);
-            }
-        } catch (e) {
-            console.error(`Error creating fallback icon for ${game.name}:`, e);
-        }
-    }
-
-    // Load favicon and extract colors
-    loadFavicon(card, game, domain) {
-        // Check if we have a cached favicon
-        const cachedFavicon = localStorage.getItem(`favicon_data_${domain}`);
-        if (cachedFavicon) {
-            // Display cached favicon
-            this.displayFavicon(card, cachedFavicon, game);
-
-            // Extract colors from cached favicon
-            this.extractColorsWithVibrant(cachedFavicon, card);
-            return;
-        }
-
-        // First try direct display (always works for UI but doesn't let us cache)
-        const directImg = document.createElement('img');
-        directImg.style.display = 'none';
-        document.body.appendChild(directImg);
-
-        directImg.onload = () => {
-            try {
-                // Try to copy image to canvas to convert to data URL
-                const canvas = document.createElement('canvas');
-                canvas.width = 48;
-                canvas.height = 48;
-                const ctx = canvas.getContext('2d');
-
-                try {
-                    // This will throw a security error if CORS blocks it
-                    ctx.drawImage(directImg, 0, 0, 48, 48);
-
-                    // If we got here, we successfully cached the image!
-                    const dataUrl = canvas.toDataURL('image/png');
-                    localStorage.setItem(`favicon_data_${domain}`, dataUrl);
-
-                    // Display the cached version
-                    this.displayFavicon(card, dataUrl, game);
-
-                    // Extract colors
-                    this.extractColorsWithVibrant(dataUrl, card);
-                } catch (canvasError) {
-                    // CORS error when trying to draw to canvas
-                    console.info(`Canvas security error for ${domain}, trying alternative approach`);
-
-                    // Just display the direct image for now (it works for display)
-                    this.displayFavicon(card, directImg.src, game);
-
-                    // Try to use built-in icons
-                    this.tryBuiltInIcons(domain, game, card);
-                }
-            } catch (e) {
-                console.warn(`Error processing favicon for ${domain}:`, e);
-                // Still show the image, just don't cache it
-                this.displayFavicon(card, directImg.src, game);
-            } finally {
-                // Clean up
-                document.body.removeChild(directImg);
-            }
-        };
-
-        directImg.onerror = () => {
-            console.warn(`Favicon load failed for ${game.name}`);
-            document.body.removeChild(directImg);
-            this.tryBuiltInIcons(domain, game, card);
-        };
-
-        // Set source to Google's favicon service
-        directImg.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
-    }
-
-    // Extract colors using Vibrant.js
-    extractColorsWithVibrant(imageUrl, card) {
-        if (!window.Vibrant) return;
-
-        try {
-            // Create a new image element
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
-
-            // Set up onload handler before setting src
-            img.onload = () => {
-                try {
-                    // Use Vibrant.from for node-vibrant 3.1.6
-                    Vibrant.from(img).getPalette((err, palette) => {
-                        if (err || !palette) return;
-
-                        // Prefer DarkVibrant as requested
-                        const swatch = palette.DarkVibrant ||
-                            palette.Vibrant ||
-                            palette.LightVibrant ||
-                            palette.Muted;
-
-                        if (!swatch) return;
-
-                        // Create color scheme from the swatch
-                        const baseColor = chroma(swatch.getHex());
-                        const colors = {
-                            primary: baseColor.hex(),
-                            lightBackground: baseColor.luminance(0.93).hex(),
-                            darkBackground: baseColor.luminance(0.15).hex()
-                        };
-
-                        // Determine text colors based on contrast
-                        colors.lightModeText = chroma.contrast(colors.lightBackground, '#000000') >= 4.5 ? '#000000' : '#ffffff';
-                        colors.darkModeText = chroma.contrast(colors.darkBackground, '#ffffff') >= 4.5 ? '#ffffff' : '#000000';
-
-                        // Update card colors
-                        card.dataset.primaryColor = colors.primary;
-                        card.dataset.lightBackground = colors.lightBackground;
-                        card.dataset.darkBackground = colors.darkBackground;
-                        card.dataset.lightModeText = colors.lightModeText;
-                        card.dataset.darkModeText = colors.darkModeText;
-
-                        // Apply the colors
-                        this.applyCardColors(card);
-                    });
-                } catch (e) {
-                    console.warn('Error processing image with Vibrant.js:', e);
-                }
-            };
-
-            img.onerror = () => {
-                console.warn('Error loading image for Vibrant.js processing');
-            };
-
-            // Set the source last
-            img.src = imageUrl;
-        } catch (e) {
-            console.warn('Error extracting colors with Vibrant.js:', e);
-        }
-    }
-
-    // Try to use built-in icons
-    tryBuiltInIcons(domain, game, card) {
-        // We previously had hardcoded fallback icons here, but they've been removed
-        // to reduce code size and unnecessary data embedding
-        const gameTypeIcons = {};
-
-        // Check if we have a local icon for this type of game
-        for (const [keyword, dataUrl] of Object.entries(gameTypeIcons)) {
-            if (domain.toLowerCase().includes(keyword.toLowerCase())) {
-                // Store in localStorage
-                localStorage.setItem(`favicon_data_${domain}`, dataUrl);
-
-                // Display the icon
-                this.displayFavicon(card, dataUrl, game);
-
-                // Extract colors
-                this.extractColorsWithVibrant(dataUrl, card);
-                return;
-            }
-        }
-    }
-
-    // Display a favicon
-    displayFavicon(card, src, game) {
-        try {
-            // Clear current content
-            const iconWrapper = card.querySelector('.card-icon-wrapper');
-            while (iconWrapper && iconWrapper.firstChild) {
-                iconWrapper.removeChild(iconWrapper.firstChild);
-            }
-
-            // Create favicon element
-            const favicon = new Image();
-            favicon.className = 'game-favicon';
-            favicon.alt = `${game.name} icon`;
-            favicon.src = src;
-            favicon.style.width = '48px';
-            favicon.style.height = '48px';
-            favicon.style.objectFit = 'contain';
-
-            // Add to DOM
-            if (iconWrapper) {
-                iconWrapper.appendChild(favicon);
-            }
-        } catch (e) {
-            console.warn(`Error displaying favicon for ${game.name}:`, e);
-        }
-    }
-
-    // Apply colors to a card based on current color scheme
-    applyCardColors(card) {
-        const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const isCompleted = card.classList.contains('completed');
-
-        // Get stored colors
-        const primary = card.dataset.primaryColor;
-
-        // For completed cards, use a neutral background
-        let background, textColor;
-
-        if (isCompleted) {
-            // Use a neutral grey background for completed cards
-            background = isDarkMode ? '#2a2a2a' : '#f0f0f0';
-            textColor = isDarkMode ? '#ffffff' : '#333333';
-        } else {
-            // Use the extracted colors for active cards
-            background = isDarkMode ? card.dataset.darkBackground : card.dataset.lightBackground;
-            textColor = isDarkMode ? card.dataset.darkModeText : card.dataset.lightModeText;
-        }
-
-        // Apply colors
-        if (primary) {
-            card.style.borderColor = isCompleted ? 'transparent' : primary;
-        }
-        if (background) card.style.backgroundColor = background;
-
-        // Apply text colors 
-        const cardTitle = card.querySelector('.card-title');
-        const averageDisplay = card.querySelector('.average-display');
-        const cardDivider = card.querySelector('.card-divider');
-
-        if (cardTitle) cardTitle.style.color = textColor;
-
-        // Style divider if present
-        if (cardDivider) {
-            cardDivider.style.backgroundColor = isCompleted ?
-                (isDarkMode ? '#444' : '#eee') :
-                chroma(primary).alpha(0.3).css();
-        }
-
-        // Adjust average display color and alignment
-        if (averageDisplay) {
-            const avgColor = isDarkMode
-                ? chroma(textColor).brighten(0.5).hex()
-                : chroma(textColor).darken(0.5).hex();
-            averageDisplay.style.color = avgColor;
-            averageDisplay.style.textAlign = 'center';
-        }
-    }
-
-    initializeEventListeners() {
-        // Export/Import buttons
-        document.getElementById('exportData').addEventListener('click', () => storage.exportData());
-        document.getElementById('importData').addEventListener('click', () => document.getElementById('importFile').click());
-        document.getElementById('importFile').addEventListener('change', (e) => this.handleImport(e));
-        // (Removed) global paste result CTA
-
-        // Schema import/export buttons
-        document.getElementById('exportSchemaOnly').addEventListener('click', () => storage.exportGameSchema());
-        document.getElementById('importSchemaOnly').addEventListener('click', () => document.getElementById('importSchemaFile').click());
-        document.getElementById('importSchemaFile').addEventListener('change', (e) => this.handleSchemaImport(e));
-
-        // Reminder banner buttons
-        document.getElementById('exportDataBanner').addEventListener('click', () => {
-            storage.exportData();
-            this.hideBanner();
-        });
-        document.getElementById('dismissBanner').addEventListener('click', () => this.hideBanner());
-        document.getElementById('closeBanner').addEventListener('click', () => this.hideBanner());
-
-        // Modal close buttons
-        document.querySelectorAll('.close').forEach(btn => {
-            btn.addEventListener('click', () => this.closeModals());
-        });
-
-        // Robust close handling: delegate clicks on any future `.close` elements
-        document.addEventListener('click', (e) => {
-            if (e.target && (e.target.classList && e.target.classList.contains('close') || (e.target.closest && e.target.closest('.close')))) {
-                this.closeModals();
-            }
-        });
-
-        // Allow Escape key to close any open modal
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                this.closeModals();
-            }
-        });
-
-        // Click outside modal to close
-        window.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal')) {
-                this.closeModals();
-            }
-        });
-
-        // Game management modal
-        document.getElementById('editSchema').addEventListener('click', () => this.showSchemaModal('manage'));
-        document.getElementById('editSchemaManually').addEventListener('click', () => this.showSchemaEditor());
-        document.getElementById('saveSchema').addEventListener('click', () => this.saveSchema());
-        document.getElementById('cancelSchema').addEventListener('click', () => this.hideSchemaEditor());
-        document.getElementById('quickAddGame').addEventListener('click', () => this.handleQuickAddGame());
-
-        // Tab buttons
-        document.getElementById('quickAddTab').addEventListener('click', () => this.switchTab('quickAdd'));
-        document.getElementById('manageTab').addEventListener('click', () => this.switchTab('manage'));
-        document.getElementById('advancedTab').addEventListener('click', () => this.switchTab('advanced'));
-
-        // Result submit button
-        document.getElementById('submitResult').addEventListener('click', () => this.handleResultSubmit());
-
-        // (Removed) global paste listener for auto-detect flow
-    }
-
-    // New method to switch between tabs
-    switchTab(tabName) {
-        // Hide all tab content
-        document.querySelectorAll('.modal-tab-content').forEach(tab => {
-            tab.style.display = 'none';
-        });
-
-        // Remove active class from all tabs
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-
-        // Show selected tab content and mark tab as active
-        if (tabName === 'quickAdd') {
-            document.getElementById('quickAddSection').style.display = 'block';
-            document.getElementById('quickAddTab').classList.add('active');
-        } else if (tabName === 'manage') {
-            document.getElementById('manageSection').style.display = 'block';
-            document.getElementById('manageTab').classList.add('active');
-            this.loadManageGamesContent();
-        } else if (tabName === 'advanced') {
-            document.getElementById('advancedSection').style.display = 'block';
-            document.getElementById('advancedTab').classList.add('active');
-        }
-    }
-
-    // Method to load game management content
-    loadManageGamesContent() {
-        const activeGamesList = document.getElementById('activeGamesList');
-        const hiddenGamesList = document.getElementById('hiddenGamesList');
-
-        // Clear previous entries
-        activeGamesList.innerHTML = '';
-        hiddenGamesList.innerHTML = '';
-
-        // Process all games
-        window.GAMES.forEach(game => {
-            const isHidden = storage.isGameHidden(game.id);
-            const gameItem = this.createGameListItem(game, isHidden);
-
-            if (isHidden) {
-                hiddenGamesList.appendChild(gameItem);
-            } else {
-                activeGamesList.appendChild(gameItem);
-            }
-        });
-    }
-
-    showSchemaModal(activeTab = 'manage') {
-        const modal = document.getElementById('schemaModal');
-        modal.style.display = 'block';
-
-        // Switch to the specified tab
-        this.switchTab(activeTab);
-    }
-
-    closeModals() {
-        let schemaModalWasOpen = false;
-        const schemaModalElement = document.getElementById('schemaModal');
-
-        document.querySelectorAll('.modal').forEach(modal => {
-            if (modal === schemaModalElement && modal.style.display === 'block') {
-                schemaModalWasOpen = true;
-            }
-            modal.style.display = 'none';
-        });
-
-        if (schemaModalWasOpen) {
-            this.updateCardPositions();
-        }
-    }
-
-    hideGame(gameId) {
-        const game = window.GAMES.find(g => g.id === gameId);
-        if (!game) return;
-
-        if (confirm(`Are you sure you want to hide ${game.name}? It can be restored later.`)) {
-            if (storage.hideGame(gameId)) {
-                // Remove from active list and add to hidden list in the modal
-                const activeItem = document.querySelector(`#activeGamesList [data-game-id="${gameId}"]`);
-                if (activeItem) {
-                    activeItem.remove();
-
-                    // Create item for hidden list
-                    const hiddenList = document.getElementById('hiddenGamesList');
-                    const gameItem = this.createGameListItem(game, true);
-                    hiddenList.appendChild(gameItem);
-                }
-
-                this.showToast('Game Hidden', `${game.name} has been hidden`, 'info');
-            }
-        }
-    }
-
-    async handleImport(event) {
-        const file = event.target.files[0];
-        if (file) {
-            try {
-                await storage.importData(file);
-                this.updateCardPositions();
-                this.showToast('Success', 'Data imported successfully!', 'success');
-            } catch (error) {
-                this.showToast('Error', 'Error importing data: ' + error.message, 'error');
-            }
-        }
-    }
-
-    startCardPolling() {
-        // Initial render
-        this.updateCardPositions();
-
-        // Poll every second
-        setInterval(() => this.updateCardPositions(), 1000);
-    }
-
-    updateCardPositions() {
-        const activeList = document.getElementById('gameList');
-        const completedList = document.getElementById('completedGameList');
-        const today = this.getLocalDateString();
-        let cardsToReRender = new Set(); // Game IDs that need full re-render
-        let requiresFullListReRender = false;
-
-        // Presumed IDs for the elements to be hidden/shown
-        const completedGamesHeader = document.getElementById('completed-puzzles-header');
-        const addGameButton = document.getElementById('add-game-btn');
-
-        // Check if any game's hidden status has changed compared to what's displayed
-        const currentlyDisplayedGameIds = new Set([...activeList.children, ...completedList.children].map(card => card.dataset.gameId));
-        const allGameSchemas = window.GAMES || []; // Correct: Use the global GAMES array
-
-        allGameSchemas.forEach(game => {
-            const isCurrentlyDisplayed = currentlyDisplayedGameIds.has(game.id);
-            const shouldBeDisplayed = !window.storage.isGameHidden(game.id);
-
-            if (isCurrentlyDisplayed !== shouldBeDisplayed) {
-                requiresFullListReRender = true;
-            }
-        });
-
-        // If a full re-render is needed (e.g. game unhidden), clear lists and rebuild
-        if (requiresFullListReRender) {
-            activeList.innerHTML = '';
-            completedList.innerHTML = '';
-            const gamesToDisplay = allGameSchemas.filter(game => !window.storage.isGameHidden(game.id));
-            gamesToDisplay.forEach(game => {
-                const card = this.createGameCard(game);
-                // Initial placement logic (will be refined below)
-                const lastResult = window.storage.getLatestGameResult(game.id, today);
-                if (lastResult && lastResult.CompletionState === true) {
-                    completedList.appendChild(card);
-                } else {
-                    activeList.appendChild(card);
-                }
-            });
-        }
-
-        // Iterate over all cards in both lists (active and completed)
-        [...activeList.children, ...completedList.children].forEach(card => {
-            const gameId = card.getAttribute('data-game-id');
-            if (!currentlyDisplayedGameIds.has(gameId)) return; // Card is already gone or shouldn't be there
-
-            const gameSchema = allGameSchemas.find(g => g.id === gameId);
-
-            // ---- Start: Update average display text and structure ----
-            if (gameSchema && gameSchema.average_display) {
-                const avgValue = storage.getGameAverage(
-                    gameSchema.id,
-                    gameSchema.average_display.field,
-                    gameSchema.average_display.days
-                );
-
-                const template = gameSchema.average_display.template;
-                const replacement = (avgValue !== null) ? String(avgValue) : '—';
-                const formatted = template.replace(/\{avg(?::[^}]*)?\}/, replacement);
-
-                let averageDisplayElement = card.querySelector('.average-display');
-                let cardDividerElement = card.querySelector('.card-divider');
-                const cardTopRow = card.querySelector('.card-top-row');
-
-                // Ensure elements exist
-                if (!cardDividerElement && cardTopRow) {
-                    cardDividerElement = document.createElement('div');
-                    cardDividerElement.className = 'card-divider';
-                    cardTopRow.after(cardDividerElement);
-                }
-                if (!averageDisplayElement && (cardDividerElement || cardTopRow)) {
-                    averageDisplayElement = document.createElement('div');
-                    averageDisplayElement.className = 'average-display';
-                    if (cardDividerElement) {
-                        cardDividerElement.after(averageDisplayElement);
-                    } else if (cardTopRow) {
-                        cardTopRow.after(averageDisplayElement);
-                    }
-                }
-                if (averageDisplayElement) {
-                    averageDisplayElement.textContent = formatted;
-                }
-            }
-            // ---- End: Update average display ----
-
-            const isInCompletedList = card.parentElement === completedList;
-            let gameShouldBeInCompleted = false;
-
-            if (gameSchema && !window.storage.isGameHidden(gameId)) {
-                const latestResultToday = window.storage.getLatestGameResult(gameId, today);
-                if (latestResultToday) {
-                    gameShouldBeInCompleted = true;
-                }
-            }
-
-            if (isInCompletedList !== gameShouldBeInCompleted) {
-                if (gameShouldBeInCompleted) {
-                    completedList.appendChild(card);
-                    card.classList.add('completed');
-                } else {
-                    activeList.appendChild(card);
-                    card.classList.remove('completed');
-                }
-            }
-            // Always call applyCardColors to update styles based on completion, dark mode, and new average text/colors
-            this.applyCardColors(card);
-        });
-
-        // After all cards are processed and potentially moved:
-
-        // 1. Visibility for "Completed Games" header
-        if (completedGamesHeader) {
-            if (completedList.children.length === 0) {
-                completedGamesHeader.style.display = 'none'; // Hide if empty
-            } else {
-                completedGamesHeader.style.display = ''; // Show if not empty (restore default)
-            }
-        }
-
-        // 2. Visibility for "New Game" button - Ensure it's always visible
-        if (addGameButton) {
-            addGameButton.style.display = ''; // Restore default display (always visible)
-        }
-
-        // If any cards were marked for re-render, do it now (simplified)
-        // cardsToReRender.forEach(gameId => {  // This loop is no longer needed as cards are moved directly
-        //     this.updateCardPositions();
-        // });
-    }
-
-    createGameCard(game) {
-        const card = document.createElement('div');
-        card.className = 'game-card';
-        card.setAttribute('data-game-id', game.id);
-        const isCompleted = storage.isGameCompletedToday(game.id);
-        if (isCompleted) {
-            card.classList.add('completed');
-        }
-
-        // Add randomized puzzle decoration position
-        this.addRandomPuzzleDecoration(card);
-
-        // Get average if configured
-        let averageDisplayHtml = ''; // Initialize to empty string
-        if (game.average_display) {
-            const avg = storage.getGameAverage(
-                game.id,
-                game.average_display.field,
-                game.average_display.days
-            );
-
-            const template = game.average_display.template;
-            const replacement = (avg !== null) ? String(avg) : '—';
-            const displayText = template.replace(/\{avg(?::[^}]*)?\}/, replacement);
-            averageDisplayHtml = `
-                <div class="card-divider"></div>
-                <div class="average-display">${displayText}</div>
-            `;
-        }
-
-        card.innerHTML = `
-            <div class="card-top-row">
-                <div class="card-icon-wrapper">
-                    <img class="game-favicon" alt="${game.name} icon" src="">
-                </div>
-                <h3 class="card-title">${game.name}</h3>
-            </div>
-            ${averageDisplayHtml}
-            <div class="game-actions">
-                <button class="btn play-btn" data-url="${game.url}">Play</button>
-                <button class="btn stats-btn" data-game="${game.id}">Stats</button>
-                <button class="btn result-btn" data-game="${game.id}">Enter Result</button>
-            </div>
-        `;
-
-        // Add event listeners
-        card.querySelector('.play-btn').addEventListener('click', () => this.openPlayFlow(game));
-        card.querySelector('.stats-btn').addEventListener('click', () => this.showStats(game.id));
-        card.querySelector('.result-btn').addEventListener('click', () => this.showResultInput(game.id));
-
-        // Apply brand styling to the card
-        this.applyGameStyling(card, game);
-
-        return card;
-    }
-
-    openPlayFlow(game) {
-        try { window.open(game.url, '_blank'); } catch (_) { }
-        const results = storage.getGameResults(game.id);
-        if (results && results.length > 0) {
-            this.showStats(game.id);
-        } else {
-            this.showResultInput(game.id);
-        }
-    }
-
-    // New method to add randomized puzzle decoration position
-    addRandomPuzzleDecoration(card) {
-        // Create and add the first puzzle piece element
-        const puzzlePiece1 = document.createElement('div');
-        puzzlePiece1.className = 'puzzle-decoration piece1';
-
-        // Make sure pieces are more visible by positioning them more inside the card
-        const positions1 = ['top-center', 'middle-right', 'bottom-center', 'middle-left'];
-        const randomPos1 = positions1[Math.floor(Math.random() * positions1.length)];
-        puzzlePiece1.classList.add(randomPos1);
-
-        // Larger size for better visibility
-        const size1 = 80 + Math.floor(Math.random() * 60); // Random size between 80px and 140px
-        puzzlePiece1.style.width = `${size1}px`;
-        puzzlePiece1.style.height = `${size1}px`;
-
-        // More defined puzzle piece shape with stronger border-radius
-        const radius1 = [
-            `${40 + Math.random() * 30}% ${70 + Math.random() * 30}% ${70 + Math.random() * 30}% ${40 + Math.random() * 30}%`,
-            `${40 + Math.random() * 30}% ${40 + Math.random() * 30}% ${70 + Math.random() * 30}% ${70 + Math.random() * 30}%`
-        ].join(' / ');
-        puzzlePiece1.style.borderRadius = radius1;
-
-        // Much higher opacity and more visible styling
-        if (document.body.classList.contains('dark-mode')) {
-            puzzlePiece1.style.backgroundColor = `rgba(255, 255, 255, ${(0.12 + Math.random() * 0.08).toFixed(2)})`;
-        } else {
-            const cardTitleElement = card.querySelector('.card-title');
-            let color = '#808080'; // Default grey color
-            if (cardTitleElement && cardTitleElement.textContent) {
-                color = this.stringToColor(cardTitleElement.textContent);
-            }
-            const colorRgb = this.hexToRgb(color);
-            puzzlePiece1.style.backgroundColor = `rgba(${colorRgb.r}, ${colorRgb.g}, ${colorRgb.b}, ${(0.15 + Math.random() * 0.1).toFixed(2)})`;
-        }
-
-        // Add border to make it more defined
-        puzzlePiece1.style.border = `1px solid rgba(255, 255, 255, ${document.body.classList.contains('dark-mode') ? 0.1 : 0.03})`;
-
-        // Create and add the second puzzle piece element
-        const puzzlePiece2 = document.createElement('div');
-        puzzlePiece2.className = 'puzzle-decoration piece2';
-
-        // Ensure second piece position is different from first
-        let positions2 = [...positions1];
-        positions2 = positions2.filter(pos => pos !== randomPos1);
-        const randomPos2 = positions2[Math.floor(Math.random() * positions2.length)];
-        puzzlePiece2.classList.add(randomPos2);
-
-        // Randomize the size for second piece
-        const size2 = 70 + Math.floor(Math.random() * 40); // Random size between 70px and 110px
-        puzzlePiece2.style.width = `${size2}px`;
-        puzzlePiece2.style.height = `${size2}px`;
-
-        // More defined puzzle piece shape
-        const radius2 = [
-            `${40 + Math.random() * 30}% ${70 + Math.random() * 30}% ${70 + Math.random() * 30}% ${40 + Math.random() * 30}%`,
-            `${40 + Math.random() * 30}% ${40 + Math.random() * 30}% ${70 + Math.random() * 30}% ${70 + Math.random() * 30}%`
-        ].join(' / ');
-        puzzlePiece2.style.borderRadius = radius2;
-
-        // Much higher opacity for visibility
-        if (document.body.classList.contains('dark-mode')) {
-            puzzlePiece2.style.backgroundColor = `rgba(255, 255, 255, ${(0.12 + Math.random() * 0.08).toFixed(2)})`;
-        } else {
-            // Use a different color variant for the second piece
-            const cardTitleElement = card.querySelector('.card-title');
-            let color = '#A9A9A9'; // Default dark grey color
-            if (cardTitleElement && cardTitleElement.textContent) {
-                color = this.stringToColor(cardTitleElement.textContent + '1');
-            }
-            const colorRgb = this.hexToRgb(color);
-            puzzlePiece2.style.backgroundColor = `rgba(${colorRgb.r}, ${colorRgb.g}, ${colorRgb.b}, ${(0.15 + Math.random() * 0.1).toFixed(2)})`;
-        }
-
-        // Add border to make it more defined
-        puzzlePiece2.style.border = `1px solid rgba(255, 255, 255, ${document.body.classList.contains('dark-mode') ? 0.1 : 0.03})`;
-
-        // Add the pieces to the card
-        card.appendChild(puzzlePiece1);
-        card.appendChild(puzzlePiece2);
-    }
-
-    // Helper method to convert hex color to RGB components
-    hexToRgb(hex) {
-        // Remove # if present
-        hex = hex.replace('#', '');
-
-        // Parse the hex values
-        const r = parseInt(hex.substring(0, 2), 16);
-        const g = parseInt(hex.substring(2, 4), 16);
-        const b = parseInt(hex.substring(4, 6), 16);
-
-        return { r, g, b };
-    }
-
-    showStats(gameId) {
-        // Ensure subsequent submissions know the active game
-        this.currentGameId = gameId;
-        const results = storage.getGameResults(gameId);
-
-        if (results.length === 0) {
-            this.showToast('No Data', 'Enter your first result to start tracking stats', 'info');
-            return;
-        }
-
-        const modal = document.getElementById('statsModal');
-        const chartContainer = document.querySelector('.chart-container');
-        const game = window.GAMES.find(g => g.id === gameId);
-
-        // Parse all results for visualization
-        const parsedResults = results.map(result => {
-            try {
-                const parsed = parser.parse(gameId, result.rawOutput);
-                return {
-                    date: result.date,
-                    ...parsed
-                };
-            } catch (error) {
-                console.error(`Error parsing result for ${result.date}:`, error);
-                return null;
-            }
-        }).filter(Boolean);
-
-        // Check if there are any tracked variables
-        const hasTrackedVariables = parsedResults.length > 0 && parsedResults.some(result => {
-            // Check if there are any properties besides date
-            return Object.keys(result).length > 1;
-        });
-
-        // Update chart container based on tracked variables
-        if (hasTrackedVariables) {
-            // Show chart and create it with parsed data
-            chartContainer.style.display = 'block';
-            chartContainer.innerHTML = '<canvas id="statsChart"></canvas>';
-            gameCharts.createChart('statsChart', gameId, parsedResults);
-        } else {
-            // Hide chart and show message
-            chartContainer.style.display = 'block';
-            chartContainer.innerHTML = `
-                <div class="no-stats-message">
-                    <h3>No Statistics Available</h3>
-                    <p>This game doesn't have statistics tracking configured in the schema.</p>
-                    <p>You can still track your history, but graphs and averages aren't available.</p>
-                    <p class="hint">To enable statistics, edit the game schema to add result parsing rules.</p>
-                </div>
-            `;
-        }
-
-        // Quick entry area + raw history
-        const historyList = document.getElementById('historyList');
-        historyList.innerHTML = '';
-
-        // Inject quick entry controls above history if not present
-        if (!document.getElementById('quickEntryBar')) {
-            const statsContent = document.getElementById('statsContent');
-            const quickBar = document.createElement('div');
-            quickBar.id = 'quickEntryBar';
-            quickBar.style.display = 'flex';
-            quickBar.style.gap = '10px';
-            quickBar.style.margin = '16px 0 20px';
-            quickBar.style.padding = '12px';
-            quickBar.style.border = '1px solid var(--border-color)';
-            quickBar.style.borderRadius = '10px';
-            quickBar.style.background = 'rgba(74, 144, 226, 0.06)';
-            quickBar.innerHTML = `
-                <textarea id="quickResultInput" placeholder="Paste today's result here..." style="flex:1; min-height: 110px; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-background); color: var(--text-color); font-family: monospace; resize: vertical;"></textarea>
-                <button id="quickSubmitResult" class="btn result-btn">Enter Result</button>
-            `;
-            statsContent.prepend(quickBar);
-        }
-
-        // Wire quick entry to reuse the existing modal submit flow
-        const quickInputEl = document.getElementById('quickResultInput');
-        const quickBtnEl = document.getElementById('quickSubmitResult');
-
-        // Clear the textarea every time stats screen opens for a fresh experience
-        if (quickInputEl) {
-            quickInputEl.value = '';
-        }
-
-        if (quickBtnEl) {
-            quickBtnEl.onclick = () => {
-                const value = quickInputEl ? quickInputEl.value.trim() : '';
-                if (!value) return;
-                const modalInput = document.getElementById('resultInput');
-                if (modalInput) {
-                    modalInput.value = value;
-                }
-                this.handleResultSubmit();
-            };
-        }
-
-        results.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(result => {
-            const entry = document.createElement('div');
-            entry.className = 'history-entry';
-
-            const header = document.createElement('div');
-            header.className = 'history-header';
-
-            const dateContainer = document.createElement('div');
-            dateContainer.className = 'date-container';
-
-            const date = document.createElement('input');
-            date.type = 'date';
-            date.className = 'date-input';
-            date.value = result.date;
-            date.title = 'Click to edit date';
-
-            // Add date change handler
-            date.addEventListener('change', () => {
-                const newDate = date.value;
-                if (!newDate) return;
-
-                // Check if the new date already exists
-                const existingResult = results.find(r => r.date === newDate);
-                if (existingResult && existingResult !== result) {
-                    this.showToast('Error', 'A result already exists for this date', 'error');
-                    date.value = result.date;
-                    return;
-                }
-
-                try {
-                    // Update the result with the new date
-                    storage.updateGameResult(gameId, result.date, result.rawOutput, newDate);
-                    // Refresh the stats view
-                    this.showStats(gameId);
-                } catch (error) {
-                    this.showToast('Error', 'Error updating date: ' + error.message, 'error');
-                    date.value = result.date;
-                }
-            });
-
-            dateContainer.appendChild(date);
-
-            const actions = document.createElement('div');
-            actions.className = 'history-actions';
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn delete-btn';
-            deleteBtn.textContent = '🗑️';
-            deleteBtn.title = 'Delete this entry';
-            deleteBtn.addEventListener('click', () => {
-                if (confirm('Are you sure you want to delete this entry?')) {
-                    storage.deleteGameResult(gameId, result.date);
-                    this.showStats(gameId);
-                }
-            });
-
-            const editBtn = document.createElement('button');
-            editBtn.className = 'btn edit-btn';
-            editBtn.textContent = '✏️';
-            editBtn.title = 'Edit this entry';
-            editBtn.addEventListener('click', () => {
-                content.contentEditable = true;
-                content.focus();
-            });
-
-            actions.appendChild(editBtn);
-            actions.appendChild(deleteBtn);
-            header.appendChild(dateContainer);
-            header.appendChild(actions);
-
-            const content = document.createElement('pre');
-            content.textContent = result.rawOutput;
-            content.contentEditable = false;
-
-            // Add edit handlers
-            content.addEventListener('focus', () => {
-                entry.classList.add('editing');
-            });
-
-            content.addEventListener('blur', () => {
-                entry.classList.remove('editing');
-                content.contentEditable = false;
-
-                if (content.textContent.trim() === '') {
-                    if (confirm('Empty content will delete this entry. Continue?')) {
-                        storage.deleteGameResult(gameId, result.date);
-                        this.showStats(gameId);
-                    } else {
-                        content.textContent = result.rawOutput;
-                    }
-                    return;
-                }
-
-                // Store the raw output without validation
-                storage.updateGameResult(gameId, result.date, content.textContent);
-                // Refresh the stats view
-                this.showStats(gameId);
-            });
-
-            entry.appendChild(header);
-            entry.appendChild(content);
-            historyList.appendChild(entry);
-        });
-
-        modal.style.display = 'block';
-    }
-
-    showResultInput(gameId) {
-        this.currentGameId = gameId;
-        const modal = document.getElementById('resultModal');
-        const titleEl = document.getElementById('resultModalTitle');
-        const game = window.GAMES.find(g => g.id === gameId);
-        if (titleEl && game) {
-            titleEl.textContent = `Enter ${game.name} results`;
-        }
-        document.getElementById('resultInput').value = '';
-        modal.style.display = 'block';
-    }
-
-    // (Removed) global paste handler
-
-    // (Removed) detectGameFromText
-
-    async handleResultSubmit() {
-        const input = document.getElementById('resultInput').value.trim();
-        if (!input) return;
-
-        if (!this.currentGameId) {
-            this.showToast('Select a game', 'Open a game and paste the result from its card or stats screen.', 'warning');
-            return;
-        }
-
-        const game = window.GAMES.find(g => g.id === this.currentGameId);
-        storage.addGameResult(this.currentGameId, input);
-        this.closeModals();
-        this.updateCardPositions();
-        this.showToast('Nice job!', `Completed today's ${game.name}`, 'success');
-    }
-
-    showSchemaEditor() {
-        const editor = document.getElementById('schemaEditor');
-        editor.style.display = 'block';
-
-        // Initialize CodeMirror if not already done
-        if (!this.schemaEditor) {
-            const textarea = document.getElementById('schemaInput');
-            this.schemaEditor = CodeMirror.fromTextArea(textarea, {
-                mode: 'application/json',
-                theme: 'monokai',
-                lineNumbers: true,
-                matchBrackets: true,
-                autoCloseBrackets: true,
-                gutters: ['CodeMirror-lint-markers'],
-                lint: true,
-                extraKeys: {
-                    'Ctrl-Space': 'autocomplete'
-                }
-            });
-        }
-
-        // Set the content
-        this.schemaEditor.setValue(JSON.stringify(window.GAMES, null, 2));
-    }
-
-    hideSchemaEditor() {
-        document.getElementById('schemaEditor').style.display = 'none';
-    }
-
-    handleQuickAddGame() {
-        const nameInput = document.getElementById('quickAddName');
-        const urlInput = document.getElementById('quickAddUrl');
-
-        const name = nameInput.value.trim();
-        const url = urlInput.value.trim();
-
-        // Validate inputs
-        if (!name) {
-            this.showToast('Error', 'Game name is required', 'error');
-            nameInput.focus();
-            return;
-        }
-
-        if (!url) {
-            this.showToast('Error', 'Game URL is required', 'error');
-            urlInput.focus();
-            return;
-        }
-
-        try {
-            // Create a unique ID from the name
-            const id = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-
-            // Check if game with this ID already exists
-            if (window.GAMES.some(game => game.id === id)) {
-                this.showToast('Error', 'A game with a similar name already exists', 'error');
-                return;
-            }
-
-            // Create simple game object
-            const newGame = {
-                id,
-                name,
-                url
-            };
-
-            // Add to games array
-            window.GAMES.push(newGame);
-
-            // Save to localStorage for persistence
-            storage.saveGamesSchema(window.GAMES);
-
-            // Clear form inputs
-            nameInput.value = '';
-            urlInput.value = '';
-
-            // Refresh display
-            this.updateCardPositions();
-
-            this.showToast('Success', `${name} added successfully. Note: Statistics tracking will require manual schema editing.`, 'success');
-        } catch (error) {
-            this.showToast('Error', 'Failed to add game: ' + error.message, 'error');
-        }
-    }
-
-    async saveSchema() {
-        try {
-            const newSchema = JSON.parse(this.schemaEditor.getValue());
-            // Validate schema structure
-            if (!Array.isArray(newSchema)) {
-                throw new Error('Schema must be an array of games');
-            }
-            newSchema.forEach(game => {
-                if (!game.id || !game.name || !game.url) {
-                    throw new Error('Each game must have id, name, and url');
-                }
-            });
-
-            // Update the games array
-            window.GAMES.length = 0;
-            window.GAMES.push(...newSchema);
-
-            // Save to localStorage for persistence
-            storage.saveGamesSchema(window.GAMES);
-
-            // Refresh the display
-            this.updateCardPositions();
-            this.hideSchemaEditor();
-            document.getElementById('schemaModal').style.display = 'none';
-            this.showToast('Success', 'Schema updated successfully!', 'success');
-        } catch (error) {
-            this.showToast('Error', 'Invalid schema format: ' + error.message, 'error');
-        }
-    }
-
-    // Helper method to create a game list item for the manage games modal
-    createGameListItem(game, isHidden) {
-        const item = document.createElement('div');
-        item.className = 'game-list-item';
-        item.setAttribute('data-game-id', game.id);
-
-        // Create icon (reuse favicon code)
-        const iconContainer = document.createElement('div');
-        iconContainer.className = 'game-icon';
-
-        // Create a fallback icon by default
-        const fallbackIcon = document.createElement('div');
-        fallbackIcon.className = 'fallback-icon-small';
-        fallbackIcon.textContent = game.name.charAt(0).toUpperCase();
-        fallbackIcon.style.width = '24px';
-        fallbackIcon.style.height = '24px';
-        fallbackIcon.style.borderRadius = '50%';
-        fallbackIcon.style.backgroundColor = this.stringToColor(game.name);
-        fallbackIcon.style.display = 'flex';
-        fallbackIcon.style.justifyContent = 'center';
-        fallbackIcon.style.alignItems = 'center';
-        fallbackIcon.style.fontWeight = 'bold';
-        fallbackIcon.style.fontSize = '12px';
-        fallbackIcon.style.color = '#ffffff';
-
-        iconContainer.appendChild(fallbackIcon);
-
-        // Create name
-        const nameEl = document.createElement('div');
-        nameEl.className = 'game-name';
-        nameEl.textContent = game.name;
-
-        // Create actions container
-        const actions = document.createElement('div');
-        actions.className = 'game-actions-small';
-
-        // Get default game IDs (original games)
-        const defaultGameIds = new Set(window.GAMES_DEFAULT ? window.GAMES_DEFAULT.map(g => g.id) : []);
-
-        // Create appropriate button based on state and type
-        if (isHidden) {
-            // Create restore button for hidden games
-            const restoreBtn = document.createElement('button');
-            restoreBtn.className = 'btn restore-btn';
-            restoreBtn.textContent = 'Restore';
-            restoreBtn.addEventListener('click', () => this.restoreGame(game.id));
-            actions.appendChild(restoreBtn);
-        } else {
-            // For visible games, show hide or remove based on presence in defaults
-            const isDefault = defaultGameIds.has(game.id);
-            const isCustom = !isDefault;
-
-            const actionBtn = document.createElement('button');
-            if (!isCustom) {
-                actionBtn.className = 'btn hide-btn';
-                actionBtn.textContent = 'Hide';
-                actionBtn.addEventListener('click', () => this.hideGame(game.id));
-            } else {
-                actionBtn.className = 'btn remove-btn warning-btn';
-                actionBtn.textContent = 'Remove';
-                actionBtn.addEventListener('click', () => this.removeGame(game.id));
-            }
-            actions.appendChild(actionBtn);
-        }
-
-        // Assemble the item
-        item.appendChild(iconContainer);
-        item.appendChild(nameEl);
-        item.appendChild(actions);
-
-        // Try to load the favicon
-        if (game.url) {
-            try {
-                const url = new URL(game.url);
-                const domain = url.hostname;
-
-                // First check local storage for cached favicon
-                const cachedFavicon = localStorage.getItem(`favicon_data_${domain}`);
-                if (cachedFavicon) {
-                    // Create and add the favicon if cached
-                    const faviconImg = document.createElement('img');
-                    faviconImg.className = 'game-favicon-small';
-                    faviconImg.alt = `${game.name} icon`;
-                    faviconImg.src = cachedFavicon;
-
-                    // Replace the fallback icon
-                    iconContainer.innerHTML = '';
-                    iconContainer.appendChild(faviconImg);
-                } else {
-                    // If not cached, use Google favicon API directly for the small icons
-                    const faviconImg = document.createElement('img');
-                    faviconImg.className = 'game-favicon-small';
-                    faviconImg.alt = `${game.name} icon`;
-                    faviconImg.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-
-                    // Replace the fallback icon
-                    iconContainer.innerHTML = '';
-                    iconContainer.appendChild(faviconImg);
-                }
-            } catch (e) {
-                console.warn(`Error loading favicon for ${game.name} in management interface:`, e);
-                // Fallback icon is already created, so no need to do anything
-            }
-        }
-
-        return item;
-    }
-
-    // Helper method to create a consistent color from a string
-    stringToColor(str) {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            hash = str.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        let color = '#';
-        for (let i = 0; i < 3; i++) {
-            const value = (hash >> (i * 8)) & 0xFF;
-            color += ('00' + value.toString(16)).substr(-2);
-        }
-        return color;
-    }
-
-    restoreGame(gameId) {
-        const game = window.GAMES.find(g => g.id === gameId);
-        if (!game) return;
-
-        if (storage.unhideGame(gameId)) {
-            // Remove from hidden list and add to active list
-            const hiddenItem = document.querySelector(`#hiddenGamesList [data-game-id="${gameId}"]`);
-            if (hiddenItem) {
-                hiddenItem.remove();
-
-                // Create item for active list
-                const activeList = document.getElementById('activeGamesList');
-                const gameItem = this.createGameListItem(game, false);
-                activeList.appendChild(gameItem);
-            }
-
-            this.showToast('Game Restored', `${game.name} has been restored`, 'success');
-        }
-    }
-
-    removeGame(gameId) {
-        const game = window.GAMES.find(g => g.id === gameId);
-        if (!game) return;
-
-        // Double confirmation for removing a game since it's destructive
-        if (confirm(`Are you sure you want to REMOVE ${game.name}? This cannot be undone and will delete the game definition.`)) {
-            if (confirm(`⚠️ FINAL WARNING: Remove ${game.name} permanently?`)) {
-                // Find the game index
-                const index = window.GAMES.findIndex(g => g.id === gameId);
-                if (index !== -1) {
-                    // Remove the game
-                    window.GAMES.splice(index, 1);
-
-                    // Save the updated games schema
-                    storage.saveGamesSchema(window.GAMES);
-
-                    // Remove item from the active list
-                    const activeItem = document.querySelector(`#activeGamesList [data-game-id="${gameId}"]`);
-                    if (activeItem) {
-                        activeItem.remove();
-                    }
-
-                    this.showToast('Game Removed', `${game.name} has been permanently removed`, 'success');
-                }
-            }
-        }
-    }
-
-    // Handler for schema import
-    async handleSchemaImport(event) {
-        const file = event.target.files[0];
-        if (file) {
-            try {
-                await storage.importGameSchema(file);
-                this.updateCardPositions();
-                // Reset the file input
-                event.target.value = '';
-            } catch (error) {
-                this.showToast('Error', 'Error importing schema: ' + error.message, 'error');
-                // Reset the file input
-                event.target.value = '';
-            }
-        }
-    }
-
-    // Reminder banner methods
-    showDailyReminderBanner() {
-        // Check if we've shown the banner today
-        const today = this.getLocalDateString();
-        const lastShown = localStorage.getItem('reminderBannerLastShown');
-
-        if (lastShown === today) {
-            // Already shown today, don't show again
-            return;
-        }
-
-        // Only show banner if there are tracked stats (games with results)
-        const hasTrackedStats = this.hasAnyTrackedStatistics();
-        if (!hasTrackedStats) {
-            return;
-        }
-
-        // Show banner after a short delay
-        setTimeout(() => {
-            const banner = document.getElementById('reminderBanner');
-            if (banner) { // Check if the banner element exists
-                banner.classList.remove('hidden');
-                // Mark as shown today
-                localStorage.setItem('reminderBannerLastShown', today);
-            } else {
-                console.warn("Reminder banner element with ID 'reminderBanner' not found.");
-            }
-        }, 1000);
-    }
-
-    // Check if there are any games with tracked statistics
-    hasAnyTrackedStatistics() {
-        // Check all games that have average_display configuration
-        const gamesWithStats = window.GAMES.filter(game => game.average_display);
-
-        // For each game, check if there's at least one result
-        for (const game of gamesWithStats) {
-            const results = storage.getGameResults(game.id);
-            // If the game has any results, return true
-            if (results && results.length > 0) {
-                return true;
-            }
-        }
-
-        // No games found with statistics
-        return false;
-    }
-
-    hideBanner() {
-        const banner = document.getElementById('reminderBanner');
-        if (banner) { // Check if the banner element exists
-            banner.classList.add('hidden');
-        }
-    }
-}
-
-// Initialize and run the application
-(async () => {
+// PuzzleTracker: today's list, paste-anywhere import, game details and game management.
+(function () {
+    const { h, fill, icon, gameIcon, sheet, sheetHeader, toast, menu, relativeDay } = PT.ui;
+    const { localDate, addDays, format, summarize, statOf } = PT.stats;
+
+    let store;
     try {
-        // Create and initialize the storage instance first, making it globally available
-        window.storage = await Storage.create();
-
-        // Now that window.storage is initialized, create the App instance
-        window.app = new App();
-
-        // If there was other setup code that ran after `new App()` that might also
-        // rely on `window.app` or `window.storage`, ensure it's here or called from here.
-        // For example, if event listeners were attached outside the App class based on these globals.
-        // Based on the provided code, the App constructor handles its own event listeners.
-
-        console.log("Application initialized successfully.");
-
+        store = new PT.Store();
     } catch (error) {
-        console.error("Failed to initialize application:", error);
-        // Optionally, display a user-friendly error message on the page
-        const body = document.querySelector('body');
-        if (body) {
-            body.innerHTML = '<div style="padding: 20px; text-align: center; font-family: sans-serif;"><h1>Application Error</h1><p>Could not initialize the application. Please try again later or check the console for details.</p></div>';
+        fill(document.getElementById('app'), h('div', { class: 'fatal' },
+            h('h1', { text: 'Your saved data could not be read' }),
+            h('p', { text: 'Nothing has been changed or deleted. Details: ' + error.message })));
+        throw error;
+    }
+
+    const PENDING_KEY = 'pt.pending';
+    const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+    const canHover = window.matchMedia('(hover: hover)').matches;
+    let today = localDate();
+
+    // ---- theme --------------------------------------------------------------------
+
+    function applyTheme() {
+        const theme = store.theme();
+        if (theme) document.documentElement.dataset.theme = theme;
+        else delete document.documentElement.dataset.theme;
+    }
+
+    function effectiveTheme() {
+        return store.theme() || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    }
+
+    function toggleTheme() {
+        store.setTheme(effectiveTheme() === 'dark' ? 'light' : 'dark');
+        applyTheme();
+        render();
+    }
+
+    // ---- home ---------------------------------------------------------------------
+
+    function render() {
+        const games = store.myGames();
+        const rows = games.map(game => ({ game, s: summarize(game, store.results(game.id), today) }));
+        const todo = rows.filter(r => !r.s.today);
+        const done = rows.filter(r => r.s.today);
+
+        const app = document.getElementById('app');
+        fill(app, 
+            topBar(),
+            todayHeader(done.length, rows.length),
+            pasteZone(),
+            pendingCallout() || welcomeCallout(),
+            games.length === 0 ? emptyState() : null,
+            todo.length ? section(`Up next`, todo.length, todo.map(r => gameRow(r.game, r.s))) : null,
+            done.length ? section('Done today', done.length, done.map(r => gameRow(r.game, r.s))) : null,
+            games.length && !todo.length ? h('p', { class: 'all-done', text: 'All done for today. See you tomorrow!' }) : null,
+            footer());
+    }
+
+    function topBar() {
+        const dark = effectiveTheme() === 'dark';
+        return h('header', { class: 'topbar' },
+            h('div', { class: 'brand' }, h('span', { class: 'brand-mark' }, icon('puzzle', { size: 20 })), h('span', { text: 'PuzzleTracker' })),
+            h('div', { class: 'topbar-actions' },
+                h('button', { class: 'icon-btn', type: 'button', title: dark ? 'Light theme' : 'Dark theme', 'aria-label': dark ? 'Switch to light theme' : 'Switch to dark theme', onclick: toggleTheme }, icon(dark ? 'sun' : 'moon')),
+                h('button', {
+                    class: 'icon-btn', type: 'button', 'aria-label': 'Menu', 'aria-haspopup': 'menu',
+                    onclick: e => menu(e.currentTarget, [
+                        { label: 'Manage games', icon: 'list', onSelect: openManage },
+                        { label: 'Create a game', icon: 'plus', onSelect: () => PT.builder.open(null, builderOptions()) },
+                        { label: 'Back up my data', icon: 'download', onSelect: exportData },
+                        { label: 'Restore from backup', icon: 'upload', onSelect: importData },
+                    ]),
+                }, icon('more'))));
+    }
+
+    function todayHeader(doneCount, total) {
+        const date = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+        const pct = total ? doneCount / total : 0;
+        return h('section', { class: 'today' },
+            h('div', { class: 'today-text' },
+                h('h1', { text: 'Today' }),
+                h('p', { class: 'muted', text: date })),
+            total ? h('div', { class: 'progress', role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': total, 'aria-valuenow': doneCount, 'aria-label': 'Games done today' },
+                h('div', { class: 'progress-track' }, h('div', { class: 'progress-fill', style: { '--p': String(pct) } })),
+                h('span', { class: 'progress-label', text: `${doneCount} of ${total} done` })) : null);
+    }
+
+    function pasteZone() {
+        const keys = isMac ? ['⌘', 'V'] : ['Ctrl', 'V'];
+        return h('button', { class: 'paste-zone', type: 'button', onclick: pasteFromButton },
+            h('span', { class: 'paste-icon' }, icon('clipboard', { size: 22 })),
+            h('span', { class: 'paste-text' },
+                h('strong', { text: 'Paste a result' }),
+                h('span', { class: 'muted' }, canHover
+                    ? ['Copy your share text in any game, then press ', h('kbd', { text: keys[0] }), ' ', h('kbd', { text: keys[1] }), ' anywhere here.']
+                    : 'Copy your share text in any game, then tap here.')));
+    }
+
+    function section(title, count, rows) {
+        return h('section', { class: 'list-section' },
+            h('h2', { class: 'section-title' }, title, h('span', { class: 'count', text: String(count) })),
+            h('ul', { class: 'rows' }, rows));
+    }
+
+    function metaLine(game, s) {
+        const parts = [];
+        if (s.streak > 1) parts.push(h('span', { class: 'meta-streak' }, icon('flame', { size: 14 }), String(s.streak)));
+        if (s.average !== null && s.stat) parts.push(h('span', { text: `avg ${s.stat.name.toLowerCase()} ${format(s.stat, s.average, { withMax: false })}` }));
+        if (s.solvedRate !== null) parts.push(h('span', { text: `${Math.round(s.solvedRate * 100)}% solved` }));
+        if (!game.tracking) parts.push(h('span', { text: game.draft || game.legacy ? 'Tracking needs setup' : 'History only' }));
+        if (!parts.length) parts.push(h('span', { text: s.played ? `${s.played} played` : 'Not played yet' }));
+        return h('span', { class: 'row-meta' }, parts.flatMap((p, i) => (i ? [h('span', { class: 'dot', 'aria-hidden': 'true', text: '·' }), p] : [p])));
+    }
+
+    function resultChip(game, s) {
+        if (!s.today) return null;
+        const v = s.today.values;
+        const lost = v.Solved === false;
+        const text = s.stat && v[s.stat.name] !== undefined ? format(s.stat, v[s.stat.name]) : lost ? 'Missed' : 'Done';
+        return h('span', { class: `chip ${lost ? 'chip-bad' : 'chip-good'}` }, icon(lost ? 'x' : 'check', { size: 14 }), h('span', { text: lost && s.stat ? `${text}` : text }));
+    }
+
+    function gameRow(game, s) {
+        return h('li', { class: `row${s.today ? ' is-done' : ''}` },
+            h('button', { class: 'row-main', type: 'button', onclick: () => openGame(game.id) },
+                gameIcon(game, 40),
+                h('span', { class: 'row-text' },
+                    h('span', { class: 'row-title' }, h('span', { text: game.name }), resultChip(game, s)),
+                    metaLine(game, s))),
+            game.safeUrl && !s.today
+                ? h('a', { class: 'btn btn-play', href: game.safeUrl, target: '_blank', rel: 'noopener noreferrer', onclick: () => markPending(game.id) }, 'Play', icon('external', { size: 15 }))
+                : h('button', { class: 'icon-btn row-chevron', type: 'button', 'aria-label': `Open ${game.name}`, tabindex: '-1', onclick: () => openGame(game.id) }, icon('chevron')));
+    }
+
+    function welcomeCallout() {
+        const hasResults = Object.values(store.data.gameResults).some(list => list.length);
+        let dismissed = false;
+        try { dismissed = localStorage.getItem('pt.welcomed') === '1'; } catch (_) { /* storage blocked */ }
+        if (hasResults || dismissed || !store.myGames().length) return null;
+        const dismiss = () => { try { localStorage.setItem('pt.welcomed', '1'); } catch (_) { /* storage blocked */ } render(); };
+        return h('div', { class: 'callout' },
+            h('span', { class: 'callout-text' }, h('strong', { text: 'Welcome!' }), ' We started you with a few popular games. Add or remove games to match your routine.'),
+            h('button', { class: 'btn btn-small', type: 'button', onclick: () => { dismiss(); openManage(); } }, 'Manage games'),
+            h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Dismiss', onclick: dismiss }, icon('x', { size: 18 })));
+    }
+
+    function emptyState() {
+        return h('div', { class: 'empty' },
+            h('h2', { text: 'Pick the games you play' }),
+            h('p', { class: 'muted', text: 'Add your daily games to build a routine. You can paste results from any game we know, even ones not on your list.' }),
+            h('button', { class: 'btn btn-primary', type: 'button', onclick: openManage }, icon('plus', { size: 18 }), 'Choose games'));
+    }
+
+    function footer() {
+        const last = store.data.lastExport;
+        const days = last ? Math.floor((Date.now() - new Date(last).getTime()) / PT.stats.DAY) : null;
+        const stale = Object.keys(store.data.gameResults).length > 0 && (days === null || days >= 14);
+        return h('footer', { class: `footer${stale ? ' is-stale' : ''}` },
+            h('p', {},
+                'Your results are saved in this browser only. ',
+                h('span', { text: last ? `Last backup ${days === 0 ? 'today' : days === 1 ? 'yesterday' : `${days} days ago`}.` : 'No backup yet.' })),
+            h('div', { class: 'footer-actions' },
+                h('button', { class: 'link-btn', type: 'button', onclick: exportData, text: 'Back up' }),
+                h('button', { class: 'link-btn', type: 'button', onclick: importData, text: 'Restore' }),
+                h('button', { class: 'link-btn', type: 'button', onclick: openManage, text: 'Manage games' })));
+    }
+
+    // ---- "play, then paste" -------------------------------------------------------
+
+    function markPending(id) {
+        try { sessionStorage.setItem(PENDING_KEY, JSON.stringify({ id, at: Date.now() })); } catch (_) { /* private mode */ }
+    }
+
+    function pendingGame() {
+        try {
+            const p = JSON.parse(sessionStorage.getItem(PENDING_KEY) || 'null');
+            if (!p || Date.now() - p.at > 3 * 60 * 60 * 1000) return null;
+            const game = store.game(p.id);
+            return game && !store.resultOn(game.id, today) ? game : null;
+        } catch (_) {
+            return null;
         }
     }
-})(); 
+
+    function clearPending() {
+        try { sessionStorage.removeItem(PENDING_KEY); } catch (_) { /* private mode */ }
+    }
+
+    function pendingCallout() {
+        const game = pendingGame();
+        if (!game) return null;
+        return h('div', { class: 'callout', role: 'status' },
+            gameIcon(game, 28),
+            h('span', { class: 'callout-text' }, h('strong', { text: `Back from ${game.name}?` }), ' Paste your result to log it.'),
+            h('button', { class: 'btn btn-small', type: 'button', onclick: pasteFromButton }, 'Paste'),
+            h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Dismiss', onclick: () => { clearPending(); render(); } }, icon('x', { size: 18 })));
+    }
+
+    // ---- paste anywhere -----------------------------------------------------------
+
+    function isTextField(el) {
+        return el && (el.isContentEditable || el.tagName === 'TEXTAREA' || (el.tagName === 'INPUT' && !['checkbox', 'radio', 'button', 'submit'].includes(el.type)));
+    }
+
+    document.addEventListener('paste', e => {
+        if (isTextField(e.target) || document.querySelector('dialog[open]')) return;
+        const text = e.clipboardData && e.clipboardData.getData('text/plain');
+        if (!text || !text.trim()) return;
+        e.preventDefault();
+        openConfirm(text);
+    });
+
+    async function pasteFromButton() {
+        if (navigator.clipboard && navigator.clipboard.readText) {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text && text.trim()) {
+                    openConfirm(text);
+                    return;
+                }
+            } catch (_) { /* permission denied or unsupported: fall back to a paste box */ }
+        }
+        openConfirm('');
+    }
+
+    // Games ordered for a picker: the player's games first, then the rest by name.
+    function pickerGames() {
+        const mine = store.myGames();
+        const mineIds = new Set(mine.map(g => g.id));
+        const rest = store.allGames().filter(g => !mineIds.has(g.id)).sort((a, b) => a.name.localeCompare(b.name));
+        return { mine, rest };
+    }
+
+    function gameSelect(selectedId, onChange, { placeholder } = {}) {
+        const { mine, rest } = pickerGames();
+        const option = g => h('option', { value: g.id, selected: g.id === selectedId, text: g.name });
+        return h('select', { class: 'select', onchange: e => onChange(e.target.value) },
+            placeholder ? h('option', { value: '', text: placeholder, selected: !selectedId, disabled: true }) : null,
+            mine.length ? h('optgroup', { label: 'My games' }, mine.map(option)) : null,
+            h('optgroup', { label: mine.length ? 'Other games' : 'All games' }, rest.map(option)));
+    }
+
+    function previewChips(game, text) {
+        if (!game) return null;
+        if (!game.tracking) {
+            return h('p', { class: 'muted small', text: 'This game has no tracking rules yet, so the text is saved as-is. You can add rules later from the game’s page.' });
+        }
+        const values = PT.rules.evaluate(game.tracking, text);
+        const chips = game.tracking.stats.filter(s => values[s.name] !== undefined).map(s =>
+            h('span', { class: `chip ${s.name === 'Solved' ? (values.Solved ? 'chip-good' : 'chip-bad') : ''}` },
+                h('span', { class: 'chip-label', text: s.name }), h('strong', { text: format(s, values[s.name]) })));
+        if (!chips.length) return h('p', { class: 'warn small', text: `Couldn’t read any ${game.name} stats from this text. It will still be saved, and stats will appear if the rules are fixed later.` });
+        return h('div', { class: 'chips' }, chips);
+    }
+
+    // Shows what was detected and lets the player confirm the game(s) and date.
+    // A paste that holds several games' sections (e.g. Gamedle's "all dailies"
+    // share) can be logged to each of them at once.
+    function openConfirm(initialText, { gameId } = {}) {
+        let text = initialText;
+        let chosen = gameId || null;
+        let several = [];
+        let date = today;
+
+        const body = h('div', { class: 'sheet-body' });
+        const { close } = sheet(h('div', {}, sheetHeader('Log a result', () => close()), body), { label: 'Log a result' });
+
+        function detectGame() {
+            if (gameId || !text.trim()) return;
+            const hits = PT.rules.detect(store.allGames().filter(g => g.tracking), text);
+            const sectioned = hits.filter(hit => hit.game.tracking.within && PT.rules.withinMatches(hit.game.tracking, text));
+            several = sectioned.length > 1 ? sectioned.map(hit => ({ id: hit.game.id, checked: true })) : [];
+            const pending = pendingGame();
+            if (hits.length) {
+                const mine = hits.find(hit => store.isMine(hit.game.id) && hit.score === hits[0].score);
+                chosen = (mine || hits[0]).game.id;
+            } else if (pending) {
+                chosen = pending.id;
+            } else {
+                chosen = null;
+            }
+        }
+
+        function dayField(note) {
+            return h('div', { class: 'confirm-date' },
+                h('label', { class: 'field inline' },
+                    h('span', { class: 'field-label', text: 'Day' }),
+                    h('input', { class: 'input', type: 'date', value: date, max: today, onchange: e => { date = e.target.value || today; draw(); } })),
+                note);
+        }
+
+        function saved(games, outcomes) {
+            for (const game of games) if (!store.isMine(game.id)) store.addToMine(game.id);
+            clearPending();
+            close();
+            render();
+            if (games.length === 1) {
+                toast(outcomes[0] === 'replaced' ? `Updated ${games[0].name}` : `Logged ${games[0].name}`, { tone: 'good', action: 'View', onAction: () => openGame(games[0].id) });
+            } else {
+                toast(`Logged ${games.length} games`, { tone: 'good' });
+            }
+        }
+
+        function drawSeveral() {
+            const picked = several.filter(m => m.checked).map(m => store.game(m.id));
+            const replacing = picked.filter(g => store.resultOn(g.id, date));
+            fill(body,
+                h('p', { class: 'muted', text: `This paste has results for ${several.length} games.` }),
+                h('ul', { class: 'multi-list' }, several.map(m => {
+                    const game = store.game(m.id);
+                    return h('li', {},
+                        h('label', { class: `multi-row${m.checked ? '' : ' is-off'}` },
+                            h('input', { type: 'checkbox', checked: m.checked, onchange: e => { m.checked = e.target.checked; draw(); } }),
+                            gameIcon(game, 36),
+                            h('span', { class: 'multi-text' }, h('strong', { text: game.name }), previewChips(game, text))));
+                })),
+                h('pre', { class: 'share-text', text: text.trim() }),
+                dayField(replacing.length ? h('span', { class: 'warn small', text: `Replaces ${replacing.map(g => g.name).join(', ')} for ${relativeDay(date, today).toLowerCase()}.` }) : null),
+                h('div', { class: 'sheet-actions' },
+                    h('button', { class: 'btn btn-quiet', type: 'button', text: 'Log as one game', onclick: () => { several = []; draw(); } }),
+                    h('span', { class: 'spacer' }),
+                    h('button', { class: 'btn', type: 'button', onclick: () => close(), text: 'Cancel' }),
+                    h('button', {
+                        class: 'btn btn-primary', type: 'button', disabled: !picked.length, autofocus: picked.length > 0,
+                        onclick: () => saved(picked, picked.map(g => store.setResult(g.id, date, text.trim()))),
+                    }, icon('check', { size: 18 }), `Save ${picked.length} result${picked.length === 1 ? '' : 's'}`)));
+        }
+
+        function drawOne() {
+            const game = chosen ? store.game(chosen) : null;
+            const existing = game ? store.resultOn(game.id, date) : null;
+            const detected = game && game.tracking && PT.rules.matchesAny(game.tracking.detect, text);
+            fill(body,
+                text.trim() ? null : h('label', { class: 'field' },
+                    h('span', { class: 'field-label', text: 'Share text' }),
+                    h('textarea', {
+                        class: 'textarea', rows: 6, placeholder: 'Paste the text from the game\u2019s Share button',
+                        oninput: e => { text = e.target.value; if (text.trim()) { detectGame(); draw(); } },
+                    })),
+                text.trim() ? h('div', { class: 'confirm-game' },
+                    game ? gameIcon(game, 44) : h('span', { class: 'game-icon game-icon-unknown', style: { '--size': '44px' } }, '?'),
+                    h('div', { class: 'confirm-game-text' },
+                        h('span', { class: 'muted small', text: game ? (detected ? 'Recognized as' : 'Saving to') : 'Which game is this?' }),
+                        gameSelect(chosen, id => { chosen = id; draw(); }, { placeholder: 'Choose a game' }))) : null,
+                text.trim() ? previewChips(game, text) : null,
+                text.trim() ? h('pre', { class: 'share-text', text: text.trim() }) : null,
+                text.trim() ? dayField(existing ? h('span', { class: 'warn small', text: `Replaces the ${game.name} result already saved for ${relativeDay(date, today).toLowerCase()}.` }) : null) : null,
+                h('div', { class: 'sheet-actions' },
+                    h('button', { class: 'btn', type: 'button', onclick: () => close(), text: 'Cancel' }),
+                    h('button', {
+                        class: 'btn btn-primary', type: 'button', disabled: !game || !text.trim(), autofocus: Boolean(game && text.trim()),
+                        onclick: () => saved([game], [store.setResult(game.id, date, text.trim())]),
+                    }, icon('check', { size: 18 }), existing ? 'Replace result' : 'Save result')));
+        }
+
+        function draw() {
+            if (several.length > 1) drawSeveral();
+            else drawOne();
+            const area = body.querySelector('textarea');
+            if (area) area.focus();
+            else body.querySelector('[autofocus]')?.focus();
+        }
+
+        detectGame();
+        draw();
+    }
+
+    // ---- game sheet ---------------------------------------------------------------
+
+    function openGame(id) {
+        const content = h('div', {});
+        let close;
+        let showAll = false;
+
+        function draw() {
+            const game = store.game(id);
+            if (!game) { close(); return; }
+            const s = summarize(game, store.results(id), today);
+            const tiles = [
+                ['Played', String(s.played)],
+                s.solvedRate !== null ? ['Solved', `${Math.round(s.solvedRate * 100)}%`] : null,
+                ['Streak', String(s.streak)],
+                ['Best streak', String(s.bestStreak)],
+                s.stat && s.average !== null ? [`Avg ${s.stat.name.toLowerCase()}`, format(s.stat, s.average, { withMax: false })] : null,
+            ].filter(Boolean);
+
+            const todayLabel = s.today && s.stat && s.today.values.Solved !== false && typeof s.today.values[s.stat.name] === 'number'
+                ? String(s.today.values[s.stat.name]) : s.today && s.today.values.Solved === false ? 'X' : null;
+
+            fill(content, 
+                sheetHeader(h('span', { class: 'game-title' }, gameIcon(game, 32), h('span', { text: game.name })), () => close(),
+                    game.safeUrl ? h('a', { class: 'btn btn-small', href: game.safeUrl, target: '_blank', rel: 'noopener noreferrer', onclick: () => markPending(game.id) }, 'Play', icon('external', { size: 14 })) : null,
+                    h('button', {
+                        class: 'icon-btn', type: 'button', 'aria-label': 'More', 'aria-haspopup': 'menu',
+                        onclick: e => menu(e.currentTarget, [
+                            { label: 'Edit tracking rules', icon: 'sliders', onSelect: () => PT.builder.open(game.id, builderOptions(draw)) },
+                            store.isMine(id)
+                                ? { label: 'Remove from my games', icon: 'x', onSelect: () => { store.removeFromMine(id); render(); draw(); toast(`Removed ${game.name} from your games`, { action: 'Undo', onAction: () => { store.addToMine(id); render(); draw(); } }); } }
+                                : { label: 'Add to my games', icon: 'plus', onSelect: () => { store.addToMine(id); render(); draw(); } },
+                        ]),
+                    }, icon('more'))),
+                h('div', { class: 'sheet-body' },
+                    !game.tracking ? h('div', { class: 'notice' },
+                        h('p', { text: game.legacy ? 'This game used old-style rules that are no longer supported. Rebuild them with blocks to see stats again; your history is safe.' : 'Stats aren’t set up for this game yet. Your results are still saved.' }),
+                        h('button', { class: 'btn btn-small', type: 'button', onclick: () => PT.builder.open(game.id, builderOptions(draw)) }, icon('sliders', { size: 16 }), 'Set up tracking')) : null,
+                    h('div', { class: 'tiles' }, tiles.map(([label, value]) => h('div', { class: 'tile' }, h('strong', { text: value }), h('span', { text: label })))),
+                    s.played && s.distribution ? h('div', { class: 'panel' }, h('h3', { class: 'panel-title', text: `${s.stat.name} distribution` }), PT.charts.distribution(s.distribution, todayLabel)) : null,
+                    s.played && !s.distribution && s.trend.length ? h('div', { class: 'panel' }, h('h3', { class: 'panel-title', text: `${s.stat.name} over time` }), PT.charts.trend(s.trend, s.stat)) : null,
+                    addResultPanel(game, draw),
+                    historyPanel(game, s, showAll, () => { showAll = true; draw(); }, draw)));
+        }
+
+        ({ close } = sheet(content, { className: 'sheet-game', label: 'Game details' }));
+        draw();
+    }
+
+    function addResultPanel(game, redraw) {
+        let date = today;
+        const preview = h('div', { class: 'preview' });
+        const area = h('textarea', {
+            class: 'textarea', rows: 4, placeholder: `Paste a ${game.name} result`,
+            oninput: () => update(),
+        });
+        const save = h('button', {
+            class: 'btn btn-primary', type: 'button', disabled: true,
+            onclick: () => {
+                const outcome = store.setResult(game.id, date, area.value.trim());
+                if (!store.isMine(game.id)) store.addToMine(game.id);
+                clearPending();
+                render();
+                redraw();
+                toast(outcome === 'replaced' ? `Updated ${game.name}` : `Logged ${game.name}`, { tone: 'good' });
+            },
+        }, icon('check', { size: 18 }), 'Save');
+        function update() {
+            const text = area.value.trim();
+            save.disabled = !text;
+            const existing = store.resultOn(game.id, date);
+            fill(preview, text ? previewChips(game, text) : null,
+                text && existing ? h('p', { class: 'warn small', text: `Replaces the result saved for ${relativeDay(date, today).toLowerCase()}.` }) : null);
+        }
+        return h('div', { class: 'panel' },
+            h('h3', { class: 'panel-title', text: store.resultOn(game.id, today) ? 'Add or replace a result' : 'Log today’s result' }),
+            area, preview,
+            h('div', { class: 'row-actions' },
+                h('input', { class: 'input', type: 'date', value: date, max: today, 'aria-label': 'Day', onchange: e => { date = e.target.value || today; update(); } }),
+                save));
+    }
+
+    function historyPanel(game, s, showAll, onShowAll, redraw) {
+        if (!s.entries.length) return null;
+        const visible = showAll ? s.entries : s.entries.slice(0, 15);
+        return h('div', { class: 'panel' },
+            h('h3', { class: 'panel-title', text: 'History' }),
+            h('ul', { class: 'history' }, visible.map(entry => historyItem(game, entry, redraw))),
+            !showAll && s.entries.length > visible.length
+                ? h('button', { class: 'btn btn-quiet wide', type: 'button', onclick: onShowAll, text: `Show all ${s.entries.length}` }) : null);
+    }
+
+    function historyItem(game, entry, redraw) {
+        const stats = (game.tracking && game.tracking.stats) || [];
+        const summary = stats.filter(st => entry.values[st.name] !== undefined && st.name !== 'Solved').slice(0, 3)
+            .map(st => `${st.name} ${format(st, entry.values[st.name])}`).join(' · ');
+        const lost = entry.values.Solved === false;
+        const details = h('details', { class: 'history-item' },
+            h('summary', {},
+                h('span', { class: 'history-date', text: relativeDay(entry.date, today) }),
+                h('span', { class: `history-summary${lost ? ' is-loss' : ''}`, text: lost ? ['Not solved', summary].filter(Boolean).join(' · ') : summary || (stats.length ? 'No stats read' : 'Saved') }),
+                icon('down', { size: 16 })),
+            h('pre', { class: 'share-text', text: entry.raw }),
+            h('div', { class: 'history-actions' },
+                h('label', { class: 'field inline' },
+                    h('span', { class: 'field-label', text: 'Day' }),
+                    h('input', {
+                        class: 'input', type: 'date', value: entry.date, max: today,
+                        onchange: e => {
+                            try { store.updateResult(game.id, entry.date, { date: e.target.value }); render(); redraw(); }
+                            catch (err) { toast(err.message, { tone: 'bad' }); e.target.value = entry.date; }
+                        },
+                    })),
+                h('button', {
+                    class: 'btn btn-small', type: 'button',
+                    onclick: e => {
+                        e.currentTarget.disabled = true;
+                        const pre = details.querySelector('pre');
+                        const editor = h('textarea', { class: 'textarea', rows: Math.min(10, entry.raw.split('\n').length + 1), value: entry.raw });
+                        pre.replaceWith(editor);
+                        editor.focus();
+                        const saveBtn = h('button', { class: 'btn btn-small btn-primary', type: 'button', text: 'Save text', onclick: () => {
+                            if (!editor.value.trim()) { toast('Text can’t be empty. Delete the result instead.', { tone: 'bad' }); return; }
+                            store.updateResult(game.id, entry.date, { rawOutput: editor.value.trim() });
+                            render(); redraw();
+                        } });
+                        details.querySelector('.history-actions').append(saveBtn);
+                    },
+                }, icon('pencil', { size: 15 }), 'Edit text'),
+                h('button', {
+                    class: 'btn btn-small btn-danger', type: 'button',
+                    onclick: () => {
+                        store.deleteResult(game.id, entry.date);
+                        render(); redraw();
+                        toast(`Deleted ${relativeDay(entry.date, today).toLowerCase()}’s result`, { action: 'Undo', onAction: () => { store.setResult(game.id, entry.date, entry.raw); render(); redraw(); } });
+                    },
+                }, icon('trash', { size: 15 }), 'Delete')));
+        return h('li', {}, details);
+    }
+
+    // ---- manage games -------------------------------------------------------------
+
+    function openManage() {
+        let query = '';
+        const content = h('div', {});
+        const { close } = sheet(content, { className: 'sheet-manage', label: 'Manage games', onClose: render });
+
+        function draw() {
+            const mine = store.myGames();
+            const all = store.allGames().sort((a, b) => a.name.localeCompare(b.name));
+            const q = query.trim().toLowerCase();
+            const others = all.filter(g => !store.isMine(g.id) && (!q || g.name.toLowerCase().includes(q)));
+            const body = h('div', { class: 'sheet-body' },
+                h('h3', { class: 'panel-title', text: `My games (${mine.length})` }),
+                mine.length ? h('ul', { class: 'manage-list' }, mine.map((game, i) => h('li', { class: 'manage-item' },
+                    gameIcon(game, 32),
+                    h('span', { class: 'manage-name' }, h('span', { text: game.name }), !game.tracking ? h('span', { class: 'badge', text: 'no stats' }) : null),
+                    h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Move ${game.name} up`, disabled: i === 0, onclick: () => { store.moveMine(game.id, -1); draw(); } }, icon('up', { size: 18 })),
+                    h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Move ${game.name} down`, disabled: i === mine.length - 1, onclick: () => { store.moveMine(game.id, 1); draw(); } }, icon('down', { size: 18 })),
+                    h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Edit ${game.name} tracking`, onclick: () => PT.builder.open(game.id, builderOptions(draw)) }, icon('sliders', { size: 18 })),
+                    h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Remove ${game.name}`, onclick: () => { store.removeFromMine(game.id); draw(); } }, icon('x', { size: 18 }))))) : h('p', { class: 'muted small', text: 'No games yet. Add some below.' }),
+                h('div', { class: 'manage-add-head' },
+                    h('h3', { class: 'panel-title', text: 'Add games' }),
+                    h('button', { class: 'btn btn-small', type: 'button', onclick: () => PT.builder.open(null, builderOptions(draw)) }, icon('plus', { size: 16 }), 'Create a game')),
+                h('label', { class: 'search' }, icon('search', { size: 18 }),
+                    h('input', { class: 'input', type: 'search', placeholder: 'Search games', value: query, 'aria-label': 'Search games', oninput: e => { query = e.target.value; draw(); requestAnimationFrame(() => { const el = content.querySelector('.search input'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }); } })),
+                h('ul', { class: 'manage-list' }, others.map(game => h('li', { class: 'manage-item' },
+                    gameIcon(game, 32),
+                    h('span', { class: 'manage-name' }, h('span', { text: game.name }), !game.builtIn ? h('span', { class: 'badge', text: 'custom' }) : null),
+                    h('button', { class: 'btn btn-small', type: 'button', onclick: () => { store.addToMine(game.id); draw(); } }, icon('plus', { size: 16 }), 'Add')))),
+                others.length ? null : h('p', { class: 'muted small', text: q ? 'No matching games.' : 'Every game is on your list.' }));
+            fill(content, sheetHeader('Manage games', () => close()), body);
+        }
+        draw();
+    }
+
+    function builderOptions(after) {
+        return {
+            store,
+            onSaved: () => { render(); if (after) after(); },
+        };
+    }
+
+    // ---- backup -------------------------------------------------------------------
+
+    function exportData() {
+        const blob = new Blob([store.exportJson()], { type: 'application/json' });
+        const a = h('a', { href: URL.createObjectURL(blob), download: `puzzletracker-backup-${today}.json` });
+        document.body.append(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        render();
+        toast('Backup downloaded', { tone: 'good' });
+    }
+
+    function importData() {
+        const input = h('input', { type: 'file', accept: '.json,application/json' });
+        input.addEventListener('change', async () => {
+            const file = input.files[0];
+            if (!file) return;
+            try {
+                const summary = store.importJson(await file.text());
+                render();
+                const parts = [`${summary.added} result${summary.added === 1 ? '' : 's'} added`];
+                if (summary.same) parts.push(`${summary.same} already here`);
+                if (summary.conflicts) parts.push(`${summary.conflicts} kept as they were here`);
+                if (summary.games) parts.push(`${summary.games} custom game${summary.games === 1 ? '' : 's'}`);
+                toast(`Restored: ${parts.join(', ')}.`, { tone: 'good', duration: 8000 });
+            } catch (error) {
+                toast(`Couldn’t restore: ${error.message}`, { tone: 'bad', duration: 8000 });
+            }
+        });
+        input.click();
+    }
+
+    // ---- day changes --------------------------------------------------------------
+
+    function refreshDay() {
+        const now = localDate();
+        if (now !== today) {
+            today = now;
+            render();
+        }
+    }
+
+    function scheduleMidnight() {
+        const now = new Date();
+        const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+        setTimeout(() => { refreshDay(); scheduleMidnight(); }, next - now);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            refreshDay();
+            if (pendingGame()) render();
+        }
+    });
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', render);
+
+    applyTheme();
+    render();
+    scheduleMidnight();
+
+    PT.app = { store, render, openGame, openConfirm, openManage };
+})();

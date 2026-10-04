@@ -1,0 +1,3134 @@
+{
+ "wordle": [
+  {
+   "text": "Wordle 1,932 3/6*\n\n⬜⬜⬜⬜🟩\n⬜⬜⬜🟨🟩\n🟩🟩🟩🟩🟩",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true,
+    "HardMode": true,
+    "Puzzle": 1932
+   }
+  },
+  {
+   "text": "Wordle 1,913 3/6*\n\n⬛⬛⬛⬛⬛\n⬛🟨🟨⬛🟩\n🟩🟩🟩🟩🟩",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true,
+    "HardMode": true,
+    "Puzzle": 1913
+   }
+  },
+  {
+   "text": "Wordle 1,467 X/6\n\n⬜⬜⬜⬜⬜\n⬜⬜⬜🟨⬜\n⬜🟩⬜⬜🟩\n🟩⬜⬜⬜🟩\n🟩🟩⬜⬜🟩\n🟩🟩⬜⬜🟩",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "HardMode": false,
+    "Puzzle": 1467
+   }
+  },
+  {
+   "text": "Wordle 1 932 X/6\n\n⬛🟨⬛⬛🟩\n🟩⬛⬛⬛🟩\n🟩⬛⬛⬛🟩\n🟩⬛⬛⬛🟩\n🟩⬛⬛⬛🟩\n🟩⬛⬛⬛🟩",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "HardMode": false,
+    "Puzzle": 1932
+   }
+  },
+  {
+   "text": "Wordle 1,931 5/6\n\n⬛⬛⬛⬛⬛\n🟦⬛⬛⬛⬛\n⬛🟦⬛🟦⬛\n🟧🟧🟧🟧⬛\n🟧🟧🟧🟧🟧",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 5,
+    "Solved": true,
+    "HardMode": false,
+    "Puzzle": 1931
+   }
+  },
+  {
+   "text": "Wordle 1 932 6/6\n\n⬜⬜⬜⬜⬜\n🟧⬜⬜🟦⬜\n🟧🟧⬜⬜🟧\n🟧🟧⬜⬜🟧\n🟧🟧🟧⬜🟧\n🟧🟧🟧🟧🟧",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 6,
+    "Solved": true,
+    "HardMode": false,
+    "Puzzle": 1932
+   }
+  },
+  {
+   "text": "Wordle 1.932 4/6\n\n⬛⬛⬛⬛⬛\n⬛⬛⬛🟨⬛\n⬛⬛⬛🟩🟩\n🟩🟩🟩🟩🟩",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true,
+    "HardMode": false,
+    "Puzzle": 1932
+   }
+  },
+  {
+   "text": "Wordle 1932 4/6*\n\n⬜🟩⬜⬜⬜\n⬜🟩⬜⬜⬜\n⬜🟩🟩⬜⬜\n🟩🟩🟩🟩🟩",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true,
+    "HardMode": true,
+    "Puzzle": 1932
+   }
+  },
+  {
+   "text": "Archive October 2, 2026\nWordle 1,931 5/6\n\n⬛⬛⬛⬛⬛\n⬛⬛⬛⬛⬛\n🟨🟨⬛⬛🟩\n⬛🟨🟩🟨🟩\n🟩🟩🟩🟩🟩",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 5,
+    "Solved": true,
+    "HardMode": false,
+    "Puzzle": 1931
+   }
+  },
+  {
+   "text": "Wordle 1,011 5/6\n\n🟩🟩⬛️⬛️⬛️\n🟩🟩🟨⬛️⬛️\n🟩🟩⬛️🟨⬛️\n🟩🟩⬛️🟩🟩\n🟩🟩🟩🟩🟩",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 5,
+    "Solved": true,
+    "HardMode": false,
+    "Puzzle": 1011
+   }
+  },
+  {
+   "text": "Brain freeze 🤔Wordle 1,932 X/6\n\n⬜🟨⬜⬜🟩\n🟩⬜⬜⬜🟩\n🟩⬜⬜⬜🟩\n🟩⬜⬜⬜🟩\n🟩⬜🟩⬜🟩\n🟩⬜🟩⬜🟩",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "HardMode": false,
+    "Puzzle": 1932
+   }
+  }
+ ],
+ "disorderly": [
+  {
+   "text": "I just played Disorderly! - Sort these names by the total number of U.S.-born male babies given that name in 2024\nhttps://playdisorderly.com/\n\n1️⃣ 🟢 🟢 🟢\n2️⃣ 🟢 🟢 🟢\n3️⃣ 🔴 🔴 🟢\n4️⃣ 🔴 🟢 🟢\n5️⃣ 🔴 🔴 🟢\n6️⃣ 🟢 🟢 🟢",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true
+   }
+  },
+  {
+   "text": "I just played Disorderly! - Sort these movies by their release date\nhttps://playdisorderly.com/\n\n1️⃣ 🟢\n2️⃣ 🟢\n3️⃣ 🟢\n4️⃣ 🟢\n5️⃣ 🟢\n6️⃣ 🟢",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Tough one today!\n\nI just played Disorderly! - Sort these names by the total number of U.S.-born male babies given that name in 2024\nhttps://playdisorderly.com/\n\n1️⃣ 🟢 🟢 🟢 🟢 🟢 🟢\n2️⃣ 🔴 🔴 🔴 🔴 🔴 🟢\n3️⃣ 🔴 🔴 🔴 🔴 🟢 🟢\n4️⃣ 🔴 🔴 🔴 🟢 🟢 🟢\n5️⃣ 🟢 🟢 🟢 🟢 🟢 🟢\n6️⃣ 🔴 🔴 🔴 🔴 🔴 🟢",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 6,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Got me on this one.\nI just played Disorderly! - Sort these pairs of North American cities by the distance between them\nhttps://playdisorderly.com/\n\n1️⃣ 🟢 🟢 🟢 🟢\n2️⃣ 🔴 🔴 🔴 🟢\n3️⃣ 🔴 🔴 🔴 🟢\n4️⃣ 🔴 🟢 🟢 🟢\n5️⃣ 🟢 🟢 🟢 🟢\n6️⃣ 🔴 🔴 🔴 🟢",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true
+   }
+  },
+  {
+   "text": "I just played Disorderly! - Sort these animated movies by their average review score on Letterboxd.com\nhttps://playdisorderly.com/puzzle/PzMmtQ/\n\n1️⃣ 🟢\n2️⃣ 🟢\n3️⃣ 🟢\n4️⃣ 🟢\n5️⃣ 🟢\n6️⃣ 🟢",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true
+   }
+  },
+  {
+   "text": "I just played Disorderly! - Sort these emojis in order of how frequently they're used \nhttps://playdisorderly.com/\n1️⃣ 🟢 🟢\n2️⃣ 🟢 🟢\n3️⃣ 🟢 🟢\n4️⃣ 🟢 🟢\n5️⃣ 🔴 🟢\n6️⃣ 🔴 🟢",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 2,
+    "Solved": true
+   }
+  },
+  {
+   "text": "I just played Disorderly! - Sort these video game consoles by how many units they've sold\nhttps://playdisorderly.com/\n\n1️⃣ 🟢 🟢\n2️⃣ 🔴 🟢\n3️⃣ 🟢 🟢\n4️⃣ 🔴 🟢\n5️⃣ 🔴 🟢\n6️⃣ 🔴 🟢",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 2,
+    "Solved": true
+   }
+  },
+  {
+   "text": "I just played Disorderly! - Sort these video game consoles by how many units they've sold\nhttps://playdisorderly.com/\n\n1️⃣ 🔴 🟢 🟢\n2️⃣ 🔴 🔴 🟢\n3️⃣ 🟢 🟢 🟢\n4️⃣ 🔴 🔴 🟢\n5️⃣ 🔴 🟢 🟢\n6️⃣ 🔴 🟢 🟢",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true
+   }
+  },
+  {
+   "text": "I just played Disorderly! - Sort these amounts of money from most to least valuable (as of February 15\nhttps://playdisorderly.com/\n\n1️⃣ 🔴 🔴 🔴 🔴 🔴 🔴 🔴 🔴 🟢\n2️⃣ 🔴 🔴 🔴 🔴 🔴 🔴 🟢 🟢 🟢\n3️⃣ 🔴 🔴 🔴 🔴 🔴 🔴 🔴 🟢 🟢\n4️⃣ 🔴 🔴 🔴 🟢 🟢 🟢 🟢 🟢 🟢\n5️⃣ 🔴 🔴 🔴 🔴 🟢 🟢 🟢 🟢 🟢\n6️⃣ 🔴 🔴 🔴 🔴 🔴 🔴 🔴 🔴 🟢",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 9,
+    "Solved": true
+   }
+  },
+  {
+   "text": "I just played Disorderly! - Sort these movies by their release date\nhttps://playdisorderly.com/\n\n1️⃣ 🔴 🟢\n2️⃣ 🟢 🟢\n3️⃣ 🔴 🟢\n4️⃣ 🔴 🟢\n5️⃣ 🟢 🟢\n6️⃣ 🔴 🟢",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 2,
+    "Solved": true
+   }
+  }
+ ],
+ "nyt-connections": [
+  {
+   "text": "Connections\nPuzzle #1211\n🟨🟨🟨🟨\n🟦🟦🟦🟦\n🟩🟩🟩🟩\n🟪🟪🟪🟪",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Mistakes": 0,
+    "Solved": true,
+    "Puzzle": 1211
+   }
+  },
+  {
+   "text": "Connections\nPuzzle #1206\n🟩🟩🟩🟩\n🟨🟦🟨🟨\n🟨🟦🟨🟨\n🟦🟦🟨🟦\n🟦🟦🟦🟦\n🟨🟨🟨🟨\n🟪🟪🟪🟪",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Mistakes": 3,
+    "Solved": true,
+    "Puzzle": 1206
+   }
+  },
+  {
+   "text": "Connections\nPuzzle #1201\n🟩🟩🟩🟩\n🟨🟨🟨🟨\n🟦🟪🟦🟦\n🟪🟦🟪🟦\n🟦🟪🟦🟦\n🟦🟪🟦🟦",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Mistakes": 4,
+    "Solved": false,
+    "Puzzle": 1201
+   }
+  },
+  {
+   "text": "Connections\nPuzzle #1131\n🟩🟪🟨🟨\n🟨🟨🟪🟨\n🟩🟩🟪🟦\n🟨🟪🟨🟨",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Mistakes": 4,
+    "Solved": false,
+    "Puzzle": 1131
+   }
+  },
+  {
+   "text": "Nope.\n\nConnections\nPuzzle #1170\n🟨🟪🟦🟩\n🟪🟪🟦🟪\n🟪🟩🟦🟪\n🟨🟨🟨🟨\n🟩🟩🟦🟩\n\nSkill 57/99\nUniqueness 1 in a Million",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Mistakes": 4,
+    "Solved": false,
+    "Puzzle": 1170
+   }
+  }
+ ],
+ "costcodle": [
+  {
+   "text": "Costcodle #1101 3/6\n⬇️🟥\n⬇️🟥\n✅\n https://costcodle.com/",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1101,
+    "Guesses": 3,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Costcodle #1097 1/6\n✅\n https://costcodle.com/",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1097,
+    "Guesses": 1,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Costcodle #1100 5/6\n⬇️🟨\n⬇️🟨\n⬆️🟨\n⬆️🟨\n✅\n https://costcodle.com/",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1100,
+    "Guesses": 5,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Costcodle #769 X/6\n⬇️🟥\n⬇️🟥\n⬇️🟥\n⬇️🟥\n⬆️🟥\n⬆️🟨\nhttps://costcodle.com",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 769,
+    "Guesses": null,
+    "Solved": false
+   }
+  },
+  {
+   "text": "Costcodle #638 X/6\n⬆️🟥\n⬆️🟥\n⬆️🟨\n⬆️🟨\n⬆️🟨\n⬆️🟨\n https://costcodle.com/",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 638,
+    "Guesses": null,
+    "Solved": false
+   }
+  },
+  {
+   "text": "Costcodle #1094 2/6\n⬆️🟨\n✅",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1094,
+    "Guesses": 2,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Costcodle #1101 4/6\n⬆️🟥\n⬇️🟨\n⬆️🟨\n✅\nhttps://costcodle.com",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": 1101,
+    "Guesses": 4,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Costcodle #1101 X/6\n⬆️🟥\n⬆️🟥\n⬆️🟨\n⬇️🟨\n⬆️🟨\n⬇️🟨\nhttps://costcodle.com",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": 1101,
+    "Guesses": null,
+    "Solved": false
+   }
+  }
+ ],
+ "worldle": [
+  {
+   "text": "#Worldle #1717 (04.10.2026) 1/6 (100%)\n🔥 Current Win Streak: 14 days\n🟩🟩🟩🟩🟩🎉\n🧭⭐📍🗺️🚩🧠🗿📜🛡️🔤🗣️👫🪙📐\nhttps://worldle.teuteuf.fr/share",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1717,
+    "Guesses": 1,
+    "Solved": true,
+    "Closest": 100,
+    "BonusRounds": 14,
+    "Streak": 14
+   }
+  },
+  {
+   "text": "#Worldle #1716 (03.10.2026) 4/6 (100%)\n🔥 Current Win Streak: 9 days\n🟩🟩🟩🟨⬜↗️\n🟩🟩🟩🟩⬜⬅️\n🟩🟩🟩🟩🟨➡️\n🟩🟩🟩🟩🟩🎉\n🧭⭐🚩📜🛡️🔤👫🏙📐\nhttps://worldle.teuteuf.fr/share",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1716,
+    "Guesses": 4,
+    "Solved": true,
+    "Closest": 100,
+    "BonusRounds": 9,
+    "Streak": 9
+   }
+  },
+  {
+   "text": "#Worldle #1717 (04.10.2026) 2/6 (100%)\n🔥 Current Win Streak: 18 days\n🟩🟨⬜⬜⬜⬅️\n🟩🟩🟩🟩🟩🎉\n\nhttps://worldle.teuteuf.fr/share",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1717,
+    "Guesses": 2,
+    "Solved": true,
+    "Closest": 100,
+    "BonusRounds": 0,
+    "Streak": 18
+   }
+  },
+  {
+   "text": "#Worldle #1716 (03.10.2026) X/6 (96%)\n🔥 Current Win Streak: 0 days\n🟩🟩🟩🟩🟨⬆️\n🟩🟩🟩🟩🟨➡️\n🟩🟩🟩🟩🟨↘️\n🟩🟩🟩🟩🟨↙️\n🟩🟩🟩🟩🟨↖️\n🟩🟩🟩🟩🟨↘️\n\nhttps://worldle.teuteuf.fr/share",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1716,
+    "Guesses": null,
+    "Solved": false,
+    "Closest": 96,
+    "BonusRounds": 0,
+    "Streak": 0
+   }
+  },
+  {
+   "text": "#Worldle #1717 (04.10.2026) 1/6 (100%)\n🔥 Aktuelle Siegesserie: 12 Tage\n🟩🟩🟩🟩🟩🎉\n\nhttps://worldle.teuteuf.fr/share",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1717,
+    "Guesses": 1,
+    "Solved": true,
+    "Closest": 100,
+    "BonusRounds": 0,
+    "Streak": 12
+   }
+  },
+  {
+   "text": "#Worldle #1717 (04.10.2026) 1/6 (100%)\n🔥 現在の連勝数：不明\n🟩🟩🟩🟩🟩🎉\n🧭⭐📍🗺️🚩🧠🗿📜🛡️🔤🗣️💸👫🪙📐\nhttps://worldle.teuteuf.fr/share",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1717,
+    "Guesses": 1,
+    "Solved": true,
+    "Closest": 100,
+    "BonusRounds": 15,
+    "Streak": null
+   }
+  },
+  {
+   "text": "I was better than 69% of players! 🏆\n#Worldle #1716 (03.10.2026) 1/6 (100%)\n🔥 Current Win Streak: 1 days\n🟩🟩🟩🟩🟩🎉\n🧭⭐📍🗺️🚩🗿📜🛡️🔤💰👫🪙📐\nhttps://s.worldle.teuteuf.fr/chu/",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1716,
+    "Guesses": 1,
+    "Solved": true,
+    "Closest": 100,
+    "BonusRounds": 13,
+    "Streak": 1
+   }
+  },
+  {
+   "text": "#Worldle #808 (08.04.2024) X/6 (94%)\n🟩🟩🟩⬛️⬛️⬆️\n🟩🟩🟩🟩⬛️↖️\n🟩🟩🟩🟩🟨↖️\n🟩🟩🟨⬛️⬛️↗️\n🟩🟨⬛️⬛️⬛️↗️\n🟩🟩🟩🟩🟨➡️\n\nhttps://worldle.teuteuf.fr",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 808,
+    "Guesses": null,
+    "Solved": false,
+    "Closest": 94,
+    "BonusRounds": 0,
+    "Streak": null
+   }
+  },
+  {
+   "text": "My streak was kept afloat by a lifesaver today. 🛟😅\n#Worldle #1716 (03.10.2026) 😛/6 (96%)\n🔥 Current Win Streak: 9 days\n🟩🟩🟩🟩🟨⬆️\n🟩🟩🟩🟩🟨➡️\n🟩🟩🟩🟩🟨↘️\n🟩🟩🟩🟩🟨↙️\n🟩🟩🟩🟩🟨↖️\n🟩🟩🟩🟩🟨🛟\n\nhttps://worldle.teuteuf.fr/share",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": 1716,
+    "Guesses": null,
+    "Solved": false,
+    "Closest": 96,
+    "BonusRounds": 0,
+    "Streak": 9
+   }
+  }
+ ],
+ "oec-pick-5": [
+  {
+   "text": "Pick5 #879 - Developed Exposed Photographic Material \n🥈 85.44%\n🟢 🟢 🟢 🟡 🟢 4/5\nPlay #oecGames today!\nhttps://oec.world/en/games/pick-5",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 879,
+    "Percent": 85.44,
+    "Top five": 4,
+    "Medal": "🥈",
+    "Solved": true
+   }
+  },
+  {
+   "text": "Pick5 #870 - Sheep and Goats \n20.00%\n🟡 🟡 🟡 🟡 🟢 1/5\nPlay #oecGames today!\nhttps://oec.world/en/games/pick-5",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 870,
+    "Percent": 20,
+    "Top five": 1,
+    "Medal": null,
+    "Solved": false
+   }
+  },
+  {
+   "text": "Pick5 #863 - Motor vehicles; parts and accessories (8701 to 8705) \n🏅 100.00%\n🟢 🟢 🟢 🟢 🟢 5/5\nPlay #oecGames today!\nhttps://oec.world/en/games/pick-5",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 863,
+    "Percent": 100,
+    "Top five": 5,
+    "Medal": "🏅",
+    "Solved": true
+   }
+  },
+  {
+   "text": "Pick5 #862 - Aluminium Ore \n🥇 98.72%\n🟢 🔴 🟢 🟢 🟢 5/5\nPlay #oecGames today!\nhttps://oec.world/en/games/pick-5",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 862,
+    "Percent": 98.72,
+    "Top five": 5,
+    "Medal": "🥇",
+    "Solved": true
+   }
+  }
+ ],
+ "pokedoku": [
+  {
+   "text": "🌟 PokeDoku Champion 🌟\n📅 2026-09-12\n\nScore: 9/9\nUniqueness: 114 (best possible: 75)\nBetter than 95.8% of players today\n\n✅ ✅ ✅ \n✅ ✅ ✅ \n✅ ✅ ✅ \n\nPlay at: https://pokedoku.com/share/RLRbTgz44tDA",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 9,
+    "Uniqueness": 114,
+    "BestPossible": 75,
+    "BetterThanPercent": 95.8,
+    "Streak": null,
+    "Solved": true,
+    "Puzzle": "2026-09-12"
+   }
+  },
+  {
+   "text": "🔴 PokeDoku Summary ⚪️\n📅 2026-07-21\n\nScore: 7/9\nUniqueness: 300 (best possible: 69)\nBetter than 10.2% of players today\n\n✅ 🟥 🟥 \n✅ ✅ ✅ \n✅ ✅ ✅ \n\nPlay at: https://pokedoku.com/share/HrUp24GX5EPo",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 7,
+    "Uniqueness": 300,
+    "BestPossible": 69,
+    "BetterThanPercent": 10.2,
+    "Streak": null,
+    "Solved": false,
+    "Puzzle": "2026-07-21"
+   }
+  },
+  {
+   "text": "🔴 PokeDoku Summary ⚪️\nBy: JPR\n\nScore: 6/9\nUniqueness: 403 (best possible: 34)\nBetter than 3.1% of players today\n\n✅ ✅ ✅ \n✅ ✅ ✅ \n🟥 🟥 🟥 \n\nPlay at: https://pokedoku.com/share/uRwwpZizBRYb",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 6,
+    "Uniqueness": 403,
+    "BestPossible": 34,
+    "BetterThanPercent": 3.1,
+    "Streak": null,
+    "Solved": false,
+    "Puzzle": null
+   }
+  },
+  {
+   "text": "12/09/2025\n.\n.\n.\n🔴 PokeDoku Summary ⚪️\n📅 2025-09-12\n\nScore: 2/9\nUniqueness: 743/117\n\n✅ 🟥 🟥 \n✅ 🟥 🟥 \n🟥 🟥 🟥 \n\nPlay at: https://pokedoku.com/share/ai7rPMVsY7n4",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Score": 2,
+    "Uniqueness": 743,
+    "BestPossible": 117,
+    "BetterThanPercent": null,
+    "Streak": null,
+    "Solved": false,
+    "Puzzle": "2025-09-12"
+   }
+  },
+  {
+   "text": "🔴 PokeDoku Summary ⚪️\n📅 2024-12-15\n\nScore: 7/9\nUniqueness: 342/168\n\n✅ ✅ ✅ \n🟥 ✅ ✅ \n✅ ✅ 🟥 \n\nPlay at: https://pokedoku.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 7,
+    "Uniqueness": 342,
+    "BestPossible": 168,
+    "BetterThanPercent": null,
+    "Streak": null,
+    "Solved": false,
+    "Puzzle": "2024-12-15"
+   }
+  },
+  {
+   "text": "🔴 PokeDoku Summary ⚪️\n📅 2025-04-03\n🎁 Bonus Puzzle\n\nScore: 8/9\nUniqueness: 167/15\n🔥 Streak: 5\n\n✅ ✅ ✅ \n✅ ✅ ✅ \n🟥 ✅ ✅ \n\nPlay at: https://pokedoku.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 8,
+    "Uniqueness": 167,
+    "BestPossible": 15,
+    "BetterThanPercent": null,
+    "Streak": 5,
+    "Solved": false,
+    "Puzzle": "2025-04-03"
+   }
+  },
+  {
+   "text": "🔴 PokeDoku Summary ⚪️\n📅 2026-08-30\n\nScore: 8/9\nUniqueness: 254 (best possible: 78)\nBetter than 17.4% of players today\n\n✅ ✅ ✅ \n✅ ✅ ✅ \n✅ 🟥 ✅ \n\n\nPlay at: https://pokedoku.com/share/U7J7tYRcQOOo",
+   "outcome": "partial",
+   "evidence": "S",
+   "expected": {
+    "Score": 8,
+    "Uniqueness": 254,
+    "BestPossible": 78,
+    "BetterThanPercent": 17.4,
+    "Streak": null,
+    "Solved": false,
+    "Puzzle": "2026-08-30"
+   }
+  },
+  {
+   "text": "🔴 PokeDoku Summary ⚪️\nBy: JPR\n🎁 Bonus Puzzle\n\nScore: 6/9\nUniqueness: 403 (best possible: 34)\nBetter than 3.1% of players today\n\n✅ ✅ ✅ \n✅ ✨ ✅ \n🟥 🟥 🟥 \n\n\nPlay at: https://pokedoku.com",
+   "outcome": "partial",
+   "evidence": "S",
+   "expected": {
+    "Score": 6,
+    "Uniqueness": 403,
+    "BestPossible": 34,
+    "BetterThanPercent": 3.1,
+    "Streak": null,
+    "Solved": false,
+    "Puzzle": null
+   }
+  }
+ ],
+ "framed": [
+  {
+   "text": "Framed #1669\n🎥 🟥 🟥 🟩 ⬛ ⬛ ⬛\n\nhttps://framed.wtf",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true,
+    "Puzzle": 1669
+   }
+  },
+  {
+   "text": "Framed #1669\n🎥 🟥 🟥 🟥 🟥 🟥 🟥\n\nhttps://framed.wtf",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": 1669
+   }
+  },
+  {
+   "text": "Framed #818\n🎥 🟥 🟥 🟥 🟥 🟥 🟥\n\nhttps://framed.wtf",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": 818
+   }
+  },
+  {
+   "text": "Framed #758\n🎥 🟥 🟥 🟥 🟩 ⬛ ⬛\n\nhttps://framed.wtf",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true,
+    "Puzzle": 758
+   }
+  },
+  {
+   "text": "#Framed #1668\n🎥 🟥 🟥 🟥 🟥 🟥 🟩\n\nhttps://framed.wtf",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 6,
+    "Solved": true,
+    "Puzzle": 1668
+   }
+  },
+  {
+   "text": "Framed #1206\n🎥 🟩 ⬛ ⬛ ⬛ ⬛ ⬛\n\nhttps://framed.wtf/",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true,
+    "Puzzle": 1206
+   }
+  }
+ ],
+ "daily-dozen-trivia": [
+  {
+   "text": "The Dozen: Daily Trivia\nGame 930\n\nScore: 14\n🟩🟩🟩\n🟩🟥🟥\n🟩🟩🟩\n7 Correct, Time 05:22\n\nDailyDozenTrivia.com\n\n@TheDozenTrivia x @BarstoolSports\n#TheDailyDozen",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 14,
+    "Correct": 7,
+    "Time": 322,
+    "Puzzle": 930
+   }
+  },
+  {
+   "text": "The Dozen: Daily Trivia\nGame 475\n\nScore: 40\n🟩🟪🟥\n🟩🟩🟩\n🟩🟩🟩\n8 Correct, Time 03:29\n\nDailyDozenTrivia.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 40,
+    "Correct": 8,
+    "Time": 209,
+    "Puzzle": 475
+   }
+  },
+  {
+   "text": "The Dozen: Daily Trivia\nGame 024\nPERFECT!\n🟩🟩🟩\n🟩🟩🟩\n🟩🟩🟩",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": null,
+    "Correct": 9,
+    "Time": null,
+    "Puzzle": 24
+   }
+  },
+  {
+   "text": "The Dozen: Daily Trivia\nGame 1169\n\nScore: 6\n🟥🟩🟥\n🟥🟥🟩\n🟪🟥🟥\n3 Correct, Time 04:10\n\nDailyDozenTrivia.com\n\n@TheDozenTrivia x @BarstoolSports\n#TheDailyDozen\n",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Score": 6,
+    "Correct": 3,
+    "Time": 250,
+    "Puzzle": 1169
+   }
+  },
+  {
+   "text": "The Dozen: Daily Trivia\nGame 1169\n\nScore: 120\n🟩🟩🟩\n🟩🟩🟩\n🟩🟩🟩\nPERFECT, Time 03:12\n\nDailyDozenTrivia.com\n\n@TheDozenTrivia x @BarstoolSports\n#TheDailyDozen\n",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Score": 120,
+    "Correct": 9,
+    "Time": 192,
+    "Puzzle": 1169
+   }
+  }
+ ],
+ "globle": [
+  {
+   "text": "🌎 Oct 4, 2026 🌍\n🔥 1 | Avg. Guesses: 8\n⬜🟨🟧🟧🟥🟥🟥🟩 = 8\n\nhttps://globle-game.com\n#globle",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "Oct 4, 2026",
+    "Guesses": 8,
+    "Solved": true,
+    "AvgGuesses": 8,
+    "Streak": 1
+   }
+  },
+  {
+   "text": "🌎 Oct 4, 2026 🌍\n🔥 1 | Avg. Guesses: 10\n🟥🟥🟥🟥🟥🟥🟥🟥\n🟥🟩 = 10\n\nhttps://globle-game.com\n#globle",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "Oct 4, 2026",
+    "Guesses": 10,
+    "Solved": true,
+    "AvgGuesses": 10,
+    "Streak": 1
+   }
+  },
+  {
+   "text": "🌎 Sep 28, 2026 🌍\n🔥 2 | Avg. Guesses: 13.5\n🟨⬜⬜⬜⬜🟨🟧🟨\n🟥🟥🟨🟧🟧🟧🟥🟥\n🟥🟥🟥🟧🟥🟩 = 22\n\nhttps://globle-game.com\n#globle",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "Sep 28, 2026",
+    "Guesses": 22,
+    "Solved": true,
+    "AvgGuesses": 13.5,
+    "Streak": 2
+   }
+  },
+  {
+   "text": "Globle Stats\n🌎 Oct 4, 2026 🌍\n🔥 5 | Avg. Guesses: 7.25\n⬜🟥🟥🟥🟥🟩 = 6\n\nhttps://globle-game.com\n#globle",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "Oct 4, 2026",
+    "Guesses": 6,
+    "Solved": true,
+    "AvgGuesses": 7.25,
+    "Streak": 5
+   }
+  },
+  {
+   "text": "🌎 Mar 30, 2024 🌍\n🔥 1 | Avg. Guesses: 8.94\n🟧🟨🟧🟩 = 4\n\nhttps://globle-game.com\n#globle",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "Mar 30, 2024",
+    "Guesses": 4,
+    "Solved": true,
+    "AvgGuesses": 8.94,
+    "Streak": 1
+   }
+  },
+  {
+   "text": "🌎 Oct 3, 2026 🌍\n🔥 5 | Avg. Guesses: 7.25\n-- = --\n\nhttps://globle-game.com\n#globle",
+   "outcome": "partial",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": "Oct 3, 2026",
+    "Guesses": null,
+    "Solved": false,
+    "AvgGuesses": 7.25,
+    "Streak": 5
+   }
+  }
+ ],
+ "box-office-game": [
+  {
+   "text": "boxofficega.me\nFebruary 7, 2025\n✅ 200\n✅ 200\n✅ 200\n✅ 200\n✅ 200\n➕ 200\n🏆 1200",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 1200,
+    "Correct": 5,
+    "Bonus": 200,
+    "Solved": true,
+    "Puzzle": "February 7, 2025"
+   }
+  },
+  {
+   "text": "boxofficega.me\nFebruary 7, 1992\n✅ 120\n✅ 45\n❌ 0\n✅ 120\n❌ 0\n🏆 285",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 285,
+    "Correct": 3,
+    "Bonus": null,
+    "Solved": false,
+    "Puzzle": "February 7, 1992"
+   }
+  },
+  {
+   "text": "boxofficega.me\nFebruary 7, 2025\n✅ 110\n❌ 0\n❌ 0\n✅ 0\n❌ 0\n🏆 110",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Score": 110,
+    "Correct": 2,
+    "Bonus": null,
+    "Solved": false,
+    "Puzzle": "February 7, 2025"
+   }
+  },
+  {
+   "text": "boxofficega.me\nFebruary 7, 2025\n✅ 200\n✅ 200\n✅ 200\n✅ 200\n✅ 200\n➕ 200\n🏆 1200",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Score": 1200,
+    "Correct": 5,
+    "Bonus": 200,
+    "Solved": true,
+    "Puzzle": "February 7, 2025"
+   }
+  }
+ ],
+ "tradle": [
+  {
+   "text": "#Tradle #1672 5/6\n🟩🟨⬜⬜⬜\n🟩🟩🟩🟩🟨\n🟩🟩🟩🟩🟨\n🟩🟩🟩🟩🟨\n🟩🟩🟩🟩🟩\nhttps://oec.world/en/games/tradle",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1672,
+    "Guesses": 5,
+    "Solved": true
+   }
+  },
+  {
+   "text": "#Tradle #1661 X/6\n🟩🟩🟩🟩🟨\n🟩🟩🟩🟩🟨\n🟩🟩🟩🟩🟨\n🟩🟩🟩🟩🟨\n🟩🟩🟩🟩🟨\n🟩🟩🟩🟨⬜\nhttps://oec.world/en/games/tradle",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1661,
+    "Guesses": null,
+    "Solved": false
+   }
+  },
+  {
+   "text": "#Tradle #1673 4/6\n🟩🟩🟨⬜⬜\n🟩🟩🟩⬜⬜\n🟩🟩🟩🟩⬜\n🟩🟩🟩🟩🟩\nhttps://tradle.net/",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1673,
+    "Guesses": 4,
+    "Solved": true
+   }
+  },
+  {
+   "text": "#Tradle #1670 X/6\n🟩🟩🟩🟨⬜\n🟩🟩🟩🟨⬜\n🟩🟩🟩🟩🟨\n🟩🟩🟩🟩⬜\n🟩🟩🟩🟩🟨\n🟩🟩🟩🟩🟨\nhttps://tradle.net/",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1670,
+    "Guesses": null,
+    "Solved": false
+   }
+  },
+  {
+   "text": "#Tradle #761 5/6\n🟩🟩🟨⬜⬜\n🟩🟩🟩🟩⬜\n🟩🟩🟩🟩🟨\n🟩🟩🟩🟩🟨\n🟩🟩🟩🟩🟩\nhttps://games.oec.world/en/tradle",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 761,
+    "Guesses": 5,
+    "Solved": true
+   }
+  },
+  {
+   "text": "#Tradle #1128 2/6\n🟩🟩🟩🟩⬜\n🟩🟩🟩🟩🟩\nhttps://oec.world/en/games/tradle",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1128,
+    "Guesses": 2,
+    "Solved": true
+   }
+  }
+ ],
+ "movie-to-movie": [
+  {
+   "text": "Movie to Movie Challenge\nBoyz n the Hood ➡ Hit Man\n🎬🧑🎬🧑🎬🧑🎬\nhttps://movietomovie.com/play/650/974635",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Hops": 3,
+    "Solved": true,
+    "Puzzle": "650/974635"
+   }
+  },
+  {
+   "text": "Got this one in 2, y’all. Movie to Movie Challenge\nSpeak No Evil ➡ Blow\n🎬🧑🎬🧑🎬\nhttps://movietomovie.com/play/1114513/4133",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Hops": 2,
+    "Solved": true,
+    "Puzzle": "1114513/4133"
+   }
+  },
+  {
+   "text": "Movie to Movie Challenge\nSecretariat ➡ Alien: Romulus\n🎬🧑🎬🧑🎬🧑🎬🧑🎬\nhttps://movietomovie.com/play/39486/945961\n\nQue jogo bom",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Hops": 4,
+    "Solved": true,
+    "Puzzle": "39486/945961"
+   }
+  },
+  {
+   "text": "Movie to Movie Challenge\nThe Godfather ➡ Pulp Fiction\n🎬🧑🎬🧑🎬\nhttps://movietomovie.com/play/238/680",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Hops": 2,
+    "Solved": true,
+    "Puzzle": "238/680"
+   }
+  },
+  {
+   "text": "The Godfather ➡ Marlon Brando ➡ The Freshman ➡ Frank Whaley ➡ Pulp Fiction",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Hops": 2,
+    "Solved": true,
+    "Puzzle": null
+   },
+   "detectable": false
+  }
+ ],
+ "queens": [
+  {
+   "text": "Queens #887 | 0:40 with no mistakes\nFirst 👑s: 🟥 🟨 🟥\n🏅 I’m in the Top 1% of my connections today!\nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 40,
+    "NoMistakes": true,
+    "NoHints": null,
+    "Puzzle": 887
+   }
+  },
+  {
+   "text": "Queens #885 | 1:46 with no mistakes & no hints\nFirst 👑s: 🟧 🟦 🟫\nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 106,
+    "NoMistakes": true,
+    "NoHints": true,
+    "Puzzle": 885
+   }
+  },
+  {
+   "text": "Queens #866 | 17:14\nFirst 👑s: 🟨 🟥 🟩\nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 1034,
+    "NoMistakes": false,
+    "NoHints": null,
+    "Puzzle": 866
+   }
+  },
+  {
+   "text": "Queens #886 | 3:27 and flawless\nFirst 👑s: 🟥 🟪 🟥 \nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 207,
+    "NoMistakes": true,
+    "NoHints": null,
+    "Puzzle": 886
+   }
+  },
+  {
+   "text": "Queens #867 | 0:26\nNo mistakes & no hints\nFirst 👑s: 🟧 🟩 🟪\n🏅 I’m on a 351-day win streak!\nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 26,
+    "NoMistakes": true,
+    "NoHints": true,
+    "Puzzle": 867
+   }
+  },
+  {
+   "text": "Queens #885 | 0:31 with no mistakes\nFirst 👑s: 🟧 🟦 🟫\n🏅 I’m smarter than 90% of CEOs today!\n#AreYouSmarterThanaCEO\nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 31,
+    "NoMistakes": true,
+    "NoHints": null,
+    "Puzzle": 885
+   }
+  },
+  {
+   "text": "Queens #254\n2:04 👑\nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 124,
+    "NoMistakes": null,
+    "NoHints": null,
+    "Puzzle": 254
+   }
+  },
+  {
+   "text": "Queens n. 159 | 1:36 \nAi primi posti 👑: 🟦 🟨 🟪\nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 96,
+    "NoMistakes": false,
+    "NoHints": null,
+    "Puzzle": 159
+   }
+  },
+  {
+   "text": "Queens n. 482 | 0:10 e impeccabile\nAi primi posti 👑: 🟧 🟪 🟩\n🏅 Sono nel primo 1% di tutte le persone che giocano!\nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 10,
+    "NoMistakes": true,
+    "NoHints": null,
+    "Puzzle": 482
+   }
+  },
+  {
+   "text": "Queens Nr. 319 | 1:55 und fehlerfrei\nErste 👑: 🟫 🟩 🟪\nlnkd.in/queens",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 115,
+    "NoMistakes": true,
+    "NoHints": null,
+    "Puzzle": 319
+   }
+  },
+  {
+   "text": "Queens #872 | 0:11\nPremières 👑 : 🟨 🟥 ⬜ \nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 11,
+    "NoMistakes": false,
+    "NoHints": null,
+    "Puzzle": 872
+   }
+  },
+  {
+   "text": "Queens #350 | 0:36 y sin fallos\nPrimeras 👑: 🟥 🟪 🟦 \nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 36,
+    "NoMistakes": true,
+    "NoHints": null,
+    "Puzzle": 350
+   }
+  },
+  {
+   "text": "Queens 576 | 0:19 \nPrimeiras 👑s: ⬜ 🟩 🟧\n🏅 Estou entre os 1% melhores de todos os jogadores!\nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 19,
+    "NoMistakes": false,
+    "NoHints": null,
+    "Puzzle": 576
+   }
+  },
+  {
+   "text": "Queens #259 | 2:07 및 완벽\n첫 👑: 🟨 🟪 🟥\nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 127,
+    "NoMistakes": true,
+    "NoHints": null,
+    "Puzzle": 259
+   }
+  },
+  {
+   "text": "Queens #270 | 1:06 en foutloos\nEerste 👑en: 🟦 ⬜ 🟩 \nlnkd.in/queens.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Time": 66,
+    "NoMistakes": true,
+    "NoHints": null,
+    "Puzzle": 270
+   }
+  }
+ ],
+ "geogrid": [
+  {
+   "text": "🟩🟩🟩\n🟩🟩🟩\n🟩🟩🟩\nScore: 123.7 | Rank: 1,253/4,953\nTop Brass 🎺 | ★★★\nI scored better than 74.7% of #geogridgame players!\nBoard #910 | ♾️ Mode: Off\nhttps://geogridgame.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 910,
+    "Score": 123.7,
+    "Correct": 9,
+    "Rank": 1253,
+    "Plays": 4953,
+    "InfiniteMode": false
+   }
+  },
+  {
+   "text": "🟩🟩❌\n🟩🟩🟩\n🟩🟩🟩\nScore: 144.9 | Rank: 662/4,547\nTop Brass 🎺 | ★★★★\nI scored better than 85.4% of #geogridgame players!\nBoard #907 | ♾️ Mode: Off\nhttps://geogridgame.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 907,
+    "Score": 144.9,
+    "Correct": 8,
+    "Rank": 662,
+    "Plays": 4547,
+    "InfiniteMode": false
+   }
+  },
+  {
+   "text": "💎💎💎\n🦄💎💎\n🦄🦄💎\nScore: 6.3 | Rank: 150/4,355\nBoard #898 | ♾️ Mode: Off\nhttps://geogridgame.com/s/y37yIDkhf0",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 898,
+    "Score": 6.3,
+    "Correct": 9,
+    "Rank": 150,
+    "Plays": 4355,
+    "InfiniteMode": false
+   }
+  },
+  {
+   "text": "💎💎💎\n🌈💎💎\n💎🌈🦄\nScore: 10.5 | Rank: 268/6,359\nBoard #895 | ♾️ Mode: On\nhttps://geogridgame.com/s/Q3MvFbUuIj",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 895,
+    "Score": 10.5,
+    "Correct": 9,
+    "Rank": 268,
+    "Plays": 6359,
+    "InfiniteMode": true
+   }
+  },
+  {
+   "text": "💎🌈🔷\n💎❌⚡️\n🦄⚡️🔷\nScore: 146.3 | Rank: 10,595/13,703\nBoard #823 | ♾️ Mode: Off\nhttps://geogridgame.com/s/iYoki0UA4E",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 823,
+    "Score": 146.3,
+    "Correct": 8,
+    "Rank": 10595,
+    "Plays": 13703,
+    "InfiniteMode": false
+   }
+  },
+  {
+   "text": "❌ ❌ ❌\n❌ ❌ ❌\n❌ ❌ ❌\n\n🌎Game Summary🌎\nBoard #45\nScore: 900\nRank: 9,082 / 11,501\nhttps://geogridgame.com\n@geogridgame",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 45,
+    "Score": 900,
+    "Correct": 0,
+    "Rank": 9082,
+    "Plays": 11501
+   }
+  }
+ ],
+ "emovi": [
+  {
+   "text": "#Emovi 🎬 #1533\n♾️⚔️\n🟩⬜⬜\nhttps://emovi.teuteuf.fr",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1533,
+    "Guesses": 1,
+    "Solved": true
+   }
+  },
+  {
+   "text": "#Emovi 🎬 #1514\n🤖🕶️🔫\n🟥🟩⬜\nhttps://emovi.teuteuf.fr",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1514,
+    "Guesses": 2,
+    "Solved": true
+   }
+  },
+  {
+   "text": "#Emovi 🎬 #1093\n🤖🕶️🔫\n🟥🟥🟩\nhttps://emovi.teuteuf.fr",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1093,
+    "Guesses": 3,
+    "Solved": true
+   }
+  },
+  {
+   "text": "#Emovi 🎬 #1533\n♾️⚔️\n🟥🟥🟥\nhttps://emovi.teuteuf.fr",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": 1533,
+    "Guesses": null,
+    "Solved": false
+   }
+  }
+ ],
+ "guessthe-game": [
+  {
+   "text": "#GuessTheGame #1593\n\n🎮 🟥 🟩 ⬜ ⬜ ⬜ ⬜\n\n#ProGamer\nhttps://GuessThe.Game/p/1593",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 2,
+    "Solved": true,
+    "Puzzle": 1593
+   }
+  },
+  {
+   "text": "#GuessTheGame #1585\n\n🎮 🟥 🟥 🟥 🟥 🟥 🟥\n\n#ProGamer\nhttps://GuessThe.Game/p/1585",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": 1585
+   }
+  },
+  {
+   "text": "#GuessTheGame #1528\n\n🎮 🟥 🟨 🟨 🟨 🟨 🟨\n\n#ProGamer\nhttps://GuessThe.Game/p/1528",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": 1528
+   }
+  },
+  {
+   "text": "Woop woop\n\n#GuessTheGame #1580\n\n🎮 🟩 ⬜ ⬜ ⬜ ⬜ ⬜\n\n#InsightfulGuesser\nhttps://GuessThe.Game/p/1580",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true,
+    "Puzzle": 1580
+   }
+  },
+  {
+   "text": "#GuessTheGame #1186\n\n🎮 🟥 🟥 🟥 🟥 🟩 ⬜\n\n#GameNavigator\nhttps://guessthe.game/p/1186",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 5,
+    "Solved": true,
+    "Puzzle": 1186
+   }
+  },
+  {
+   "text": "#GuessTheGame #1356\n\n🎮 🟥 🟥 🟥 🟩 ⬜ ⬜",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true,
+    "Puzzle": 1356
+   }
+  },
+  {
+   "text": "#GuessTheGame #1604\n\n🎮 🟥 🟨 🟩 ⬜ ⬜ ⬜\n\n🕹️#ProGamer🕹️\nhttps://GuessThe.Game/p/1604",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true,
+    "Puzzle": 1604
+   }
+  },
+  {
+   "text": "#GuessTheGame #1604\n\n🎮 🟩 ⬜ ⬜ ⬜ ⬜ ⬜\n\n#ProGamer\nGuessThe.Game",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true,
+    "Puzzle": 1604
+   }
+  },
+  {
+   "text": "#GuessTheGame #1580\n🎮 🟩 ⬜ ⬜ ⬜ ⬜ ⬜\nhttps://GuessThe.Game/p/1580",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true,
+    "Puzzle": 1580
+   }
+  }
+ ],
+ "gamedle": [
+  {
+   "text": "🔍 Gamedle (Guess): #1438 🟥🟥🟥🟩⬜⬜⬜⬜⬜⬜\nhttps://gamedle.wtf/guess",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true,
+    "Puzzle": 1438
+   }
+  },
+  {
+   "text": "🔍 Gamedle (Guess): #1438 🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥\nhttps://gamedle.wtf/guess",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": 1438
+   }
+  },
+  {
+   "text": "Gamedle\n🕹️ (Cover art) #1625:\n🟥🟩⬜⬜⬜⬜\n🎨 (Artwork) #1384:\n🟥🟥🟥🟥🟥🟥\n🔑 (Keywords) #1185:\n🟥🟥🟥🟩⬜⬜\n🔍 (Guess) #1438:\n🟥🟥🟥🟥🟥🟥🟩⬜⬜⬜\nhttps://gamedle.wtf",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 7,
+    "Solved": true,
+    "Puzzle": 1438
+   }
+  },
+  {
+   "text": "🔍 Gamedle (Enigma): #1438 🟥🟩⬜⬜⬜⬜⬜⬜⬜⬜\nhttps://gamedle.wtf/guess",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 2,
+    "Solved": true,
+    "Puzzle": 1438
+   }
+  },
+  {
+   "text": "🕹️🔍 Gamedle (Guess mode): 06/06/2024 🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥 > https://gamedle.wtf/guess",
+   "outcome": "loss",
+   "evidence": "U",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": "06/06/2024"
+   }
+  }
+ ],
+ "gamedle-classic": [
+  {
+   "text": "🕹️ Gamedle (Cover art): #1625 🟥🟥🟩⬜⬜⬜\nhttps://gamedle.wtf/classic",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true,
+    "Puzzle": 1625
+   }
+  },
+  {
+   "text": "🕹️ Gamedle (Cover art): #1625 🟥🟥🟥🟥🟥🟥\nhttps://gamedle.wtf/classic",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": 1625
+   }
+  },
+  {
+   "text": "Gamedle\n🕹️ (Cover art) #1625:\n🟥🟩⬜⬜⬜⬜\n🎨 (Artwork) #1384:\n🟥🟥🟥🟥🟥🟥\n🔑 (Keywords) #1185:\n🟥🟥🟥🟩⬜⬜\n🔍 (Guess) #1438:\n🟥🟥🟥🟥🟥🟥🟩⬜⬜⬜\nhttps://gamedle.wtf",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 2,
+    "Solved": true,
+    "Puzzle": 1625
+   }
+  },
+  {
+   "text": "Gamedle\n🕹️ (Capa) #1377:\n🟨🟩⬜⬜⬜⬜\n\n🎨 (Artwork) #1136:\n🟥🟥🟥🟥🟥🟥\n\n👤 (Personagem) #229:\n🟥🟥🟥🟥\n\n🔑 (Palavras-chave) #936:\n🟥🟥🟥🟥🟥🟥",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 2,
+    "Solved": true,
+    "Puzzle": 1377
+   }
+  },
+  {
+   "text": "Gamedle\n🕹️ (Capa) #1375:\n🟥🟥🟥🟥🟥🟥\n\n🎨 (Artwork) #1134:\n🟥🟥🟩⬜⬜⬜\n\n👤 (Personagem) #227:\n🟩⬜⬜⬜\n\n🔑 (Palavras-chave) #934:\n🟥🟥🟥🟥🟥🟥",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": 1375
+   }
+  },
+  {
+   "text": "🕹️ Gamedle: 26/07/2024 🟥🟥🟩⬜⬜⬜> https://gamedle.wtf",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true,
+    "Puzzle": "26/07/2024"
+   }
+  },
+  {
+   "text": "🕹️ Gamedle: 13/08/2024 🟥🟥🟥🟥🟥🟥> https://gamedle.wtf",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": "13/08/2024"
+   }
+  },
+  {
+   "text": "🕹️ Gamedle (Portada): #1625 🟥🟨🟥🟩⬜⬜\nhttps://gamedle.wtf/classic",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true,
+    "Puzzle": 1625
+   }
+  }
+ ],
+ "gamedle-artwork": [
+  {
+   "text": "🎨 Gamedle (Artwork): #1384 🟥🟥🟥🟩⬜⬜\nhttps://gamedle.wtf/artwork",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true,
+    "Puzzle": 1384
+   }
+  },
+  {
+   "text": "🎨 Gamedle (Artwork): #1384 🟥🟥🟥🟥🟥🟥\nhttps://gamedle.wtf/artwork",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": 1384
+   }
+  },
+  {
+   "text": "Gamedle\n🕹️ (Cover art) #1625:\n🟥🟩⬜⬜⬜⬜\n🎨 (Artwork) #1384:\n🟥🟥🟥🟥🟥🟥\n🔑 (Keywords) #1185:\n🟥🟥🟥🟩⬜⬜\n🔍 (Guess) #1438:\n🟥🟥🟥🟥🟥🟥🟩⬜⬜⬜\nhttps://gamedle.wtf",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": 1384
+   }
+  },
+  {
+   "text": "Gamedle\n🕹️ (Capa) #1375:\n🟥🟥🟥🟥🟥🟥\n\n🎨 (Artwork) #1134:\n🟥🟥🟩⬜⬜⬜\n\n👤 (Personagem) #227:\n🟩⬜⬜⬜\n\n🔑 (Palavras-chave) #934:\n🟥🟥🟥🟥🟥🟥",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true,
+    "Puzzle": 1134
+   }
+  },
+  {
+   "text": "Gamedle\n🕹️ (Capa) #1377:\n🟨🟩⬜⬜⬜⬜\n\n🎨 (Artwork) #1136:\n🟥🟥🟥🟥🟥🟥\n\n👤 (Personagem) #229:\n🟥🟥🟥🟥\n\n🔑 (Palavras-chave) #936:\n🟥🟥🟥🟥🟥🟥",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": 1136
+   }
+  },
+  {
+   "text": "🕹️🎨 Gamedle (Artwork mode): 06/06/2024 🟥🟥🟥🟥🟩⬜ > https://gamedle.wtf/artwork",
+   "outcome": "win",
+   "evidence": "U",
+   "expected": {
+    "Guesses": 5,
+    "Solved": true,
+    "Puzzle": "06/06/2024"
+   }
+  }
+ ],
+ "gamedle-keywords": [
+  {
+   "text": "🔑 Gamedle (Keywords): #1185 🟥🟩⬜⬜⬜⬜\nhttps://gamedle.wtf/keywords",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 2,
+    "Solved": true,
+    "Puzzle": 1185
+   }
+  },
+  {
+   "text": "🔑 Gamedle (Keywords): #1185 🟥🟥🟥🟥🟥🟥\nhttps://gamedle.wtf/keywords",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": 1185
+   }
+  },
+  {
+   "text": "Gamedle\n🕹️ (Cover art) #1625:\n🟥🟩⬜⬜⬜⬜\n🎨 (Artwork) #1384:\n🟥🟥🟥🟥🟥🟥\n🔑 (Keywords) #1185:\n🟥🟥🟥🟩⬜⬜\n🔍 (Guess) #1438:\n🟥🟥🟥🟥🟥🟥🟩⬜⬜⬜\nhttps://gamedle.wtf",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true,
+    "Puzzle": 1185
+   }
+  },
+  {
+   "text": "Gamedle\n🕹️ (Capa) #1377:\n🟨🟩⬜⬜⬜⬜\n\n🎨 (Artwork) #1136:\n🟥🟥🟥🟥🟥🟥\n\n👤 (Personagem) #229:\n🟥🟥🟥🟥\n\n🔑 (Palavras-chave) #936:\n🟥🟥🟥🟥🟥🟥",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": 936
+   }
+  },
+  {
+   "text": "🔑 Gamedle (Keywords): 17/09/2025 🟩⬜⬜⬜⬜⬜\nhttps://gamedle.wtf/keywords",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true,
+    "Puzzle": "17/09/2025"
+   }
+  },
+  {
+   "text": "🕹️🔑 Gamedle (keywords mode): 15/08/2025 🟩⬜⬜⬜⬜⬜> https://gamedle.wtf/keywords",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true,
+    "Puzzle": "15/08/2025"
+   }
+  },
+  {
+   "text": "🕹️🔑 Gamedle (keywords mode): 04/09/2025 🟥🟥🟥🟥🟥🟥> https://gamedle.wtf/keywords",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Puzzle": "04/09/2025"
+   }
+  },
+  {
+   "text": "🕹️🔑 Gamedle (keywords mode): 27/07/2025 🟨🟨🟨🟨🟩⬜> https://gamedle.wtf/keywords",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 5,
+    "Solved": true,
+    "Puzzle": "27/07/2025"
+   }
+  }
+ ],
+ "puckdoku": [
+  {
+   "text": "Puckdoku Game 1030 - 9/9🏆:\n\n8 Uniqueness\n🟩🟩🟩\n🟩🟩🟩\n🟩🟩🟩\n\nhttps://www.puckdoku.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Correct": 9,
+    "Guesses": 9,
+    "Uniqueness": 8,
+    "Solved": true,
+    "Puzzle": 1030
+   }
+  },
+  {
+   "text": "1 misstep, dangit!\n\nPuckdoku Game 1111 - 8/9:\n\n195 Uniqueness\n🟩🟩⬜\n🟩🟩🟩\n🟩🟩🟩\n\nhttps://www.puckdoku.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Correct": 8,
+    "Guesses": 9,
+    "Uniqueness": 195,
+    "Solved": false,
+    "Puzzle": 1111
+   }
+  },
+  {
+   "text": "Puckdoku Game 1181 - 9/10:\n\n40 Uniqueness\n🟩🟩🟩\n🟩🟩🟩\n🟩🟩🟩\n\nhttps://www.puckdoku.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Correct": 9,
+    "Guesses": 10,
+    "Uniqueness": 40,
+    "Solved": true,
+    "Puzzle": 1181
+   }
+  },
+  {
+   "text": "Puckdoku Game 446 - 6/9:\n\n328 Uniqueness\n🟩🟩⬜\n🟩🟩⬜\n🟩🟩⬜\n\nhttps://www.puckdoku.com\nNever good at that category.",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Correct": 6,
+    "Guesses": 9,
+    "Uniqueness": 328,
+    "Solved": false,
+    "Puzzle": 446
+   }
+  },
+  {
+   "text": "Puckdoku Game 447 - 6/9:\n\n329 Uniqueness\n🟩⬜🟩\n🟩🟩🟩\n⬜🟩🟩",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Correct": 6,
+    "Guesses": 9,
+    "Uniqueness": 329,
+    "Solved": false,
+    "Puzzle": 447
+   }
+  },
+  {
+   "text": "Puckdoku Game 1189 - 9/9🏆:\n\n12 Uniqueness\n🟩🟩🟩\n🟩🟩🟩\n🟩🟩🟩\n\nhttps://www.puckdoku.com",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Correct": 9,
+    "Guesses": 9,
+    "Uniqueness": 12,
+    "Solved": true,
+    "Puzzle": 1189
+   }
+  },
+  {
+   "text": "Puckdoku Game 1189 - 7/9:\n\n240 Uniqueness\n🟩🟩⬜\n🟩🟩🟩\n⬜🟩🟩\n\nhttps://www.puckdoku.com",
+   "outcome": "partial",
+   "evidence": "S",
+   "expected": {
+    "Correct": 7,
+    "Guesses": 9,
+    "Uniqueness": 240,
+    "Solved": false,
+    "Puzzle": 1189
+   }
+  }
+ ],
+ "moviegrid": [
+  {
+   "text": "Movie Grid - 10/04/2026:\n\n9/9 Correct\n\nScore: 2685\n\n🟩🟩🟩\n🟩🟩🟩\n🟩🟩🟩\n\nhttps://www.moviegrid.io",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Correct": 9,
+    "Score": 2685,
+    "Solved": true,
+    "Puzzle": "10/04/2026"
+   }
+  },
+  {
+   "text": "Blanked on one of these.\n\nMovie Grid - 12/16/2025:\n\n6/9 Correct\n\nScore: 1760\n\n🟩🟩🟩\n🟩🟩🟩\n⬜⬜⬜\n\nhttps://www.moviegrid.io",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Correct": 6,
+    "Score": 1760,
+    "Solved": false,
+    "Puzzle": "12/16/2025"
+   }
+  },
+  {
+   "text": "Movie Grid - 09/28/2026:\n7/9 Correct\nScore: 2020\n\n🟩🟩🟩\n🟩🟩⬜\n⬜🟩🟩\n\nhttps://www.moviegrid.io\n\nDid not expect that answer.",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Correct": 7,
+    "Score": 2020,
+    "Solved": false,
+    "Puzzle": "09/28/2026"
+   }
+  },
+  {
+   "text": "Movie Grid - Off Script 161:\n9/9 Correct\nScore: 2498 (top 10%)\n\n🟩🟩🟩\n🟩🟩🟩\n🟩🟩🟩\n\nhttps://www.moviegrid.io/off-script\n\nHuh, not bad\n\nMovie Pyramid - 09/22/2026:\n10/10 Correct\nScore: 1185 (top 17%)\n\n        🟩\n     🟩🟩\n   🟩🟩🟩\n 🟩🟩🟩🟩\n\nhttps://www.moviepyramid.io\n\nTricky categories today.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Correct": 9,
+    "Score": 2498,
+    "Solved": true,
+    "Puzzle": "Off Script 161"
+   }
+  },
+  {
+   "text": "Movie Grid - 10/04/2026:\n\n9/9 Correct\n\nScore: 2685\n\n🟩🟩🟩\n🟩🟩🟩\n🟩🟩🟩\n\nhttps://www.moviegrid.io",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Correct": 9,
+    "Score": 2685,
+    "Solved": true,
+    "Puzzle": "10/04/2026"
+   }
+  },
+  {
+   "text": "Movie Grid - 10/04/2026:\n\n2/9 Correct\n\nScore: 580\n\n🟩⬜⬜\n⬜🟩⬜\n⬜⬜⬜\n\nhttps://www.moviegrid.io",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Correct": 2,
+    "Score": 580,
+    "Solved": false,
+    "Puzzle": "10/04/2026"
+   }
+  }
+ ],
+ "spellcheck-game": [
+  {
+   "text": "Spellcheck #418\n🟩🟩🟩🟩🟩\n🟩🟩🟩🟩🟩\n🟩🟩🟩🟩🟩\n\nhttps://spellcheckgame.com/",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Correct": 15,
+    "Mistakes": 0,
+    "Puzzle": 418
+   }
+  },
+  {
+   "text": "Spellcheck #773\n🟩🟩🟩🟩🟩\n🟩🟩🟥🟥🟩\n🟥🟩🟥🟩🟩\n\nhttps://spellcheckgame.com/",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Correct": 11,
+    "Mistakes": 4,
+    "Puzzle": 773
+   }
+  },
+  {
+   "text": "Spellcheck #433\n🟩🟩🟩🟩🟩\n🟩🟩🟩🟩🟩\n🟥🟥🟥🟩🟥\n\nhttps://spellcheckgame.com/",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Correct": 11,
+    "Mistakes": 4,
+    "Puzzle": 433
+   }
+  },
+  {
+   "text": "Spellcheck #87\n🟥🟥🟥🟥🟥\n🟥🟥🟥🟥🟥\n🟥🟥🟥🟥🟥\n\nhttps://spellcheckgame.com/",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Correct": 0,
+    "Mistakes": 15,
+    "Puzzle": 87
+   }
+  },
+  {
+   "text": "Spellcheck #74\n🟩🟥🟩🟥🟩\n🟩🟩🟩🟩🟩\n🟩🟥🟥🟥🟥",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Correct": 9,
+    "Mistakes": 6,
+    "Puzzle": 74
+   }
+  }
+ ],
+ "foodguessr": [
+  {
+   "text": "I got 11,341 on the FoodGuessr Daily!\n\n🌕🌕🌕🌕🌖 4,600 (Round 1)\n🌕🌕🌕🌕🌕 5,000 (Round 2) 💯\n🌕🌖🌑🌑🌑 1,741 (Round 3)\n\nSaturday, Sep 26, 2026\nPlay here: https://www.foodguessr.com/",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 11341
+   }
+  },
+  {
+   "text": "I got 15,000 on the FoodGuessr Daily!\n\nThat's 1,838 points above today's average! 🎉\n\n🌕🌕🌕🌕🌕 5,000 (Round 1) 💯\n🌕🌕🌕🌕🌕 5,000 (Round 2) 💯\n🌕🌕🌕🌕🌕 5,000 (Round 3) 💯\n\nFriday, Oct 2, 2026\nPlay here: https://www.foodguessr.com/",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 15000
+   }
+  },
+  {
+   "text": "I got 4,000 on the FoodGuessr Daily!\n\n🌕🌑🌑🌑🌑 1,000 (Round 1)\n🌕🌕🌕🌑🌑 3,000 (Round 2)\n🌑🌑🌑🌑🌑 0 (Round 3)\n\nWednesday, Sep 30, 2026\nPlay here: https://www.foodguessr.com/",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 4000
+   }
+  },
+  {
+   "text": "I got 5,559 on the FoodGuessr Daily!\n\n🌕🌘🌑🌑🌑 1,216 (Round 1)\n🌕🌕🌕🌕🌑 3,995 (Round 2)\n🌗🌑🌑🌑🌑 348 (Round 3)\n\nSaturday, Sep 19, 2026\nPlay here: https://www.foodguessr.com/",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 5559
+   }
+  },
+  {
+   "text": "I got 7.564 on the FoodGuessr Daily!\n\n🌕🌖🌑🌑🌑 1.692 (Round 1)\n🌕🌕🌕🌕🌑 4.000 (Round 2)\n🌕🌕🌑🌑🌑 1.872 (Round 3)\n\nTuesday, Jul 21, 2026\nPlay here: https://www.foodguessr.com/\n\nMuito legal.",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 7564
+   }
+  },
+  {
+   "text": "I got 7.930 on the FoodGuessr Daily! ☹️\n\n🌗🌑🌑🌑 430 (Round 1)\n🌕🌕🌕🌑 3.500 (Round 2)\n🌕🌕🌕🌘 4.000 (Round 3)\n\nSunday, Apr 19, 2026\nPlay here: https://www.foodguessr.com/",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 7930
+   }
+  },
+  {
+   "text": "FoodGuessr - Monday, Jan 5, 2026 UTC\n🌕🌕🌕🌕 5,000 ⋅ Round 1 💯\n🌕🌕🌗🌑 3,000 ⋅ Round 2\n🌕🌕🌕🌕 5,000 ⋅ Round 3 💯\nTotal score: 13,000/15,000\n(+1,548 above today's average!) 🎉\n\nGot the last one right away.",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 13000
+   }
+  },
+  {
+   "text": "FoodGuessr - Sunday, Mar 22, 2026 UTC\n🌕🌕🌕🌖 4.500 ⋅ Round 1\n🌕🌕🌗🌑 3.000 ⋅ Round 2\n🌕🌕🌕🌘 4.000 ⋅ Round 3\nTotal score: 11.500/15.000\n(+733 above today's average!) 🎉\nPlay here: https://www.foodguessr.com/",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 11500
+   }
+  },
+  {
+   "text": "FoodGuessr - 30 Jul 2025 GMT\n  Round 1 🌕🌕🌕🌘\n  Round 2 🌕🌕🌕🌘\n  Round 3 🌕🌕🌕🌘\nTotal score: 12,000 / 15,000\n\nCan you beat my score? New game daily!\nPlay at https://foodguessr.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 12000
+   }
+  },
+  {
+   "text": "FoodGuessr - Wednesday, Aug 6, 2025 UTC\n🌕🌕🌕🌕 5000 ⋅ Round 1 💯\n🌕🌕🌕🌘 4000 ⋅ Round 2\n🌕🌕🌕🌖 4500 ⋅ Round 3\nTotal score: 13.500/15.000\n(+2094 above today's average!) 🎉\nPlay here: https://www.foodguessr.com/",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 13500
+   }
+  },
+  {
+   "text": "I got 13.500 on the FoodGuessr Daily!\n\nThat's 2094 points above today's average! 🎉\n\n🌕🌕🌕🌕 5000 (Round 1) 💯\n🌕🌕🌕🌘 4000 (Round 2)\n🌕🌕🌕🌖 4500 (Round 3)\n\nWednesday, Aug 6, 2025\nPlay here: https://www.foodguessr.com/",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 13500
+   }
+  },
+  {
+   "text": "FoodGuessr - Sunday, Oct 4, 2026 UTC\n🌕🌕🌕🌕🌕 5,000 ⋅ Round 1 💯\n🌕🌕🌕🌖🌑 3,600 ⋅ Round 2\n🌑🌑🌑🌑🌑 0 ⋅ Round 3\nTotal score: 8,600/15,000\nPlay here: https://www.foodguessr.com/",
+   "outcome": "partial",
+   "evidence": "S",
+   "expected": {
+    "Score": 8600
+   }
+  },
+  {
+   "text": "I got 8,600 on the FoodGuessr Daily!\n\n🌕🌕🌕🌕🌕 5,000 (Round 1) 💯\n🌕🌕🌕🌖🌑 3,600 (Round 2)\n🌑🌑🌑🌑🌑 0 (Round 3)\n\nSunday, Oct 4, 2026\nPlay here: https://www.foodguessr.com/",
+   "outcome": "partial",
+   "evidence": "S",
+   "expected": {
+    "Score": 8600
+   }
+  }
+ ],
+ "thrice": [
+  {
+   "text": "Thrice Game #1193 → 9 points!\n🎲: 3️⃣2️⃣1️⃣❌3️⃣\nhttps://thricegame.com",
+   "outcome": "partial",
+   "evidence": "S",
+   "expected": {
+    "Points": 9,
+    "Puzzle": 1193
+   }
+  },
+  {
+   "text": "Thrice Game #1193 → 0 points.\n🎲: ❌❌❌❌❌\nhttps://thricegame.com",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Points": 0,
+    "Puzzle": 1193
+   }
+  },
+  {
+   "text": "Thrice Game #1190 → I got a perfect score on today's Thrice!\n🎲: 3️⃣3️⃣3️⃣3️⃣3️⃣\nhttps://thricegame.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Points": 15,
+    "Puzzle": 1190
+   }
+  },
+  {
+   "text": "Thrice Game #1191 → 13 points!\n🎲: 3️⃣3️⃣3️⃣1️⃣3️⃣\nhttps://thricegame.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Points": 13,
+    "Puzzle": 1191
+   }
+  },
+  {
+   "text": "Thrice Game #1192 → 6 points.\n🎲: 1️⃣❌❌2️⃣3️⃣\nhttps://thricegame.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Points": 6,
+    "Puzzle": 1192
+   }
+  }
+ ],
+ "relatle": [
+  {
+   "text": "relatle #419\nRed Hot Chili Peppers → Ludacris\n⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜🟩\nSolved 🥳\n13 guesses, 0 resets\nhttps://relatle.io",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 419,
+    "Guesses": 13,
+    "Resets": 0,
+    "Solved": true
+   }
+  },
+  {
+   "text": "relatle #812\nTaylor Swift → Metallica\n⬜⬜⬜🟨\n⬜⬜🟩\nSolved 🥳\n6 guesses, 1 reset\nhttps://relatle.io",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": 812,
+    "Guesses": 6,
+    "Resets": 1,
+    "Solved": true
+   }
+  },
+  {
+   "text": "relatle #812\nTaylor Swift → Metallica\n⬜⬜⬜⬜⬜🟥\nGave up 😭\n5 guesses, 0 resets\nhttps://relatle.io",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": 812,
+    "Guesses": 5,
+    "Resets": 0,
+    "Solved": false
+   }
+  },
+  {
+   "text": "relatle #812\nDrake → Rihanna\n⬜⬜🟩\nShortest Path! 🌟\n3 guesses, 0 resets\nhttps://relatle.io",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": 812,
+    "Guesses": 3,
+    "Resets": 0,
+    "Solved": true
+   }
+  }
+ ],
+ "harmonies": [
+  {
+   "text": "harmonies #908🎧\n\n🟩🟩🟩🟩\n🟪🟪🟪🟪\n🟧🟧🟧🟧\n🟦🟦🟦🟦\n\nhttps://harmonies.io/s/daily",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 908,
+    "Mistakes": 0,
+    "Guesses": 4,
+    "GroupsFound": 4,
+    "Solved": true
+   }
+  },
+  {
+   "text": "harmonies #920🎧\n\n🟪🟩🟩🟪\n🟪🟪🟪🟪\n🟧🟧🟧🟧\n🟦🟦🟦🟦\n🟩🟩🟩🟩\n\nhttps://harmonies.io/s/daily",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 920,
+    "Mistakes": 1,
+    "Guesses": 5,
+    "GroupsFound": 4,
+    "Solved": true
+   }
+  },
+  {
+   "text": "harmonies #898🎧\n\n🟧🟧🟧🟦\n🟧🟧🟧🟦\n🟧🟧🟧🟧\n🟩🟩🟩🟩\n🟦🟦🟦🟪\n🟪🟪🟪🟪\n🟦🟦🟦🟦\n\nhttps://harmonies.io/s/daily",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 898,
+    "Mistakes": 3,
+    "Guesses": 7,
+    "GroupsFound": 4,
+    "Solved": true
+   }
+  },
+  {
+   "text": "harmonies #913🎧\n\n🟧🟧🟧🟪\n🟧🟧🟧🟧\n🟩🟩🟩🟩\n🟦🟦🟪🟦\n🟦🟦🟪🟪\n🟦🟦🟦🟪\n\nhttps://harmonies.io/s/daily",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 913,
+    "Mistakes": 4,
+    "Guesses": 6,
+    "GroupsFound": 2,
+    "Solved": false
+   }
+  },
+  {
+   "text": "harmonies #888🎧\n\n🟪🟪🟪🟪\n🟦🟦🟦🟩\n🟦🟦🟩🟦\n🟦🟦🟦🟦\n🟧🟧🟧🟩\n🟧🟧🟧🟩\n\nhttps://harmonies.io/s/daily",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 888,
+    "Mistakes": 4,
+    "Guesses": 6,
+    "GroupsFound": 2,
+    "Solved": false
+   }
+  },
+  {
+   "text": "harmonies #875🎧\n\n🟧🟧🟧🟪\n🟧🟧🟧🟧\n🟩🟦🟦🟦\n🟩🟦🟦🟦\n🟩🟦🟦🟪\n\nhttps://harmonies.io",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 875,
+    "Mistakes": 4,
+    "Guesses": 5,
+    "GroupsFound": 1,
+    "Solved": false
+   }
+  },
+  {
+   "text": "harmonies #920🎧\n\n🟪🟩🟩🟪\n🟪🟪🟪🟪\n🟧🟧🟧🟧\n🟦🟦🟦🟦\n🟩🟩🟩🟩\n\nhttps://harmonies.io/s/daily",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": 920,
+    "Mistakes": 1,
+    "Guesses": 5,
+    "GroupsFound": 4,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Reverse Harmonies #920 🎧\n\nhttps://harmonies.io/s/daily",
+   "outcome": "partial",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": 920,
+    "Mistakes": null,
+    "Guesses": null,
+    "GroupsFound": null,
+    "Solved": null
+   },
+   "recognized": false
+  }
+ ],
+ "bandle": [
+  {
+   "text": "Bandle #1508 3/6\n⬛🟥🟩⬜⬜⬜\nFound: 360/371 (97%)\nCurrent Streak: 3 (max 74)\n#Bandle \nhttps://bandle.app",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1508,
+    "Guesses": 3,
+    "MaxGuesses": 6,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Of course\n\nBandle #1508 x/6\n⬛⬛⬛⬛⬛⬛\nFound: 192/204 (94.1%)\nCurrent Streak: 0 (max 61)\n#Bandle  https://bandle.app/",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1508,
+    "Guesses": null,
+    "MaxGuesses": 6,
+    "Solved": false
+   }
+  },
+  {
+   "text": "Bandle #1508 2/6\n🟥🟩⬜⬜⬜⬜\nFound: 1157/1172 (98.7%)\nCurrent Streak: 120 (max 445)\nBonus Rounds: 6/7 🖼️  🌍  🧩  📅  💿  🎸  \n#Bandle \nhttps://bandle.app",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1508,
+    "Guesses": 2,
+    "MaxGuesses": 6,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Bandle #1426 2/5\n🟥🟩⬜⬜⬜\nFound: 117/124 (94.4%)\nCurrent Streak: 4 (max 61)\n#Bandle  https://bandle.app/\n\nClose call.",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1426,
+    "Guesses": 2,
+    "MaxGuesses": 5,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Nicht mein Tag.\n\nBandle #1088 x/5\n🟥🟥🟥🟥🟥\nFound: 216/230 (93.9%)\nCurrent Streak: 0 (max 35)\n#Bandle #Heardle \nhttps://bandle.app",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1088,
+    "Guesses": null,
+    "MaxGuesses": 5,
+    "Solved": false
+   }
+  },
+  {
+   "text": "Bandle #1509 5/6\n🟥🟥🟥🟨🟩⬜\nEncontrado: 407/409 (99.5%)\nRacha actual: 382 (máx 382)\n#Bandle \nhttps://bandle.app",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1509,
+    "Guesses": 5,
+    "MaxGuesses": 6,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Bandle #1507 3/6\n⬛⬛🟩⬜⬜⬜\nGefunden: 71/102 (69.6%)\nDein Streak: 2 (max 5)\n#Bandle \nhttps://bandle.app",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1507,
+    "Guesses": 3,
+    "MaxGuesses": 6,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Bon bah là 😢\n\nBandle #1088 x/5\n⬛⬛⬛⬛⬛\nTrouvées: 460/473 (97.3%)\nFlamme: 0 (max 87)\n#Bandle #Heardle \nhttps://bandle.app",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1088,
+    "Guesses": null,
+    "MaxGuesses": 5,
+    "Solved": false
+   }
+  },
+  {
+   "text": "Não sabia essa.\n\nBandle #1455 x/6\n⬛⬛⬛⬛⬛⬛\nEncontradas: 23/26 (88.5%)\nSequência Atual: 0 (máx 6)\n#Bandle \nhttps://bandle.app",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1455,
+    "Guesses": null,
+    "MaxGuesses": 6,
+    "Solved": false
+   }
+  },
+  {
+   "text": "Bandle #956 1/5\n🟩⬜⬜⬜⬜\nFound: 31/47 (66%)\nCurrent Daily Streak: 0 (max 3)\n#Bandle #Heardle \nhttps://bandle.app",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 956,
+    "Guesses": 1,
+    "MaxGuesses": 5,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Bandle #597 4/6\n⬛️⬛️⬛️🟩⬜️⬜️\nFound: 10/14 (71.4%)\nCurrent Streak: 1 (max 2)\n#Bandle #Heardle #Wordle \n https://bandle.app/",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 597,
+    "Guesses": 4,
+    "MaxGuesses": 6,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Bandle #579 x/6\n⬛️⬛️⬛️⬛️⬛️⬛️\nFound: 3/5 (60%)\n#Bandle #Heardle #Wordle \n https://bandle.app/",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 579,
+    "Guesses": null,
+    "MaxGuesses": 6,
+    "Solved": false
+   }
+  },
+  {
+   "text": "Bandle #1509 4/6\n🟥⬛🟨🟩⬜⬜\nFound: 10/12 (83.3%)\nCurrent Streak: 2 (max 5)\n#Bandle \nhttps://bandle.app",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": 1509,
+    "Guesses": 4,
+    "MaxGuesses": 6,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Bandle #1509 x/6\n🟥🟥🟨🟥⬛🟥\nFound: 0/1 (0%)\n#Bandle \nhttps://bandle.app",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": 1509,
+    "Guesses": null,
+    "MaxGuesses": 6,
+    "Solved": false
+   }
+  }
+ ],
+ "juxtastat": [
+  {
+   "text": "Juxtastat 1128 5/5\n\n🟩🟩🟩🟩🟩\n\nhttps://juxtastat.org",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1128,
+    "Correct": 5
+   }
+  },
+  {
+   "text": "Juxtastat 1128 4/5\n\n🟩🟩🟥🟩🟩\n\n https://juxtastat.org/",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1128,
+    "Correct": 4
+   }
+  },
+  {
+   "text": "Juxtastat 1097 1/5\n\n🟩🟥🟥🟥🟥\n\nhttps://juxtastat.org",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1097,
+    "Correct": 1
+   }
+  },
+  {
+   "text": "Retrostat Week 134 1/5\n\n🟩🟥🟥🟥🟥\n\n https://juxtastat.org/#mode=retro",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "Week 134",
+    "Correct": 1,
+    "Mode": "retrostat"
+   },
+   "recognized": false
+  },
+  {
+   "text": "Juxtastat Infinite 11/∞\n\n🟩🟩🟥🟩🟥🟩🟩🟩🟩🟩\n🟩🟩🟩🟥🟥\n\n🥇 Personal Best!\n\nhttps://juxtastat.org/#mode=infinite&seed=g5AE8aZ&v=2",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": null,
+    "Correct": 11,
+    "Mode": "infinite"
+   },
+   "recognized": false
+  }
+ ],
+ "scrandle": [
+  {
+   "text": "🟩🟥🟥🟩🟩🟩🟩🟩🟩🟩 8/10 | 2026-10-03 | https://scrandle.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "2026-10-03",
+    "Score": 8
+   }
+  },
+  {
+   "text": "🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 10/10 | 2026-09-29 | https://scrandle.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "2026-09-29",
+    "Score": 10
+   }
+  },
+  {
+   "text": "🟥🟩🟩🟥🟥🟥🟥🟩🟩🟥 4/10 | 2026-09-20 | https://scrandle.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "2026-09-20",
+    "Score": 4
+   }
+  },
+  {
+   "text": "🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥 0/10 | 2025-11-23 | https://scrandle.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "2025-11-23",
+    "Score": 0
+   }
+  },
+  {
+   "text": "Maybe I'm not too good at this\n\n🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥 0/10 | Practice | https://scrandle.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "Practice",
+    "Score": 0
+   },
+   "recognized": false
+  },
+  {
+   "text": "1,620,545 | Super Scrandle | 2026-03-30 | https://scrandle.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "2026-03-30",
+    "Score": null
+   },
+   "recognized": false
+  },
+  {
+   "text": "Fun mode.\n2 442 302 | Super Scrandle | 2025-12-30 | https://scrandle.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "2025-12-30",
+    "Score": null
+   },
+   "recognized": false
+  },
+  {
+   "text": "Defeated by Bhageecha x Punjab United Special | Super Scrandle | 2026-01-09 | https://scrandle.com",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "2026-01-09",
+    "Score": null
+   },
+   "recognized": false
+  },
+  {
+   "text": "🟩🟥🟩🟩🟩🟩🟩🟩🟥🟩 8/10 | 2026-10-04 | https://scrandle.com",
+   "outcome": "partial",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": "2026-10-04",
+    "Score": 8
+   }
+  }
+ ],
+ "bonkle": [
+  {
+   "text": "Bonkle 2026/02/10: 3/9\n\n⬛⬛🟨⬛🟨🟨⬛⬛\n⬛⬛🟨🟨⬛⬛⬛⬛\n🟩🟩🟩🟩🟩🟩🟩🟩\n\nhttps://bonkle.maskofdestiny.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "2026/02/10",
+    "Guesses": 3,
+    "MaxGuesses": 9,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Bonkle 2026/03/27: 4/7\n\n⬛⬛⬛🟨⬛⬛\n⬛🟩⬛⬛⬛🟨\n⬛🟩🟨⬛🟩⬛\n🟩🟩🟩🟩🟩🟩\n\nNice one today.\n\nhttps://bonkle.maskofdestiny.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "2026/03/27",
+    "Guesses": 4,
+    "MaxGuesses": 7,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Bonkle 2026/03/23: 1/6\n\n🟩🟩🟩🟩🟩\n\nGot it in one!\n\nhttps://bonkle.maskofdestiny.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "2026/03/23",
+    "Guesses": 1,
+    "MaxGuesses": 6,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Bonkle 2026/03/24: 5/7\nThis one was tough.\n\n⬛🟩🟨⬛⬛⬛\n⬛🟩⬛⬛🟨⬛\n🟨🟩⬛⬛⬛🟨\n🟨🟩⬛🟨🟩⬛\n🟩🟩🟩🟩🟩🟩\n\nhttps://bonkle.maskofdestiny.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": "2026/03/24",
+    "Guesses": 5,
+    "MaxGuesses": 7,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Bonkle 2026/10/04: X/7\n\n⬛⬛🟨⬛⬛⬛\n⬛🟩⬛🟨⬛⬛\n🟨🟩⬛⬛🟩⬛\n⬛🟩🟩⬛🟩⬛\n🟩🟩🟩⬛🟩⬛\n🟩🟩🟩⬛🟩🟨\n🟩🟩🟩🟨🟩⬛\n\nhttps://bonkle.maskofdestiny.com",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": "2026/10/04",
+    "Guesses": null,
+    "MaxGuesses": 7,
+    "Solved": false
+   }
+  },
+  {
+   "text": "Bonkle 2026/10/04: 3/7*\n\n⬛🟨⬛⬛⬛⬛\n🟩🟩⬛🟨⬛⬛\n🟩🟩🟩🟩🟩🟩\n\nhttps://bonkle.maskofdestiny.com",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Puzzle": "2026/10/04",
+    "Guesses": 3,
+    "MaxGuesses": 7,
+    "Solved": true
+   }
+  }
+ ],
+ "starwars-guessr-guess": [
+  {
+   "text": "STAR WARS GUESSR - May 22nd 2025\r\n🎮 : Guess\r\n📋 : 4 tries\r\n🟩🟩🟩🟩🟩🟩🟩\r\n🟩🟥🟩🟩🟥🟨🟨\r\n🟩🟥🟩🟩🟨🟨🟨\r\n🟩🟥🟥🟩🟥🟥🟥\r\n🔗 : https://starwarsguessr.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Tries": 4,
+    "Solved": true,
+    "Puzzle": "May 22nd 2025",
+    "HintUsed": false,
+    "RandomStart": false
+   }
+  },
+  {
+   "text": "STAR WARS GUESSR - May 25th 2025\r\n🎮 : Guess\r\n📋 : 10 tries\r\n🟩🟩🟩🟩🟩🟩🟩\r\n🟩🟩🟩🟩🟨🟥🟩\r\n🟩🟩🟥🟥🟨🟨🟥\r\n🟩🟨🟥🟩🟨🟨🟨\r\n🟩🟩🟥🟩🟨🟥🟨\r\n+ 5 rows\r\n🔗 : https://starwarsguessr.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Tries": 10,
+    "Solved": true,
+    "Puzzle": "May 25th 2025",
+    "HintUsed": false,
+    "RandomStart": false
+   }
+  },
+  {
+   "text": "STAR WARS GUESSR - May 20th 2025\r\n🎮 : Guess\r\n📋 : 9 tries\r\n🟩🟩🟩🟩🟩🟩🟩\r\n🟩🟨🟩🟩🟥🟥🟩\r\n🟥🟨🟩🟩🟥🟨🟩\r\n🟩🟨🟥🟩🟥🟥🟥\r\n🟩🟨🟥🟩🟥🟥🟨\r\n+ 4 rows\r\n🔗 : https://starwarsguessr.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Tries": 9,
+    "Solved": true,
+    "Puzzle": "May 20th 2025",
+    "HintUsed": false,
+    "RandomStart": false
+   }
+  },
+  {
+   "text": "STAR WARS GUESSR - Oct 4th 2026\r\n🎮 : Guess\r\n📋 : 4 tries\r\n🟩🟩🟩🟩🟩🟩🟩\r\n🟩🟥🟩🟩🟥🟨🟨\r\n🟩🟥🟩🟩🟨🟨🟨\r\n🟩🟥🟥🟩🟥🟥🟥\r\n🔗 : https://starwarsguessr.com#daily_guess",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Tries": 4,
+    "Solved": true,
+    "Puzzle": "Oct 4th 2026",
+    "HintUsed": false,
+    "RandomStart": false
+   }
+  },
+  {
+   "text": "STAR WARS GUESSR - Oct 4th 2026\r\n🎮 : Guess\r\n📋 : 8 tries\r\n💡Hint used\r\n🟩🟩🟩🟩🟩🟩🟩\r\n🟩🟩🟩🟩🟩🟨🟩\r\n🟩🟩🟩🟩🟨🟩🟩\r\n🟩🟩🟩🟩🟥🟨🟩\r\n🟩🟩🟩🟥🟨🟥🟩\r\n+ 3 rows\r\n🔗 : https://starwarsguessr.com#daily_guess",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Tries": 8,
+    "Solved": true,
+    "Puzzle": "Oct 4th 2026",
+    "HintUsed": true,
+    "RandomStart": false
+   }
+  },
+  {
+   "text": "STAR WARS GUESSR - Oct 4th 2026\r\n🎮 : Guess\r\n📋 : 5 tries (Random start)\r\n🟩🟩🟩🟩🟩🟩🟩\r\n🟩🟩🟩🟩🟨🟩🟩\r\n🟩🟩🟩🟩🟥🟨🟩\r\n🟩🟩🟥🟩🟥🟨🟥\r\n🟩🟥🟥🟩🟥🟥🟥\r\n🔗 : https://starwarsguessr.com#daily_guess",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Tries": 5,
+    "Solved": true,
+    "Puzzle": "Oct 4th 2026",
+    "HintUsed": false,
+    "RandomStart": true
+   }
+  },
+  {
+   "text": "STAR WARS GUESSR - Oct 4th 2026\r\n🎮 : Guess\r\n📋 : 12 tries - Game Over\r\n🔗 : https://starwarsguessr.com#daily_guess",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Tries": 12,
+    "Solved": false,
+    "Puzzle": "Oct 4th 2026",
+    "HintUsed": false,
+    "RandomStart": false
+   }
+  },
+  {
+   "text": "STAR WARS GUESSR - 4 oct. 2026\r\n🎮 : Devinette\r\n📋 : 6 tentatives\r\n🟩🟩🟩🟩🟩🟩🟩\r\n🟩🟩🟩🟩🟩🟨🟩\r\n🟩🟩🟩🟩🟨🟨🟩\r\n🟩🟩🟩🟩🟥🟨🟥\r\n🟩🟩🟥🟩🟥🟥🟥\r\n+ 1 ligne\r\n🔗 : https://starwarsguessr.com#daily_guess",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Tries": 6,
+    "Solved": true,
+    "Puzzle": "4 oct. 2026",
+    "HintUsed": false,
+    "RandomStart": false
+   }
+  },
+  {
+   "text": "STAR WARS GUESSR - Oct 4th 2026\r\n\r\n🎮 : Hints\r\n📋 : 3 tries\r\nHard [ 🔴🔴🟢 ]\r\nMedium [ ◾️◾️◾️◾️ ]\r\nEasy [ ◾️◾️◾️ ]\r\n\r\n🎮 : Picture\r\n📋 : 🟢◾️◾️\r\n⌛️ : 5 seconds\r\n\r\n🎮 : Guess\r\n📋 : 4 tries\r\n🟩🟩🟩🟩🟩🟩🟩\r\n🟩🟥🟩🟩🟥🟨🟨\r\n🟩🟥🟩🟩🟨🟨🟨\r\n🟩🟥🟥🟩🟥🟥🟥\r\n\r\n🔗 : https://starwarsguessr.com",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Tries": 4,
+    "Solved": true,
+    "Puzzle": "Oct 4th 2026",
+    "HintUsed": false,
+    "RandomStart": false
+   }
+  }
+ ],
+ "waffle": [
+  {
+   "text": "#waffle1717 5/5\n\n🟩🟩🟩🟩🟩\n🟩⭐🟩⭐🟩\n🟩🟩⭐🟩🟩\n🟩⭐🟩⭐🟩\n🟩🟩🟩🟩🟩\n\n🔥 streak: 368\n🧙 #wafflewizard\nwafflegame.net",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Stars": 5,
+    "Solved": true,
+    "Streak": 368,
+    "Puzzle": 1717
+   }
+  },
+  {
+   "text": "#waffle1717 0/5\n\n🟩🟩🟩🟩🟩\n🟩⬜🟩⬜🟩\n🟩🟩🟩🟩🟩\n🟩⬜🟩⬜🟩\n🟩🟩🟩🟩🟩\n\n🔥 streak: 6\n⭐ #wafflerookie\nwafflegame.net",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Stars": 0,
+    "Solved": true,
+    "Streak": 6,
+    "Puzzle": 1717
+   }
+  },
+  {
+   "text": "#waffle1716 X/5\n\n🟩🟩🟩🟩🟩\n🟩⬜🟩⬜🟩\n🟩⬛🟩⬛🟩\n🟩⬜🟩⬜🟩\n🟩🟩🟩🟩🟩\n\n💔 streak: 0\nwafflegame.net",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Stars": null,
+    "Solved": false,
+    "Streak": 0,
+    "Puzzle": 1716
+   }
+  },
+  {
+   "text": "#waffle807 1/5\n\n🟩🟩🟩🟩🟩\n🟩⬜️🟩⬜️🟩\n🟩🟩⭐️🟩🟩\n🟩⬜️🟩⬜️🟩\n🟩🟩🟩🟩🟩\n\n🔥 streak: 2\nwafflegame.net",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Stars": 1,
+    "Solved": true,
+    "Streak": 2,
+    "Puzzle": 807
+   }
+  },
+  {
+   "text": "#waffle629 X/5\n\n🟩🟩🟩🟩🟩\n🟩⬜️🟩⬜️🟩\n🟩🟩🟩🟩🟩\n🟩⬜️🟩⬜️🟩\n🟩⬛️🟩⬛️🟩\n\n💔 streak: 0\nwafflegame.net",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Stars": null,
+    "Solved": false,
+    "Streak": 0,
+    "Puzzle": 629
+   }
+  },
+  {
+   "text": "Flawless!\nAstonishing. That was a delight to behold.\n\n#waffle1717 5/5\n\n🟩🟩🟩🟩🟩\n🟩⭐🟩⭐🟩\n🟩🟩⭐🟩🟩\n🟩⭐🟩⭐🟩\n🟩🟩🟩🟩🟩\n\n🔥 streak: 153\n🏆 #wafflemaster\nwafflegame.net",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Stars": 5,
+    "Solved": true,
+    "Streak": 153,
+    "Puzzle": 1717
+   }
+  }
+ ],
+ "timeguessr": [
+  {
+   "text": "TimeGuessr #1222 — 41,561/50,000\n\n1️⃣ 🏆9,258 · 📅 4y · 🌍 1.4km\n2️⃣ 🏆6,781 · 📅 0y · 🌍 2155.6km\n3️⃣ 🏆8,359 · 📅 7y · 🌍 1.3km\n4️⃣ 🏆8,683 · 📅 4y · 🌍 117.2km\n5️⃣ 🏆8,480 · 📅 3y · 🌍 620.0km\n\nhttps://timeguessr.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1222,
+    "Score": 41561,
+    "RoundScores": [
+     9258,
+     6781,
+     8359,
+     8683,
+     8480
+    ]
+   }
+  },
+  {
+   "text": "TimeGuessr #1221 — 32,082/50,000\n\n1️⃣ 🏆4.532 · 📅 5y · 🌍 4338.8km\n2️⃣ 🏆6.982 · 📅 11y · 🌍 916m\n3️⃣ 🏆8.102 · 📅 5y · 🌍 297.7km\n4️⃣ 🏆8.322 · 📅 6y · 🌍 3.6km\n5️⃣ 🏆4.144 · 📅 8y · 🌍 2566.7km\n\nhttps://timeguessr.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1221,
+    "Score": 32082,
+    "RoundScores": [
+     4532,
+     6982,
+     8102,
+     8322,
+     4144
+    ]
+   }
+  },
+  {
+   "text": "TimeGuessr #1222 — 40,020/50,000\n\n1️⃣ 🏆8 848 · 📅 5y · 🌍 2.0km\n2️⃣ 🏆6 575 · 📅 1y · 🌍 2625.9km\n3️⃣ 🏆6 988 · 📅 11y · 🌍 593m\n4️⃣ 🏆9 554 · 📅 0y · 🌍 86.4km\n5️⃣ 🏆8 055 · 📅 5y · 🌍 345.5km\n\nhttps://timeguessr.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1222,
+    "Score": 40020,
+    "RoundScores": [
+     8848,
+     6575,
+     6988,
+     9554,
+     8055
+    ]
+   }
+  },
+  {
+   "text": "TimeGuessr #1221 — 41,854/50,000\n\n1️⃣ 🏆9989 - 📅0y - 🌍559.8m\n2️⃣ 🏆7489 - 📅10y - 🌍532.2m\n3️⃣ 🏆8683 - 📅4y - 🌍116.9km\n4️⃣ 🏆9594 - 📅3y - 🌍317.4m\n5️⃣ 🏆6099 - 📅4y - 🌍2,102.4km\n\nhttps://timeguessr.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1221,
+    "Score": 41854,
+    "RoundScores": [
+     9989,
+     7489,
+     8683,
+     9594,
+     6099
+    ]
+   }
+  },
+  {
+   "text": "TimeGuessr #1221 — 35.823/50.000\n\n1️⃣ 🏆9981 - 📅0 J - 🌍931,6 m\n2️⃣ 🏆7462 - 📅8 J - 🌍1,2 km\n3️⃣ 🏆7191 - 📅8 J - 🌍52,2 km\n4️⃣ 🏆6984 - 📅11 J - 🌍777,9 m\n5️⃣ 🏆4205 - 📅6 J - 🌍3.474,1 km\n\nhttps://timeguessr.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1221,
+    "Score": 35823,
+    "RoundScores": [
+     9981,
+     7462,
+     7191,
+     6984,
+     4205
+    ]
+   }
+  },
+  {
+   "text": "TimeGuessr #1152 38,855/50,000\n🌎🟨⬛⬛ 📅🟩⬛⬛\n🌎🟩🟩🟨 📅🟩🟨⬛\n🌎🟩🟩🟨 📅🟩🟩🟩\n🌎🟩⬛⬛ 📅🟩🟨⬛\n🌎🟩🟩🟨 📅🟩🟨⬛\nhttps://timeguessr.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1152,
+    "Score": 38855
+   }
+  },
+  {
+   "text": "TimeGuessr #1096 40,127/50,000\n🌎🟩🟩🟩 📅🟩🟨⬛\n🌎⬛️⬛️⬛️ 📅🟩🟩🟨\n🌎🟩🟩🟨 📅🟩🟩🟨\n🌎🟩🟩🟩 📅🟩🟨⬛\n🌎🟩🟩🟨 📅🟩⬛⬛\nhttps://timeguessr.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1096,
+    "Score": 40127
+   }
+  },
+  {
+   "text": "TimeGuessr #1222 — 27,467/50,000\n\n1️⃣ 🏆1,480 · 📅 17y · 🌍 3168.6mi\n2️⃣ 🏆3,912 · 📅 5y · 🌍 11389.7mi\n3️⃣ 🏆6,716 · 📅 12y · 🌍 28.5mi\n4️⃣ 🏆6,529 · 📅 10y · 🌍 292.7mi\n5️⃣ 🏆8,830 · 📅 1y · 🌍 385.2mi\n\nhttps://timeguessr.com",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 1222,
+    "Score": 27467,
+    "RoundScores": [
+     1480,
+     3912,
+     6716,
+     6529,
+     8830
+    ]
+   }
+  },
+  {
+   "text": "TimeGuessr #268 33,990/50,000\n🌎🟩⬛️⬛️ 📅🟩⬛⬛\n🌎🟩⬛️⬛️ 📅🟩🟩🟨\n🌎⬛️⬛️⬛️ 📅🟩🟩🟨\n🌎🟩🟩🟨 📅🟩🟨⬛\n🌎🟩🟩🟩 📅🟨⬛️⬛️\nhttps://timeguessr.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Puzzle": 268,
+    "Score": 33990
+   }
+  }
+ ],
+ "marveldle-comics": [
+  {
+   "text": "🟩🟩🟩🟩🟩🟩\n🟩🟥🟩🟨🟩⬆️\n🟩🟥🟨🟨🟩⬆️\n🟩🟥🟨🟨🟩⬆️\n",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true
+   },
+   "detectable": false
+  },
+  {
+   "text": "🟩🟩🟩🟩🟩🟩\n🟩🟥🟩🟨🟩⬆️\n🟩🟥🟨🟨🟩⬆️\n🟩🟥🟨🟨🟩⬇️\n🟩🟥🟨🟨🟩⬆️\n🟥🟥🟨🟨🟩⬇️\n🟩🟥🟨🟨🟩⬇️\n",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 7,
+    "Solved": true
+   },
+   "detectable": false
+  },
+  {
+   "text": "🟩🟩🟩🟩🟩🟩\n",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true
+   },
+   "detectable": false
+  },
+  {
+   "text": "Knew this one.\n\n🟩🟩🟩🟩🟩🟩\n🟩🟩🟩🟨🟩⬆️\n🟩🟩🟨🟨🟩⬇️\n🟥🟩🟨🟨🟩⬆️\n\nhttps://marveldle.com/character/comics/guess",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true
+   }
+  },
+  {
+   "text": "#Marveldle #MarvelComics \nPretty good on this one\n\n🟩🟩🟩🟩🟩🟩\n🟩🟩🟩🟥🟩⬇️\n🟩🟩🟩🟥🟩⬇️\n🟥🟥🟨🟥🟩⬇️\n\nhttps://marveldle.com/character/comics/guess",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true
+   }
+  },
+  {
+   "text": "#Marveldle #MarvelComics \n\n🟩🟩🟩🟩🟩🟩\n🟩🟩🟩🟨🟩⬇️\n🟩🟩🟩🟨🟩⬇️\n🟩🟩🟩🟨🟩⬇️\n🟩🟩🟨🟨🟩⬆️\n🟩🟩🟩🟨🟩⬇️\n🟩🟩🟥🟨🟩⬆️\n🟥🟩🟩🟨🟩⬆️\n🟥🟩🟨🟥🟩⬇️\n\nDid not know that.\n\nhttps://marveldle.com/character/comics/guess",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 9,
+    "Solved": true
+   }
+  }
+ ],
+ "marveldle-mcu": [
+  {
+   "text": "🟩🟩🟩🟩🟩🟩🟩\n🟩🟩🟨🟥🟩🟥🟩\n🟩🟩🟨🟥🟩🟨🟩\n🟩🟥🟩🟨🟩🟨🟩\n🟩🟥🟨🟥🟩🟥🟥\n",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 5,
+    "Solved": true
+   },
+   "detectable": false
+  },
+  {
+   "text": "🟩🟩🟩🟩🟩🟩🟩\n🟥🟥🟨🟨🟩🟥🟩\n🟩🟥🟥🟨🟥🟥🟥\n",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true
+   },
+   "detectable": false
+  },
+  {
+   "text": "🟩🟩🟩🟩🟩🟩🟩\n",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true
+   },
+   "detectable": false
+  },
+  {
+   "text": "#Marveldle #MCU\n\n🟩🟩🟩🟩🟩🟩🟩\n🟥🟩🟨🟥🟩🟥🟨\n🟥🟩🟥🟨🟥🟥🟨\n\nhttps://marveldle.com/character/audiovisual/guess",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true
+   }
+  },
+  {
+   "text": "🟩🟩🟩🟩🟩🟩🟩\n🟩🟥🟨🟨🟩🟥🟩\n🟩🟩🟩🟥🟩🟥🟨\n🟩🟥🟩🟥🟩🟥🟨\n\n#Marveldle #MCU",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true
+   }
+  },
+  {
+   "text": "🟩🟩🟩🟩🟩🟩🟩\n🟩🟩🟨🟨🟩🟩🟩\n🟩🟩🟨🟨🟩🟩🟩\n🟩🟩🟨🟨🟩🟥🟩\n🟩🟥🟨🟥🟩🟩🟨\n🟩🟥🟨🟥🟩🟥🟩\n\nhttps://marveldle.com/character/audiovisual/guess\n#Marveldle",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 6,
+    "Solved": true
+   }
+  }
+ ],
+ "faces": [
+  {
+   "text": "Faces #868\n👤 🟥 🟩 ⬛ ⬛ ⬛\n👤 🟩 ⬛ ⬛ ⬛ ⬛\nhttps://faces.wtf",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Face1Guesses": 2,
+    "Face2Guesses": 1,
+    "Guesses": 3,
+    "Solved": true,
+    "Puzzle": 868
+   }
+  },
+  {
+   "text": "Faces #868\n👤 🟥 🟥 🟥 🟥 🟥\n👤 🟥 🟩 ⬛ ⬛ ⬛\nhttps://faces.wtf",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Face1Guesses": null,
+    "Face2Guesses": 2,
+    "Guesses": 7,
+    "Solved": false,
+    "Puzzle": 868
+   }
+  },
+  {
+   "text": "Faces #868\n👤 🟥 🟥 🟥 🟥 🟥\n👤 🟥 🟥 🟥 🟥 🟥\nhttps://faces.wtf",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Face1Guesses": null,
+    "Face2Guesses": null,
+    "Guesses": 10,
+    "Solved": false,
+    "Puzzle": 868
+   }
+  },
+  {
+   "text": "#Faces #866\n👤 🟩 ⬛ ⬛ ⬛ ⬛\n👤 🟥 🟩 ⬛ ⬛ ⬛\nhttps://faces.wtf",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Face1Guesses": 1,
+    "Face2Guesses": 2,
+    "Guesses": 3,
+    "Solved": true,
+    "Puzzle": 866
+   }
+  },
+  {
+   "text": "#Faces #846\n👤 🟥 🟥 🟩 ⬛ ⬛\n👤 🟥 🟩 ⬛ ⬛ ⬛\nhttps://faces.wtf",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Face1Guesses": 3,
+    "Face2Guesses": 2,
+    "Guesses": 5,
+    "Solved": true,
+    "Puzzle": 846
+   }
+  },
+  {
+   "text": "#Faces #823\n👤 🟩 ⬛ ⬛ ⬛ ⬛\n👤 🟩 ⬛ ⬛ ⬛ ⬛\nThat was easy! 👏🏽\nhttps://faces.wtf",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Face1Guesses": 1,
+    "Face2Guesses": 1,
+    "Guesses": 2,
+    "Solved": true,
+    "Puzzle": 823
+   }
+  }
+ ],
+ "catfishing": [
+  {
+   "text": "catfishing.net\n#829 - 10/10 🎉\n🐈🐈🐈🐈🐈\n🐈🐈🐈🐈🐈\n\nFinally",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 10,
+    "Correct": 10,
+    "Close": 0,
+    "Puzzle": 829
+   }
+  },
+  {
+   "text": "catfishing.net\n#831 - 8.5/10 🎉\n🐈🐈🐈🥚🐟\n🐈🐈🐈🐈🐈",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 8.5,
+    "Correct": 8,
+    "Close": 1,
+    "Puzzle": 831
+   }
+  },
+  {
+   "text": "catfishing.net\n#829 - 4.5/10\n🐈🐈🐟🐟🐈\n🐟🐈🐟🐟🥚",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 4.5,
+    "Correct": 4,
+    "Close": 1,
+    "Puzzle": 829
+   }
+  },
+  {
+   "text": "catfishing.net\n#832 - 1/10\n🐟🐈🐟🐟🐟\n🐟🐟🐟🐟🐟\n\n😵",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Score": 1,
+    "Correct": 1,
+    "Close": 0,
+    "Puzzle": 832
+   }
+  },
+  {
+   "text": "https://catfishing.net\n#828 - 9/10 🎉\n🐈🐈🐈🐈🐈\n🐈🐈🐟🐈🐈",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 9,
+    "Correct": 9,
+    "Close": 0,
+    "Puzzle": 828
+   }
+  },
+  {
+   "text": "catfishing.net  \n525 - 10/10 🎉  \n🐈🐈🐈🐈🐈  \n🐈🐈🐈🐈🐈",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 10,
+    "Correct": 10,
+    "Close": 0,
+    "Puzzle": 525
+   }
+  },
+  {
+   "text": "catfishing.net\n#709 - 2.5/10\n🐟🐟🥚🐟🥚\n🐟🥚🐈🐟🐟",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 2.5,
+    "Correct": 1,
+    "Close": 3,
+    "Puzzle": 709
+   }
+  },
+  {
+   "text": "catfishing.net\n#833 - 7.5/10\n🐈🐈🥚🐟🐈\n🐈🐈🐟🐈🐈",
+   "outcome": "partial",
+   "evidence": "S",
+   "expected": {
+    "Score": 7.5,
+    "Correct": 7,
+    "Close": 1,
+    "Puzzle": 833
+   }
+  },
+  {
+   "text": "catfishing.net  \n833 - 10/10 🎉  \n🐈🐈🐈🐈🐈  \n🐈🐈🐈🐈🐈  \n",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Score": 10,
+    "Correct": 10,
+    "Close": 0,
+    "Puzzle": 833
+   }
+  },
+  {
+   "text": "catfishing.net\n#400 - 5/9\n🐈🐈⚫🐟🐈\n🐈🐟🐟🐈🐟",
+   "outcome": "partial",
+   "evidence": "S",
+   "expected": {
+    "Score": 5,
+    "Correct": 5,
+    "Close": 0,
+    "Puzzle": 400
+   }
+  },
+  {
+   "text": "catfishing.net\n#833 - 8.5/10 🎉\n🐈🐈🥚🐈🐈\n🐈🐟🐈🐈🐈\n\n||Q3 🥚 Apple pie\nSkipped Q7||",
+   "outcome": "partial",
+   "evidence": "S",
+   "expected": {
+    "Score": 8.5,
+    "Correct": 8,
+    "Close": 1,
+    "Puzzle": 833
+   }
+  }
+ ]
+}

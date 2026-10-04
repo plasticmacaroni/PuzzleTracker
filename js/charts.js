@@ -1,150 +1,66 @@
-class GameCharts {
-    constructor() {
-        this.charts = {};
+// Two small charts: a Wordle-style distribution and a trend line. Plain DOM/SVG,
+// colored by CSS variables so they follow the theme.
+(function (root) {
+    const PT = root.PT || (root.PT = {});
+    const { h } = PT.ui;
+    const SVG = 'http://www.w3.org/2000/svg';
+
+    function distribution(buckets, highlight) {
+        const most = Math.max(1, ...buckets.map(b => b.count));
+        return h('div', { class: 'dist', role: 'list' }, buckets.map(b => h('div', { class: 'dist-row', role: 'listitem' },
+            h('span', { class: 'dist-label', text: b.label }),
+            h('span', { class: 'dist-track' },
+                h('span', {
+                    class: `dist-bar${b.label === highlight ? ' is-today' : ''}${b.label === 'X' ? ' is-loss' : ''}`,
+                    style: { '--w': `${Math.max(b.count ? 8 : 0, (b.count / most) * 100)}%` },
+                }, h('span', { class: 'dist-count', text: String(b.count) }))))));
     }
 
-    getRandomColor() {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
+    function svg(tag, attrs) {
+        const el = document.createElementNS(SVG, tag);
+        for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+        return el;
+    }
+
+    // Points plus a rolling average of the last 7 results.
+    function trend(points, stat) {
+        if (points.length < 2) return h('p', { class: 'muted small', text: 'The trend appears after two results.' });
+        const W = 600, H = 180, PAD = { l: 44, r: 12, t: 12, b: 26 };
+        const values = points.map(p => p.value);
+        let lo = Math.min(...values), hi = Math.max(...values);
+        if (stat && stat.max && stat.show !== 'time') hi = Math.max(hi, stat.max);
+        if (lo === hi) { lo -= 1; hi += 1; }
+        if (lo > 0 && lo / hi < 0.5) lo = 0;
+        const x = i => PAD.l + (i / (points.length - 1)) * (W - PAD.l - PAD.r);
+        const y = v => PAD.t + (1 - (v - lo) / (hi - lo)) * (H - PAD.t - PAD.b);
+
+        const chart = svg('svg', { viewBox: `0 0 ${W} ${H}`, class: 'trend', role: 'img', 'aria-label': `${stat ? stat.name : 'Value'} over the last ${points.length} results` });
+        for (const v of [lo, (lo + hi) / 2, hi]) {
+            chart.append(svg('line', { x1: PAD.l, x2: W - PAD.r, y1: y(v), y2: y(v), class: 'trend-grid' }));
+            const label = svg('text', { x: PAD.l - 8, y: y(v) + 4, class: 'trend-axis', 'text-anchor': 'end' });
+            label.textContent = PT.stats.format(stat, v, { digits: 0, withMax: false });
+            chart.append(label);
         }
-        return color;
-    }
-
-    createChart(canvasId, gameId, results) {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-
-        // Clear any existing chart
-        if (this.charts[canvasId]) {
-            this.charts[canvasId].destroy();
+        const rolling = values.map((_, i) => {
+            const window = values.slice(Math.max(0, i - 6), i + 1);
+            return window.reduce((a, b) => a + b, 0) / window.length;
+        });
+        chart.append(svg('polyline', { points: rolling.map((v, i) => `${x(i)},${y(v)}`).join(' '), class: 'trend-avg' }));
+        points.forEach((p, i) => {
+            const dot = svg('circle', { cx: x(i), cy: y(p.value), r: points.length > 60 ? 2.5 : 3.5, class: 'trend-dot' });
+            const title = svg('title', {});
+            title.textContent = `${p.date}: ${PT.stats.format(stat, p.value)}`;
+            dot.append(title);
+            chart.append(dot);
+        });
+        for (const i of [0, points.length - 1]) {
+            const label = svg('text', { x: x(i), y: H - 6, class: 'trend-axis', 'text-anchor': i ? 'end' : 'start' });
+            label.textContent = PT.stats.parseDate(points[i].date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+            chart.append(label);
         }
-
-        // Sort results by date
-        results.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-        // Prepare data
-        const dates = results.map(r => r.date);
-        const datasets = [];
-
-        // Get all possible fields from results
-        const fields = new Set();
-        results.forEach(result => {
-            Object.keys(result).forEach(key => {
-                if (key !== 'date') fields.add(key);
-            });
-        });
-
-        // Check if this game has CompletionState field
-        const hasCompletionState = fields.has('CompletionState');
-
-        // Create a dataset for each field
-        fields.forEach(field => {
-            if (field === 'CompletionState' && hasCompletionState) {
-                // Calculate completion rate over time
-                const completionRates = results.map((result, index) => {
-                    const windowSize = 7; // 7-day rolling window
-                    const startIdx = Math.max(0, index - windowSize + 1);
-                    const window = results.slice(startIdx, index + 1);
-                    const successful = window.filter(r => r.CompletionState === true).length;
-                    return (successful / window.length) * 100;
-                });
-
-                datasets.push({
-                    label: 'Success Rate (7-day)',
-                    data: completionRates,
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    fill: true,
-                    tension: 0.4,
-                    yAxisID: 'percentage'
-                });
-            } else if (field !== 'CompletionState') { // Skip CompletionState for regular datasets
-                datasets.push({
-                    label: field,
-                    data: results.map(r => r[field]),
-                    borderColor: this.getRandomColor(),
-                    backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                    fill: false,
-                    tension: 0.4
-                });
-            }
-        });
-
-        // Only include percentage axis if we have a success rate dataset
-        const hasSuccessRate = datasets.some(d => d.yAxisID === 'percentage');
-
-        // Create the chart
-        this.charts[canvasId] = new Chart(canvas, {
-            type: 'line',
-            data: {
-                labels: dates,
-                datasets: datasets
-            },
-            options: {
-                responsive: true,
-                interaction: {
-                    mode: 'index',
-                    intersect: false
-                },
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'day',
-                            displayFormats: {
-                                day: 'MMM d'
-                            }
-                        },
-                        title: {
-                            display: true,
-                            text: 'Date'
-                        }
-                    },
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Value'
-                        }
-                    },
-                    percentage: hasSuccessRate ? {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        min: 0,
-                        max: 100,
-                        title: {
-                            display: true,
-                            text: 'Success Rate (%)'
-                        },
-                        grid: {
-                            drawOnChartArea: false
-                        }
-                    } : undefined
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                const label = context.dataset.label || '';
-                                const value = context.parsed.y;
-                                if (label.includes('Success Rate')) {
-                                    return `${label}: ${value.toFixed(1)}%`;
-                                }
-                                return `${label}: ${value}`;
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        return h('div', { class: 'trend-wrap' }, chart,
+            h('p', { class: 'muted small legend' }, h('span', { class: 'legend-dot' }), 'each result  ', h('span', { class: 'legend-line' }), '7-result average'));
     }
-}
 
-// Create a global instance
-const gameCharts = new GameCharts(); 
+    PT.charts = { distribution, trend };
+})(typeof window !== 'undefined' ? window : globalThis);
