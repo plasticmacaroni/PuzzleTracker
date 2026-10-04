@@ -248,8 +248,13 @@
                 }
             }
 
+            // A backup with a game list brings that list; older backups only say
+            // which games were hidden, so add the games that have results and
+            // weren't hidden.
+            const hidden = new Set(data.hiddenGames || []);
+            const wanted = Array.isArray(data.myGames) ? data.myGames : [...incomingIds].filter(id => !hidden.has(id));
             const known = new Set(this.allGames().map(g => g.id));
-            for (const id of [...(data.myGames || []), ...incomingIds]) {
+            for (const id of wanted) {
                 if (known.has(id) && !this.isMine(id)) this.data.myGames.push(id);
             }
 

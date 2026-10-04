@@ -141,3 +141,13 @@ test('theme falls back to the old preference key', () => {
     store.setTheme('light');
     assert.equal(store.theme(), 'light');
 });
+
+test('import respects the backup\'s game list and older hidden lists', () => {
+    const store = new Store(new MemoryStorage({ guessrTrackerData: JSON.stringify({ gameResults: {}, myGames: ['wordle'] }) }));
+    const results = { wordle: [{ date: '2026-10-01', rawOutput: 'a' }], waffle: [{ date: '2026-10-01', rawOutput: 'b' }], framed: [{ date: '2026-10-01', rawOutput: 'c' }] };
+    store.importJson(JSON.stringify({ app: 'PuzzleTracker', version: 2, data: { gameResults: results, myGames: ['wordle', 'framed'] }, customGames: [] }));
+    assert.deepEqual(store.data.myGames, ['wordle', 'framed'], 'waffle has results but was not on the backup\'s list');
+    const legacy = new Store(new MemoryStorage({ guessrTrackerData: JSON.stringify({ gameResults: {}, myGames: [] }) }));
+    legacy.importJson(JSON.stringify({ userData: { gameResults: results, hiddenGames: ['waffle'] }, gameSchemaState: [] }));
+    assert.deepEqual(legacy.data.myGames.sort(), ['framed', 'wordle']);
+});
