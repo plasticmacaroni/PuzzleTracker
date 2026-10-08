@@ -13,6 +13,14 @@ test('every built-in game is valid', () => {
     for (const game of defaults) assert.deepEqual(rules.validateGame(game), [], game.id);
 });
 
+test('every built-in game has a short description and a known picture', () => {
+    const { NAMES } = require('../js/puzzles.js');
+    for (const game of defaults) {
+        assert.ok(game.about && game.about.length <= 70, `${game.id} description`);
+        assert.ok(NAMES.includes(game.picture), `${game.id} picture "${game.picture}"`);
+    }
+});
+
 test('game ids are unique', () => {
     const ids = defaults.map(g => g.id);
     assert.equal(new Set(ids).size, ids.length);

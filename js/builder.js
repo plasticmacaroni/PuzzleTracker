@@ -118,6 +118,8 @@
             id: original ? original.id : '',
             name: original ? original.name : '',
             url: original ? (original.url || '') : 'https://',
+            about: original ? (original.about || '') : '',
+            picture: original ? (original.picture || '') : '',
             tracking: clone((original && (original.tracking || original.draft)) || TEMPLATES.guesses.tracking(original ? original.name : '')),
         };
         draft.tracking.stats = draft.tracking.stats || [];
@@ -361,6 +363,31 @@
                 h('button', { class: 'token', type: 'button', onmousedown: e => e.preventDefault(), onclick: () => insert('{line}'), title: 'The rest of the line' }, '{line}'));
         }
 
+        // The example as it would appear on the Today list and when logged.
+        function previewPanel() {
+            const box = h('div', { class: 'preview-card' });
+            refreshers.push(() => {
+                if (!sample.trim()) {
+                    fill(box, h('p', { class: 'muted small', text: 'Paste an example result to see how it will look.' }));
+                    return;
+                }
+                const prepared = PT.games.prepare({ id: draft.id || 'preview', name: draft.name.trim() || 'New game', url: draft.url, tracking: tidy(draft.tracking) });
+                // Half-built rules still preview, even though they can't be saved yet.
+                const game = { ...prepared, tracking: prepared.tracking || prepared.draft };
+                const today = PT.stats.localDate();
+                const s = PT.stats.summarize(game, [{ date: today, rawOutput: sample }], today);
+                const recognized = PT.rules.matchesAny(game.tracking.detect, sample);
+                fill(box,
+                    h('ul', { class: 'rows' }, h('li', { class: 'row is-done' }, h('div', { class: 'row-main' }, PT.cards.rowSummary(game, s)))),
+                    PT.cards.statChips(game, sample),
+                    recognized ? null : h('p', { class: 'warn small', text: 'Pasting this wouldn\u2019t pick this game automatically; you\u2019d choose it by hand.' }));
+            });
+            return h('div', { class: 'panel' },
+                h('h3', { class: 'panel-title', text: 'Preview' }),
+                h('p', { class: 'muted small', text: 'How the example result shows on your Today list, and the stats saved when you log it.' }),
+                box);
+        }
+
         function legend() {
             return h('details', { class: 'legend-help' },
                 h('summary', { text: 'How blocks work' }),
@@ -407,7 +434,15 @@
                             h('label', { class: 'field' }, h('span', { class: 'field-label', text: 'Name' }),
                                 h('input', { class: 'input', value: draft.name, maxlength: 60, oninput: e => { draft.name = e.target.value; refresh(); } })),
                             h('label', { class: 'field' }, h('span', { class: 'field-label', text: 'Link to play' }),
-                                h('input', { class: 'input', type: 'url', value: draft.url, placeholder: 'https://', oninput: e => { draft.url = e.target.value.trim(); refresh(); } }))),
+                                h('input', { class: 'input', type: 'url', value: draft.url, placeholder: 'https://', oninput: e => { draft.url = e.target.value.trim(); refresh(); } })),
+                            h('label', { class: 'field' }, h('span', { class: 'field-label', text: 'What you do' }),
+                                h('input', { class: 'input', value: draft.about, maxlength: 100, placeholder: 'Guess the 5-letter word in 6 tries', oninput: e => { draft.about = e.target.value; refresh(); } })),
+                            h('div', { class: 'field' }, h('span', { class: 'field-label', text: 'Picture' }),
+                                h('div', { class: 'picture-pick' },
+                                    h('select', { class: 'select', 'aria-label': 'Picture', onchange: e => { draft.picture = e.target.value; rebuild(); } },
+                                        h('option', { value: '', selected: !draft.picture, text: 'None (use the site icon)' }),
+                                        PT.puzzles.NAMES.map(n => h('option', { value: n, selected: draft.picture === n, text: n }))),
+                                    draft.picture ? h('span', { class: 'about-pic small' }, PT.puzzles.picture(draft.picture)) : null))),
                         h('div', { class: 'panel' },
                             h('h3', { class: 'panel-title', text: 'Example result' }),
                             h('textarea', { class: 'textarea mono', rows: 6, value: sample, placeholder: 'Paste a share text from this game to test your rules against it', oninput: e => { sample = e.target.value; refresh(); } }),
@@ -437,7 +472,8 @@
                             t.stats.some(s => s.show !== 'yesno') ? h('label', { class: 'field inline' },
                                 h('span', { class: 'field-label', text: 'Main stat' }),
                                 h('select', { class: 'select', onchange: e => { t.headline = e.target.value; refresh(); } },
-                                    t.stats.filter(s => s.show !== 'yesno').map(s => h('option', { value: s.name, selected: s.name === (t.headline || ''), text: s.name })))) : null))),
+                                    t.stats.filter(s => s.show !== 'yesno').map(s => h('option', { value: s.name, selected: s.name === (t.headline || ''), text: s.name })))) : null),
+                        previewPanel())),
                 h('footer', { class: 'builder-foot' },
                     errorsBox,
                     h('div', { class: 'sheet-actions' },
@@ -452,7 +488,12 @@
         function candidate() {
             const taken = new Set(store.allGames().map(g => g.id));
             const id = draft.id || slugify(draft.name || 'game', taken);
-            return { id, name: draft.name.trim(), url: draft.url, tracking: tidy(draft.tracking), ...(sample.trim() ? { example: sample.trim().slice(0, 2000) } : {}) };
+            return {
+                id, name: draft.name.trim(), url: draft.url, tracking: tidy(draft.tracking),
+                ...(draft.about.trim() ? { about: draft.about.trim() } : {}),
+                ...(draft.picture ? { picture: draft.picture } : {}),
+                ...(sample.trim() ? { example: sample.trim().slice(0, 2000) } : {}),
+            };
         }
 
         function save() {

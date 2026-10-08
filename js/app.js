@@ -2,6 +2,7 @@
 (function () {
     const { h, fill, icon, gameIcon, sheet, sheetHeader, toast, menu, relativeDay } = PT.ui;
     const { localDate, addDays, format, summarize, statOf } = PT.stats;
+    const { rowSummary, statChips } = PT.cards;
 
     let store;
     try {
@@ -49,10 +50,11 @@
             topBar(),
             todayHeader(done.length, rows.length),
             pasteZone(),
-            pendingCallout() || welcomeCallout(),
+            pendingCallout(),
             games.length === 0 ? emptyState() : null,
-            todo.length ? section(`Up next`, todo.length, todo.map(r => gameRow(r.game, r.s))) : null,
-            done.length ? section('Done today', done.length, done.map(r => gameRow(r.game, r.s))) : null,
+            onboarding(),
+            todo.length ? section(`Up next`, todo.length, todo.map(r => gameRow(r.game, r.s)), addGamesLink()) : null,
+            done.length ? section('Done today', done.length, done.map(r => gameRow(r.game, r.s)), todo.length ? null : addGamesLink()) : null,
             games.length && !todo.length ? h('p', { class: 'all-done', text: 'All done for today. See you tomorrow!' }) : null,
             footer());
     }
@@ -60,7 +62,7 @@
     function topBar() {
         const dark = effectiveTheme() === 'dark';
         return h('header', { class: 'topbar' },
-            h('div', { class: 'brand' }, h('span', { class: 'brand-mark' }, icon('puzzle', { size: 20 })), h('span', { text: 'PuzzleTracker' })),
+            h('div', { class: 'brand' }, PT.whimsy.wordmark()),
             h('div', { class: 'topbar-actions' },
                 h('button', { class: 'icon-btn', type: 'button', title: dark ? 'Light theme' : 'Dark theme', 'aria-label': dark ? 'Switch to light theme' : 'Switch to dark theme', onclick: toggleTheme }, icon(dark ? 'sun' : 'moon')),
                 h('button', {
@@ -80,10 +82,11 @@
         return h('section', { class: 'today' },
             h('div', { class: 'today-text' },
                 h('h1', { text: 'Today' }),
-                h('p', { class: 'muted', text: date })),
+                h('p', { class: 'muted today-date', text: date }),
+                h('p', { class: 'fact' }, h('span', { class: 'fact-label', text: 'Did you know?' }), PT.whimsy.factFor(today))),
             total ? h('div', { class: 'progress', role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': total, 'aria-valuenow': doneCount, 'aria-label': 'Games done today' },
                 h('div', { class: 'progress-track' }, h('div', { class: 'progress-fill', style: { '--p': String(pct) } })),
-                h('span', { class: 'progress-label', text: `${doneCount} of ${total} done` })) : null);
+                h('span', { class: 'progress-label', text: PT.whimsy.quip(doneCount, total) })) : null);
     }
 
     function pasteZone() {
@@ -97,52 +100,56 @@
                     : 'Copy your share text in any game, then tap here.')));
     }
 
-    function section(title, count, rows) {
+    function section(title, count, rows, action) {
         return h('section', { class: 'list-section' },
-            h('h2', { class: 'section-title' }, title, h('span', { class: 'count', text: String(count) })),
+            h('div', { class: 'section-head' },
+                h('h2', { class: 'section-title' }, title, h('span', { class: 'count', text: String(count) })),
+                action),
             h('ul', { class: 'rows' }, rows));
     }
 
-    function metaLine(game, s) {
-        const parts = [];
-        if (s.streak > 1) parts.push(h('span', { class: 'meta-streak' }, icon('flame', { size: 14 }), String(s.streak)));
-        if (s.average !== null && s.stat) parts.push(h('span', { text: `avg ${s.stat.name.toLowerCase()} ${format(s.stat, s.average, { withMax: false })}` }));
-        if (s.solvedRate !== null) parts.push(h('span', { text: `${Math.round(s.solvedRate * 100)}% solved` }));
-        if (!game.tracking) parts.push(h('span', { text: game.draft || game.legacy ? 'Tracking needs setup' : 'History only' }));
-        if (!parts.length) parts.push(h('span', { text: s.played ? `${s.played} played` : 'Not played yet' }));
-        return h('span', { class: 'row-meta' }, parts.flatMap((p, i) => (i ? [h('span', { class: 'dot', 'aria-hidden': 'true', text: '·' }), p] : [p])));
-    }
-
-    function resultChip(game, s) {
-        if (!s.today) return null;
-        const v = s.today.values;
-        const lost = v.Solved === false;
-        const text = s.stat && v[s.stat.name] !== undefined ? format(s.stat, v[s.stat.name]) : lost ? 'Missed' : 'Done';
-        return h('span', { class: `chip ${lost ? 'chip-bad' : 'chip-good'}` }, icon(lost ? 'x' : 'check', { size: 14 }), h('span', { text: lost && s.stat ? `${text}` : text }));
+    function addGamesLink() {
+        return h('button', { class: 'section-action', type: 'button', onclick: openManage }, '+ Add games');
     }
 
     function gameRow(game, s) {
-        return h('li', { class: `row${s.today ? ' is-done' : ''}` },
-            h('button', { class: 'row-main', type: 'button', onclick: () => openGame(game.id) },
-                gameIcon(game, 40),
-                h('span', { class: 'row-text' },
-                    h('span', { class: 'row-title' }, h('span', { text: game.name }), resultChip(game, s)),
-                    metaLine(game, s))),
+        return h('li', { class: `row${s.today ? ' is-done' : ''}`, dataset: { tint: String(tint(game.id)) } },
+            h('button', { class: 'row-main', type: 'button', onclick: () => openGame(game.id) }, rowSummary(game, s)),
             game.safeUrl && !s.today
                 ? h('a', { class: 'btn btn-play', href: game.safeUrl, target: '_blank', rel: 'noopener noreferrer', onclick: () => markPending(game.id) }, 'Play', icon('external', { size: 15 }))
                 : h('button', { class: 'icon-btn row-chevron', type: 'button', 'aria-label': `Open ${game.name}`, tabindex: '-1', onclick: () => openGame(game.id) }, icon('chevron')));
     }
 
-    function welcomeCallout() {
+    // A stable color (one of six) per game, so each card keeps its color.
+    function tint(id) {
+        let n = 0;
+        for (const ch of id) n = (n * 31 + ch.charCodeAt(0)) % 997;
+        return n % 6;
+    }
+
+    // First visit: a handwritten note with a drawn arrow pointing at "+ Add games".
+    // It goes away once dismissed or once the first result is logged.
+    function onboarding() {
         const hasResults = Object.values(store.data.gameResults).some(list => list.length);
         let dismissed = false;
         try { dismissed = localStorage.getItem('pt.welcomed') === '1'; } catch (_) { /* storage blocked */ }
         if (hasResults || dismissed || !store.myGames().length) return null;
         const dismiss = () => { try { localStorage.setItem('pt.welcomed', '1'); } catch (_) { /* storage blocked */ } render(); };
-        return h('div', { class: 'callout' },
-            h('span', { class: 'callout-text' }, h('strong', { text: 'Welcome!' }), ' We started you with a few popular games. Add or remove games to match your routine.'),
-            h('button', { class: 'btn btn-small', type: 'button', onclick: () => { dismiss(); openManage(); } }, 'Manage games'),
-            h('button', { class: 'icon-btn', type: 'button', 'aria-label': 'Dismiss', onclick: dismiss }, icon('x', { size: 18 })));
+        const SVG = 'http://www.w3.org/2000/svg';
+        const arrow = document.createElementNS(SVG, 'svg');
+        arrow.setAttribute('viewBox', '0 0 80 72');
+        arrow.setAttribute('class', 'onboard-arrow');
+        arrow.setAttribute('aria-hidden', 'true');
+        for (const d of ['M3 16c14-9 33-12 46-4 11 7 15 21 14 40', 'M55 45l8 12 7-13']) {
+            const path = document.createElementNS(SVG, 'path');
+            path.setAttribute('d', d);
+            arrow.append(path);
+        }
+        return h('div', { class: 'onboard', role: 'note' },
+            h('div', { class: 'onboard-note' },
+                h('p', { class: 'onboard-text', text: `Psst! There are ${store.allGames().length} games to pick from. Add more suggested games here` }),
+                h('button', { class: 'onboard-dismiss', type: 'button', onclick: dismiss }, 'Got it')),
+            arrow);
     }
 
     function emptyState() {
@@ -241,19 +248,6 @@
             h('optgroup', { label: mine.length ? 'Other games' : 'All games' }, rest.map(option)));
     }
 
-    function previewChips(game, text) {
-        if (!game) return null;
-        if (!game.tracking) {
-            return h('p', { class: 'muted small', text: 'This game has no tracking rules yet, so the text is saved as-is. You can add rules later from the game’s page.' });
-        }
-        const values = PT.rules.evaluate(game.tracking, text);
-        const chips = game.tracking.stats.filter(s => values[s.name] !== undefined).map(s =>
-            h('span', { class: `chip ${s.name === 'Solved' ? (values.Solved ? 'chip-good' : 'chip-bad') : ''}` },
-                h('span', { class: 'chip-label', text: s.name }), h('strong', { text: format(s, values[s.name]) })));
-        if (!chips.length) return h('p', { class: 'warn small', text: `Couldn’t read any ${game.name} stats from this text. It will still be saved, and stats will appear if the rules are fixed later.` });
-        return h('div', { class: 'chips' }, chips);
-    }
-
     // Shows what was detected and lets the player confirm the game(s) and date.
     // A paste that holds several games' sections (e.g. Gamedle's "all dailies"
     // share) can be logged to each of them at once.
@@ -295,6 +289,7 @@
             clearPending();
             close();
             render();
+            cheer();
             if (games.length === 1) {
                 toast(outcomes[0] === 'replaced' ? `Updated ${games[0].name}` : `Logged ${games[0].name}`, { tone: 'good', action: 'View', onAction: () => openGame(games[0].id) });
             } else {
@@ -313,7 +308,7 @@
                         h('label', { class: `multi-row${m.checked ? '' : ' is-off'}` },
                             h('input', { type: 'checkbox', checked: m.checked, onchange: e => { m.checked = e.target.checked; draw(); } }),
                             gameIcon(game, 36),
-                            h('span', { class: 'multi-text' }, h('strong', { text: game.name }), previewChips(game, text))));
+                            h('span', { class: 'multi-text' }, h('strong', { text: game.name }), statChips(game, text))));
                 })),
                 h('pre', { class: 'share-text', text: text.trim() }),
                 dayField(replacing.length ? h('span', { class: 'warn small', text: `Replaces ${replacing.map(g => g.name).join(', ')} for ${relativeDay(date, today).toLowerCase()}.` }) : null),
@@ -343,7 +338,7 @@
                     h('div', { class: 'confirm-game-text' },
                         h('span', { class: 'muted small', text: game ? (detected ? 'Recognized as' : 'Saving to') : 'Which game is this?' }),
                         gameSelect(chosen, id => { chosen = id; draw(); }, { placeholder: 'Choose a game' }))) : null,
-                text.trim() ? previewChips(game, text) : null,
+                text.trim() ? statChips(game, text) : null,
                 text.trim() ? h('pre', { class: 'share-text', text: text.trim() }) : null,
                 text.trim() ? dayField(existing ? h('span', { class: 'warn small', text: `Replaces the ${game.name} result already saved for ${relativeDay(date, today).toLowerCase()}.` }) : null) : null,
                 h('div', { class: 'sheet-actions' },
@@ -401,6 +396,9 @@
                         ]),
                     }, icon('more'))),
                 h('div', { class: 'sheet-body' },
+                    game.about || game.picture ? h('div', { class: 'about' },
+                        PT.puzzles.picture(game.picture) ? h('span', { class: 'about-pic' }, PT.puzzles.picture(game.picture)) : null,
+                        game.about ? h('p', { class: 'about-text', text: game.about }) : null) : null,
                     !game.tracking ? h('div', { class: 'notice' },
                         h('p', { text: game.legacy ? 'This game used old-style rules that are no longer supported. Rebuild them with blocks to see stats again; your history is safe.' : 'Stats aren’t set up for this game yet. Your results are still saved.' }),
                         h('button', { class: 'btn btn-small', type: 'button', onclick: () => PT.builder.open(game.id, builderOptions(draw)) }, icon('sliders', { size: 16 }), 'Set up tracking')) : null,
@@ -430,6 +428,7 @@
                 clearPending();
                 render();
                 redraw();
+                cheer();
                 toast(outcome === 'replaced' ? `Updated ${game.name}` : `Logged ${game.name}`, { tone: 'good' });
             },
         }, icon('check', { size: 18 }), 'Save');
@@ -437,7 +436,7 @@
             const text = area.value.trim();
             save.disabled = !text;
             const existing = store.resultOn(game.id, date);
-            fill(preview, text ? previewChips(game, text) : null,
+            fill(preview, text ? statChips(game, text) : null,
                 text && existing ? h('p', { class: 'warn small', text: `Replaces the result saved for ${relativeDay(date, today).toLowerCase()}.` }) : null);
         }
         return h('div', { class: 'panel' },
@@ -506,6 +505,12 @@
         return h('li', {}, details);
     }
 
+    // Confetti for a logged result; a bigger burst when every game is done today.
+    function cheer() {
+        const mine = store.myGames();
+        PT.whimsy.celebrate(mine.length > 0 && mine.every(g => store.resultOn(g.id, today)));
+    }
+
     // ---- manage games -------------------------------------------------------------
 
     function openManage() {
@@ -518,11 +523,18 @@
             const all = store.allGames().sort((a, b) => a.name.localeCompare(b.name));
             const q = query.trim().toLowerCase();
             const others = all.filter(g => !store.isMine(g.id) && (!q || g.name.toLowerCase().includes(q)));
+            // Popular picks first, unless searching.
+            const suggested = q ? [] : PT.games.suggested.map(id => others.find(g => g.id === id)).filter(Boolean);
+            const rest = others.filter(g => !suggested.includes(g));
+            const addItem = game => h('li', { class: 'manage-item' },
+                PT.puzzles.thumb(game, 32),
+                manageName(game, !game.builtIn ? h('span', { class: 'badge', text: 'custom' }) : null),
+                h('button', { class: 'btn btn-small', type: 'button', onclick: () => { store.addToMine(game.id); draw(); } }, icon('plus', { size: 16 }), 'Add'));
             const body = h('div', { class: 'sheet-body' },
                 h('h3', { class: 'panel-title', text: `My games (${mine.length})` }),
                 mine.length ? h('ul', { class: 'manage-list' }, mine.map((game, i) => h('li', { class: 'manage-item' },
-                    gameIcon(game, 32),
-                    h('span', { class: 'manage-name' }, h('span', { text: game.name }), !game.tracking ? h('span', { class: 'badge', text: 'no stats' }) : null),
+                    PT.puzzles.thumb(game, 32),
+                    manageName(game, !game.tracking ? h('span', { class: 'badge', text: 'no stats' }) : null),
                     h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Move ${game.name} up`, disabled: i === 0, onclick: () => { store.moveMine(game.id, -1); draw(); } }, icon('up', { size: 18 })),
                     h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Move ${game.name} down`, disabled: i === mine.length - 1, onclick: () => { store.moveMine(game.id, 1); draw(); } }, icon('down', { size: 18 })),
                     h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Edit ${game.name} tracking`, onclick: () => PT.builder.open(game.id, builderOptions(draw)) }, icon('sliders', { size: 18 })),
@@ -532,14 +544,21 @@
                     h('button', { class: 'btn btn-small', type: 'button', onclick: () => PT.builder.open(null, builderOptions(draw)) }, icon('plus', { size: 16 }), 'Create a game')),
                 h('label', { class: 'search' }, icon('search', { size: 18 }),
                     h('input', { class: 'input', type: 'search', placeholder: 'Search games', value: query, 'aria-label': 'Search games', oninput: e => { query = e.target.value; draw(); requestAnimationFrame(() => { const el = content.querySelector('.search input'); el.focus(); el.setSelectionRange(el.value.length, el.value.length); }); } })),
-                h('ul', { class: 'manage-list' }, others.map(game => h('li', { class: 'manage-item' },
-                    gameIcon(game, 32),
-                    h('span', { class: 'manage-name' }, h('span', { text: game.name }), !game.builtIn ? h('span', { class: 'badge', text: 'custom' }) : null),
-                    h('button', { class: 'btn btn-small', type: 'button', onclick: () => { store.addToMine(game.id); draw(); } }, icon('plus', { size: 16 }), 'Add')))),
+                suggested.length ? h('h4', { class: 'manage-group', text: 'Suggested' }) : null,
+                suggested.length ? h('ul', { class: 'manage-list' }, suggested.map(addItem)) : null,
+                suggested.length && rest.length ? h('h4', { class: 'manage-group', text: 'More games' }) : null,
+                h('ul', { class: 'manage-list' }, rest.map(addItem)),
                 others.length ? null : h('p', { class: 'muted small', text: q ? 'No matching games.' : 'Every game is on your list.' }));
             fill(content, sheetHeader('Manage games', () => close()), body);
         }
         draw();
+    }
+
+    // A game's name with its one-line description underneath.
+    function manageName(game, badge) {
+        return h('span', { class: 'manage-name' },
+            h('span', { class: 'manage-title' }, h('span', { text: game.name }), badge),
+            game.about ? h('span', { class: 'manage-about', text: game.about }) : null);
     }
 
     function builderOptions(after) {

@@ -1,112 +1,120 @@
-/* PuzzleTracker — calm, warm, list-first. Colors are tokens; dark mode follows the
-   system unless the player picks a theme (html[data-theme]). */
+/* PuzzleTracker: Color Blocks. Each game is a flat color card; colors are tokens,
+   and dark mode follows the system unless the player picks a theme (html[data-theme]). */
 
 :root {
-    --bg: #f7f5f0;
+    --bg: #fbfaf7;
+    --page-bg: #fbfaf7;
     --surface: #ffffff;
-    --surface-2: #f2efe8;
-    --surface-3: #e9e5dc;
-    --text: #1f1d1a;
-    --text-2: #5f5a52;
-    --text-3: #8d877d;
-    --border: #e7e2d8;
-    --border-strong: #d4cdbf;
-    --accent: #4458d6;
-    --accent-hover: #3647b8;
-    --accent-soft: #e9ecfb;
+    --surface-2: #f2f0ea;
+    --surface-3: #e5e2d9;
+    --text: #111111;
+    --text-2: #4a4a4a;
+    --text-3: #7d7d7d;
+    --border: #e2dfd6;
+    --border-strong: #c4beb1;
+    --accent: #111111;
+    --accent-hover: #000000;
+    --accent-soft: #ecebe6;
     --on-accent: #ffffff;
-    --good: #2f8f57;
-    --good-soft: #e2f3e8;
-    --bad: #c8473a;
-    --bad-soft: #fbe8e4;
-    --warn: #a26a06;
-    --warn-soft: #fbf0d9;
-    --flame: #e07a10;
-    --shadow-1: 0 1px 2px rgb(31 29 26 / 0.05), 0 1px 1px rgb(31 29 26 / 0.03);
-    --shadow-2: 0 8px 30px rgb(31 29 26 / 0.12), 0 2px 6px rgb(31 29 26 / 0.06);
-    --backdrop: rgb(31 29 26 / 0.38);
+    --good: #1e6b3c;
+    --good-soft: #dcefe2;
+    --bad: #b3261e;
+    --bad-soft: #f6dcd8;
+    --warn: #8a5a00;
+    --warn-soft: #f6ead0;
+    --flame: #d0450f;
+    --shadow-1: 0 1px 2px rgb(17 17 17 / 0.05);
+    --shadow-2: 0 10px 34px rgb(17 17 17 / 0.16), 0 2px 6px rgb(17 17 17 / 0.06);
+    --backdrop: rgb(17 17 17 / 0.4);
+    --paste-bg: #111111;
+    --paste-text: #ffffff;
+    --paste-muted: #c9c9c9;
 
-    --b-find: #4a86e8;
-    --b-count: #8b63e6;
-    --b-has: #2f9e64;
-    --b-math: #e47a22;
-    --b-if: #e0a21b;
-    --b-stat: #5d6b86;
-    --b-ink: #ffffff;
-    --b-if-ink: #2b2205;
+    /* Card colors; each game keeps one (see [data-tint]). Card text is always ink. */
+    --block-0: #f4a3cf;
+    --block-1: #ff7a1a;
+    --block-2: #ffc933;
+    --block-3: #b4a7f5;
+    --block-4: #6fd3c0;
+    --block-5: #cde86a;
+    --ink: #111111;
 
-    --radius: 14px;
-    --radius-sm: 10px;
+    --confetti-1: var(--block-0);
+    --confetti-2: var(--block-1);
+    --confetti-3: var(--block-2);
+    --confetti-4: var(--block-3);
+
+    --radius: 6px;
+    --radius-sm: 4px;
     --font: 'Figtree', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Young Serif', Georgia, serif;
+    --font-label: 'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --font-logo: 'Silkscreen', ui-monospace, monospace;
     --mono: ui-monospace, 'SF Mono', 'Cascadia Code', Menlo, Consolas, monospace;
     color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
     :root:not([data-theme='light']) {
-        --bg: #131418;
-        --surface: #1b1d22;
-        --surface-2: #23262c;
-        --surface-3: #2c3037;
-        --text: #eceae6;
-        --text-2: #b3afa7;
-        --text-3: #8a867f;
-        --border: #2b2e35;
-        --border-strong: #3b3f48;
-        --accent: #8e9dff;
-        --accent-hover: #a6b2ff;
-        --accent-soft: #252a45;
-        --on-accent: #10121c;
+        --bg: #131313;
+        --page-bg: #131313;
+        --surface: #1d1d1d;
+        --surface-2: #262626;
+        --surface-3: #333333;
+        --text: #f1efe9;
+        --text-2: #b8b4ab;
+        --text-3: #8a867e;
+        --border: #2f2f2f;
+        --border-strong: #4a4a4a;
+        --accent: #f1efe9;
+        --accent-hover: #ffffff;
+        --accent-soft: #2a2a2a;
+        --on-accent: #111111;
         --good: #5ccb8c;
         --good-soft: #1a3226;
         --bad: #ff8573;
         --bad-soft: #3a211d;
         --warn: #f1bd55;
         --warn-soft: #3a2f17;
-        --flame: #ffa047;
-        --shadow-1: 0 1px 2px rgb(0 0 0 / 0.3);
-        --shadow-2: 0 12px 40px rgb(0 0 0 / 0.5);
-        --backdrop: rgb(0 0 0 / 0.55);
-        --b-find: #3d74d1;
-        --b-count: #7754cc;
-        --b-has: #278a56;
-        --b-math: #c9661a;
-        --b-if: #c98f12;
-        --b-stat: #4f5c75;
+        --flame: #ff8a4a;
+        --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+        --shadow-2: 0 12px 40px rgb(0 0 0 / 0.55);
+        --backdrop: rgb(0 0 0 / 0.6);
+        --paste-bg: #f1efe9;
+        --paste-text: #111111;
+        --paste-muted: #4a4a4a;
         color-scheme: dark;
     }
 }
 
 :root[data-theme='dark'] {
-    --bg: #131418;
-    --surface: #1b1d22;
-    --surface-2: #23262c;
-    --surface-3: #2c3037;
-    --text: #eceae6;
-    --text-2: #b3afa7;
-    --text-3: #8a867f;
-    --border: #2b2e35;
-    --border-strong: #3b3f48;
-    --accent: #8e9dff;
-    --accent-hover: #a6b2ff;
-    --accent-soft: #252a45;
-    --on-accent: #10121c;
+    --bg: #131313;
+    --page-bg: #131313;
+    --surface: #1d1d1d;
+    --surface-2: #262626;
+    --surface-3: #333333;
+    --text: #f1efe9;
+    --text-2: #b8b4ab;
+    --text-3: #8a867e;
+    --border: #2f2f2f;
+    --border-strong: #4a4a4a;
+    --accent: #f1efe9;
+    --accent-hover: #ffffff;
+    --accent-soft: #2a2a2a;
+    --on-accent: #111111;
     --good: #5ccb8c;
     --good-soft: #1a3226;
     --bad: #ff8573;
     --bad-soft: #3a211d;
     --warn: #f1bd55;
     --warn-soft: #3a2f17;
-    --flame: #ffa047;
-    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.3);
-    --shadow-2: 0 12px 40px rgb(0 0 0 / 0.5);
-    --backdrop: rgb(0 0 0 / 0.55);
-    --b-find: #3d74d1;
-    --b-count: #7754cc;
-    --b-has: #278a56;
-    --b-math: #c9661a;
-    --b-if: #c98f12;
-    --b-stat: #4f5c75;
+    --flame: #ff8a4a;
+    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-2: 0 12px 40px rgb(0 0 0 / 0.55);
+    --backdrop: rgb(0 0 0 / 0.6);
+    --paste-bg: #f1efe9;
+    --paste-text: #111111;
+    --paste-muted: #4a4a4a;
     color-scheme: dark;
 }
 
@@ -128,7 +136,8 @@ html {
 
 body {
     margin: 0;
-    background: var(--bg);
+    background: var(--page-bg, var(--bg));
+    background-attachment: fixed;
     color: var(--text);
     font: 400 15px/1.5 var(--font);
     -webkit-font-smoothing: antialiased;
@@ -584,6 +593,7 @@ code {
 
 .rows {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 1px;
     margin: 0;
     padding: 0;
@@ -1838,4 +1848,632 @@ code {
     display: grid;
     gap: 6px;
     padding-top: 6px;
+}
+
+/* ---- builder preview ------------------------------------------------------------ */
+
+.preview-card {
+    display: grid;
+    gap: 10px;
+}
+
+.preview-card .row-main {
+    cursor: default;
+    padding-right: 14px;
+}
+
+.preview-card .row:hover {
+    background: var(--surface);
+}
+
+/* ---- whimsy: wordmark, daily fact, confetti, look picker ------------------------- */
+
+.today h1,
+.section-title,
+.panel-title,
+.sheet-title,
+.wordmark-rest,
+.tile strong {
+    font-family: var(--font-display, var(--font));
+}
+
+/* The Handheld-style pixel logo, with each tile in a card color. */
+.wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wordmark-tiles {
+    display: inline-flex;
+    gap: 2px;
+}
+
+.wm-tile {
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    color: var(--ink);
+    font: 400 12px/1 var(--font-logo);
+}
+
+.wm-tile:nth-child(1) { background: var(--block-0); }
+.wm-tile:nth-child(2) { background: var(--block-1); }
+.wm-tile:nth-child(3) { background: var(--block-2); }
+.wm-tile:nth-child(4) { background: var(--block-3); }
+.wm-tile:nth-child(5) { background: var(--block-4); }
+.wm-tile:nth-child(6) { background: var(--block-5); }
+
+.wordmark-rest {
+    font: 400 15px/1 var(--font-logo);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+}
+
+.fact {
+    max-width: 46ch;
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--text-2);
+}
+
+.fact-label {
+    margin-right: 0.3em;
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.confetti {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.confetti-piece {
+    position: absolute;
+    top: -18px;
+    width: 9px;
+    height: 14px;
+    border-radius: 2px;
+    background: var(--confetti-1);
+    animation: confetti-fall var(--fall) cubic-bezier(0.2, 0.6, 0.4, 1) var(--delay) forwards;
+}
+
+.confetti-piece.c1 {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--confetti-2);
+}
+
+.confetti-piece.c2 {
+    background: var(--confetti-3);
+}
+
+.confetti-piece.c3 {
+    width: 6px;
+    height: 16px;
+    background: var(--confetti-4);
+}
+
+@keyframes confetti-fall {
+    to {
+        transform: translate(var(--drift), 112vh) rotate(var(--spin));
+    }
+}
+
+/* Colors for the puzzle pictures. */
+:root {
+    --art-g: #6aaa64;
+    --art-y: #e0b83c;
+    --art-r: #e2574c;
+    --art-b: #4a8fe0;
+    --art-p: #9b6bd6;
+    --art-o: #f08c2e;
+    --art-n: #8b5a3c;
+    --art-k: #3a3a3c;
+    --art-w: #e2ded4;
+}
+
+/* ---- puzzle pictures -------------------------------------------------------------- */
+
+:root {
+    --pz-a: var(--art-g);
+    --pz-b: var(--art-y);
+    --pz-c: var(--art-w);
+    --pz-d: var(--art-b);
+    --pz-e: var(--art-p);
+    --pz-f: var(--art-r);
+    --pz-o: var(--art-o);
+}
+
+.pz {
+    display: block;
+    width: 100%;
+    height: auto;
+    --pz-ink: var(--text);
+    --pz-bg: var(--surface);
+    --pz-card: var(--surface);
+}
+
+.pz .a { fill: var(--pz-a); }
+.pz .b { fill: var(--pz-b); }
+.pz .c { fill: var(--pz-c); }
+.pz .d { fill: var(--pz-d); }
+.pz .e { fill: var(--pz-e); }
+.pz .f { fill: var(--pz-f); }
+.pz .o { fill: var(--pz-o); }
+.pz .k { fill: var(--pz-k, var(--art-k)); }
+.pz .ink { fill: var(--pz-ink); }
+.pz .bg { fill: var(--pz-bg); }
+.pz .card { fill: var(--pz-card); stroke: var(--pz-ink); stroke-width: 1.5; }
+.pz .tile-ink { fill: #ffffff; }
+.pz .line { fill: none; stroke: var(--pz-ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.pz .line-soft { fill: none; stroke: #ffffff; stroke-width: 1.2; opacity: 0.6; }
+.pz .line-bad { fill: none; stroke: var(--pz-f); stroke-width: 2.2; stroke-linecap: round; }
+.pz .line-a { fill: none; stroke: var(--pz-a); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.pz .pz-text { font-family: var(--font-display, var(--font)); font-weight: 800; }
+
+.pz-thumb {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 60px;
+    height: 40px;
+    flex-shrink: 0;
+    padding: 4px 5px;
+    border-radius: 10px;
+    background: var(--surface-2);
+}
+
+/* The site's own icon, as a small badge on the picture. */
+.pz-thumb > .game-icon.game-icon {
+    --size: 18px !important;
+    position: absolute;
+    right: -6px;
+    bottom: -6px;
+    border: 0 !important;
+    border-radius: 5px !important;
+    box-shadow: 0 0 0 2px var(--surface) !important;
+    grid-area: auto !important;
+}
+
+.about {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+}
+
+.about-pic {
+    width: 96px;
+    flex-shrink: 0;
+}
+
+.about-pic.small {
+    width: 72px;
+}
+
+.about-text {
+    font-weight: 600;
+}
+
+.manage-name {
+    display: grid;
+    gap: 1px;
+}
+
+.manage-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.manage-about {
+    color: var(--text-2);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.picture-pick {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.picture-pick .select {
+    width: auto;
+}
+
+/* ---- Color Blocks: the Today cards ----------------------------------------------- */
+
+[data-tint='0'] { --block: var(--block-0); }
+[data-tint='1'] { --block: var(--block-1); }
+[data-tint='2'] { --block: var(--block-2); }
+[data-tint='3'] { --block: var(--block-3); }
+[data-tint='4'] { --block: var(--block-4); }
+[data-tint='5'] { --block: var(--block-5); }
+
+.today h1 {
+    font-size: 48px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+}
+
+.today-date,
+.progress-label,
+.fact-label {
+    font-family: var(--font-label);
+}
+
+.section-title {
+    color: var(--text);
+    font-family: var(--font-label);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+}
+
+.progress-track {
+    height: 10px;
+    border-radius: 0;
+}
+
+.progress-fill {
+    border-radius: 0;
+    background: var(--text);
+}
+
+.paste-zone {
+    border: 0;
+    background: var(--paste-bg);
+    color: var(--paste-text);
+}
+
+.paste-zone:hover {
+    border: 0;
+    background: var(--paste-bg);
+    box-shadow: inset 0 0 0 2px var(--block-2);
+}
+
+.paste-zone .muted {
+    color: var(--paste-muted);
+}
+
+.paste-zone strong {
+    font: 400 20px var(--font-display);
+}
+
+.paste-icon {
+    background: var(--block-2);
+    color: var(--ink);
+}
+
+.paste-zone kbd {
+    border-color: var(--paste-muted);
+    background: transparent;
+    color: var(--paste-text);
+}
+
+.rows {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+}
+
+.row {
+    position: relative;
+    display: block;
+    min-height: 186px;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    background: var(--block, var(--block-2));
+    color: var(--ink);
+}
+
+.row:hover {
+    background: var(--block, var(--block-2));
+    box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+.row.is-done {
+    background: repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.28) 0 6px, transparent 6px 12px), var(--block, var(--block-2));
+}
+
+/* Picture, then today's status, then the name, then the stats. */
+.row-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    width: 100%;
+    min-height: 186px;
+    padding: 14px 16px 42px;
+}
+
+.row-text {
+    display: contents;
+}
+
+.row-main > .pz-thumb {
+    width: 84px;
+    height: 56px;
+    margin-bottom: 6px;
+    border: 1.5px solid var(--ink);
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.row-main > .game-icon {
+    margin-bottom: 6px;
+}
+
+.row .pz {
+    --pz-ink: #111111;
+    --pz-bg: #ffffff;
+    --pz-card: #ffffff;
+}
+
+.row-status {
+    order: 1;
+    font: 500 11px/1.3 var(--font-label);
+    letter-spacing: 0.04em;
+}
+
+.row-status.is-solved::after {
+    content: ' \25CF';
+}
+
+.row-status.is-missed::after {
+    content: ' \2715';
+}
+
+.row-title {
+    order: 2;
+    font: 400 21px/1.15 var(--font-display);
+}
+
+.row-title > span:first-child,
+.row.is-done .row-title > span:first-child {
+    color: var(--ink);
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+/* The status line above the name already shows today's result. */
+.row-title .chip {
+    display: none;
+}
+
+.row-meta {
+    order: 3;
+    color: rgb(17 17 17 / 0.72);
+    font: 400 12px/1.5 var(--font-label);
+}
+
+/* On a card, each stat gets its own line. */
+.row .row-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.row .row-meta .dot {
+    display: none;
+}
+
+/* The site badge on a card's picture stays on white in both themes. */
+.row .pz-thumb > .game-icon.game-icon {
+    background: #ffffff;
+    box-shadow: 0 0 0 2px #ffffff !important;
+}
+
+.meta-streak {
+    color: var(--ink);
+}
+
+.btn-play,
+.row-chevron {
+    position: absolute;
+    right: 14px;
+    bottom: 12px;
+    width: auto;
+    height: auto;
+    min-height: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: 500 13px var(--font-label);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.btn-play .icon,
+.row-chevron .icon {
+    display: none;
+}
+
+.btn-play::after {
+    content: ' \2192';
+}
+
+.row-chevron::after {
+    content: 'See stats \2192';
+}
+
+.btn-play:hover,
+.row-chevron:hover {
+    background: transparent;
+    color: var(--ink);
+    text-decoration-thickness: 2px;
+}
+
+.tile {
+    border-radius: 2px;
+}
+
+.tile strong {
+    font-weight: 400;
+}
+
+@media (max-width: 600px) {
+    .rows {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .row,
+    .row-main {
+        min-height: 168px;
+    }
+
+    .row-main {
+        padding: 12px 12px 38px;
+    }
+
+    .row-main > .pz-thumb {
+        width: 72px;
+        height: 48px;
+    }
+
+    .row-title {
+        font-size: 18px;
+    }
+
+    .row-meta {
+        font-size: 11px;
+    }
+}
+
+.panel-title {
+    font-family: var(--font-label);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+}
+
+/* ---- section actions and first-visit onboarding ----------------------------------- */
+
+.section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 4px 10px;
+}
+
+.section-head .section-title {
+    margin: 0;
+}
+
+.section-action {
+    padding: 4px 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font: 500 13px var(--font-label);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+.section-action:hover {
+    text-decoration-thickness: 2px;
+}
+
+.onboard {
+    --hand: 'Caveat', 'Segoe Print', 'Bradley Hand', cursive;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: 2px;
+    margin: 22px 0 -26px;
+    padding-right: 26px;
+}
+
+.onboard-note {
+    display: grid;
+    justify-items: end;
+    gap: 2px;
+    text-align: right;
+    transform: rotate(-2deg);
+}
+
+.onboard-text {
+    max-width: 15em;
+    color: var(--text);
+    font: 700 23px/1.05 var(--hand);
+    text-wrap: balance;
+}
+
+.onboard-dismiss {
+    padding: 2px 0;
+    border: 0;
+    background: none;
+    color: var(--text-2);
+    font: 600 17px var(--hand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+}
+
+.onboard-arrow {
+    width: 64px;
+    height: 58px;
+    flex-shrink: 0;
+    margin-top: 12px;
+    overflow: visible;
+}
+
+.onboard-arrow path {
+    fill: none;
+    stroke: var(--text);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 120;
+    stroke-dashoffset: 120;
+    animation: draw-arrow 0.9s ease-out 0.3s forwards;
+}
+
+.onboard-arrow path + path {
+    animation-delay: 1.1s;
+    animation-duration: 0.3s;
+}
+
+@keyframes draw-arrow {
+    to { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .onboard-arrow path {
+        stroke-dashoffset: 0;
+    }
+}
+
+.manage-group {
+    margin: 6px 0 -6px;
+    color: var(--text-2);
+    font: 500 11px var(--font-label);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+@media (max-width: 600px) {
+    .onboard {
+        padding-right: 18px;
+    }
+
+    .onboard-text {
+        font-size: 21px;
+    }
 }

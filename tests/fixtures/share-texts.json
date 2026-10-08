@@ -3130,5 +3130,608 @@
     "Puzzle": 833
    }
   }
+ ],
+ "anthropeum": [
+  {
+   "text": "Anthropeum.com · Oct 8 2026\n🟦🟦🟨🟦🟦🟦🟦🟦🟦🟦\n92,494 · top 2% of players today!",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 92494,
+    "Top": 2,
+    "Date": "2026-10-08",
+    "Rounds": 10,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Anthropeum.com · Oct 6 2026\n🟨🟥🟩🟥🟥🟨🟨🟩🟩🟨\n48,550 · top 92% of players today!",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 48550,
+    "Top": 92,
+    "Date": "2026-10-06",
+    "Rounds": 10,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Anthropeum.com · Oct 7 2026\n🟥🟨🟩🟩🟨🟦🟥🟩🟨🟥\n50.896 · top 85% of players today!",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 50896,
+    "Top": 85,
+    "Date": "2026-10-07",
+    "Rounds": 10,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Anthropeum.com · Oct 8 2026\n🟩🟩🟩🟩🟦🟩🟨🟨🟦🟦\n79 511 · top 22% of players today!",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 79511,
+    "Top": 22,
+    "Date": "2026-10-08",
+    "Rounds": 10,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Anthropeum.com · Oct 8 2026\n🟦🟦🟨🟦🟦🟦🟦🟦🟦🟦\n92,494",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Score": 92494,
+    "Top": null,
+    "Date": "2026-10-08",
+    "Rounds": 10,
+    "Solved": true
+   }
+  }
+ ],
+ "chartle": [
+  {
+   "text": "📈 Chartle for 07 Oct 2026: Military spending as a share of GDP\n\nGuessed in 2 tries\n🟥✅⬜️⬜️⬜️\n\nPlay at https://chartle.cc",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 2,
+    "Solved": true,
+    "Date": "2026-10-07",
+    "Title": "Military spending as a share of GDP"
+   }
+  },
+  {
+   "text": "📈 Chartle for 27 Sep 2026: Electric cars sold per year\n\nGuessed in 1 try\n✅⬜️⬜️⬜️⬜️\n\nPlay at https://chartle.cc",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true,
+    "Date": "2026-09-27",
+    "Title": "Electric cars sold per year"
+   }
+  },
+  {
+   "text": "📈 Chartle for 08 Oct 2026: Plantain production\n\nFailed to guess this time\n🟥🟥🟥🟥🟥\n\nPlay at https://chartle.cc",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Date": "2026-10-08",
+    "Title": "Plantain production"
+   }
+  },
+  {
+   "text": "📈 Chartle for 30 Sept 2026: Government revenues as a share of GDP\n\nFailed to guess this time\n🟥🟥🟥🟥🟥\n\nPlay at https://chartle.cc",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Date": "2026-09-30",
+    "Title": "Government revenues as a share of GDP"
+   }
+  },
+  {
+   "text": "📈 Chartle for 05 Oct 2026: Number of live buffaloes per person\n\nGuessed in 5 tries\n🟥🟥🟥🟥✅\n\nPlay at https://chartle.cc/#389",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 5,
+    "Solved": true,
+    "Date": "2026-10-05"
+   }
+  }
+ ],
+ "krillion": [
+  {
+   "text": "Krillion #83 🦐\n465\n\n🦑🐟🦑🏮🏮🏮🦑\n\nhttps://krillion.io",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 465,
+    "Puzzle": 83,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Krillion #82 🦐\n135\n\n🏮⬛⬛🫧🐟🫧⬛\n\nhttps://krillion.io",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 135,
+    "Puzzle": 82,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Krillion #78 🦐\n110\n\n🫧🫧🐟🐟🫧🫧🫧\n\nhttps://krillion.io",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 110,
+    "Puzzle": 78,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Krillion #70 🦐\n385\n\n🫧🐟🏮🏮🦑🏮🐟\n",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 385,
+    "Puzzle": 70,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Krillion ✒️ #7 🦐\n210\n\n🐟⬛🐟🦑🐟🐟🐟\n\nhttps://krillion.io/lexicon?game=7",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 210,
+    "Puzzle": 7,
+    "Mode": "lexicon",
+    "IsMainDaily": false
+   },
+   "recognized": false
+  }
+ ],
+ "size-it-up": [
+  {
+   "text": "Size It Up\nOverall Score 439\n\n🟥🟥🟥🟥🟥 100\n🟥🟥🟥⬜⬜ 59\n🟥🟥🟥🟥🟥 100\n🟥🟥🟥🟥⬜ 80\n🟥🟥🟥🟥🟥 100\nhttps://magnitudle.com/size-it-up",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 439,
+    "Rounds": [
+     100,
+     59,
+     100,
+     80,
+     100
+    ],
+    "Solved": true
+   }
+  },
+  {
+   "text": "Size It Up\nOverall Score 233\n\n🟥⬜⬜⬜⬜ 23\n🟥🟥⬜⬜⬜ 43\n🟥⬜⬜⬜⬜ 15\n🟥🟥🟥🟥🟥 99\n🟥🟥🟥⬜⬜ 53\nhttps://magnitudle.com/size-it-up",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 233,
+    "Rounds": [
+     23,
+     43,
+     15,
+     99,
+     53
+    ],
+    "Solved": true
+   }
+  },
+  {
+   "text": "Size It Up\nOverall Score 368\n\n🟥🟥🟥🟥🟥 100\n🟥🟥🟥🟥⬜ 84\n🟥🟥🟥🟥⬜ 84\n⬜⬜⬜⬜⬜ 0\n🟥🟥🟥🟥🟥 100\nhttps://magnitudle.com/size-it-up",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 368,
+    "Rounds": [
+     100,
+     84,
+     84,
+     0,
+     100
+    ],
+    "Solved": true
+   }
+  },
+  {
+   "text": "Size It Up\nOverall Score 341\n🟥🟥🟥🟥🟥🟥⬜⬜⬜⬜\n🟥🟥🟥🟥🟥🟥🟥🟥⬜⬜\n🟥🟥🟥🟥🟥🟥🟥🟥🟥🟥\n🟥🟥🟥🟥🟥🟥🟥⬜⬜⬜\n🟥🟥🟥🟥⬜⬜⬜⬜⬜⬜\nhttps://magnitudle.com/size-it-up",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 341,
+    "Rounds": null,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Size It Up\nOverall Score 141\n\n🟥🟥⬜️⬜️⬜️ 32\n🟥🟥🟥🟥⬜️ 75\n⬜️⬜️⬜️⬜️⬜️ 4\n⬜️⬜️⬜️⬜️⬜️ 0\n🟥🟥⬜️⬜️⬜️ 30\nhttps://magnitudle.com/size-it-up",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 141,
+    "Rounds": [
+     32,
+     75,
+     4,
+     0,
+     30
+    ],
+    "Solved": true
+   }
+  }
+ ],
+ "zoomout": [
+  {
+   "text": "🔎 ZoomOut 2026-07-28: 🟩⬛⬛⬛⬛ 🤓\nhttps://zoomout.videoludid.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true,
+    "Date": "2026-07-28"
+   }
+  },
+  {
+   "text": "🔎 ZoomOut 2026-10-03: 🟥🟩⬛⬛⬛ 😎\nhttps://zoomout.videoludid.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 2,
+    "Solved": true,
+    "Date": "2026-10-03"
+   }
+  },
+  {
+   "text": "🔎 ZoomOut 2024-03-28: 🟥🟧🟧🟧🟩 🥵\nhttps://zoomout.videoludid.com",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 5,
+    "Solved": true,
+    "Date": "2024-03-28"
+   }
+  },
+  {
+   "text": "🔎 ZoomOut 2024-03-03: 🟥🟥🟥🟥🟥 😭\nhttps://zoomout.videoludid.com",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Date": "2024-03-03"
+   }
+  },
+  {
+   "text": "🔎 ZoomOut 2024-01-31: 🟥🟥🟥🟥🟧 😩\nhttps://zoomout.videoludid.com",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Guesses": null,
+    "Solved": false,
+    "Date": "2024-01-31"
+   }
+  },
+  {
+   "text": "🔎 ZoomOut 2024-11-30: 🟩⬛⬛⬛⬛ 🤓\nhttps://zoomout.videoludid.com/daily/2024-11-30",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true,
+    "Date": "2024-11-30"
+   }
+  },
+  {
+   "text": "🔎 ZoomOut 2026-10-03: 🟥🟩⬛⬛⬛ 😎\nMy guesses: ||🟥 Some Game, 🟩 Found it!||\nhttps://zoomout.videoludid.com #ZoomOut",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 2,
+    "Solved": true,
+    "Date": "2026-10-03"
+   }
+  }
+ ],
+ "top-five-trivia": [
+  {
+   "text": "Top 5 Formula 1 teams by all-time race wins (#763)\n🟥🟧🟨🟩⬜⬜⬜🟦\nhttps://topfivetrivia.com/?utm_medium=share",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Found": 5,
+    "Misses": 3,
+    "Solved": true,
+    "Puzzle": 763,
+    "Category": "Formula 1 teams by all-time race wins"
+   }
+  },
+  {
+   "text": "Top 5 #725\n⬜⬜⬜🟥🟨⬜⬜\nhttps://topfivetrivia.com/?utm_medium=share",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Found": 2,
+    "Misses": 5,
+    "Solved": false,
+    "Puzzle": 725
+   }
+  },
+  {
+   "text": "Top 5 #364\n⬜⬜🟧🟩🟨🟥⬜🟦\nhttps://top5-game.com/?date=2025-02-22",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Found": 5,
+    "Misses": 3,
+    "Solved": true,
+    "Puzzle": 364
+   }
+  },
+  {
+   "text": "Top 5 Countries by population (#957)\n⬜🟦⬜🟥⬜⬜🟨⬜\nhttps://topfivetrivia.com/?utm_medium=share",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Found": 3,
+    "Misses": 5,
+    "Solved": false,
+    "Puzzle": 957
+   }
+  },
+  {
+   "text": "Top 5 Countries by population (#957)\n🟥🟧🟨🟩🟦\nhttps://topfivetrivia.com/?utm_medium=share",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Found": 5,
+    "Misses": 0,
+    "Solved": true,
+    "Puzzle": 957,
+    "InOrder": true
+   }
+  }
+ ],
+ "originle": [
+  {
+   "text": "Originle #2 · 10,000\n🟩 · 1/8 clues\nhttps://originle.io/mila/?day=2",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 10000,
+    "Guesses": 1,
+    "Clues": 1,
+    "ClueTotal": 8,
+    "Solved": true,
+    "Puzzle": 2
+   }
+  },
+  {
+   "text": "Originle #1 · 6,000\n🟥🟥🟩 · 4/8 clues\nhttps://originle.io/aya/?day=1",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 6000,
+    "Guesses": 3,
+    "Clues": 4,
+    "ClueTotal": 8,
+    "Solved": true,
+    "Puzzle": 1
+   }
+  },
+  {
+   "text": "Originle #3 · 690\n🟥🟥🟥 · 6/8 clues\nhttps://originle.io/mattias/?day=3",
+   "outcome": "loss",
+   "evidence": "C",
+   "expected": {
+    "Score": 690,
+    "Guesses": null,
+    "Clues": 6,
+    "ClueTotal": 8,
+    "Solved": false,
+    "Puzzle": 3
+   }
+  },
+  {
+   "text": "Originle #4 · 10,000\n🟩 · 1/8 clues\nhttps://originle.io/querubin/?day=4",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 10000,
+    "Guesses": 1,
+    "Clues": 1,
+    "ClueTotal": 8,
+    "Solved": true,
+    "Puzzle": 4
+   }
+  },
+  {
+   "text": "Originle #4 · 420\n🟥🏳️ · 5/8 clues\nhttps://originle.io/querubin/?day=4",
+   "outcome": "loss",
+   "evidence": "S",
+   "expected": {
+    "Score": 420,
+    "Guesses": null,
+    "Clues": 5,
+    "ClueTotal": 8,
+    "Solved": false,
+    "GaveUp": true,
+    "Puzzle": 4
+   }
+  }
+ ],
+ "overwatchdle": [
+  {
+   "text": "I found #Overwatchdle hero #2 in classic mode in 3 tries\n\n🟥 🟩 🟥 🟥 🟥 ⬆️ ⬆️\n\n🟩 🟩 🟩 🟥 🟥 ⬆️ ⬆️\n\n🟩 🟩 🟩 🟩 🟩 🟩 🟩\n\nhttps://overwatchdle.net",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true,
+    "Puzzle": 2
+   }
+  },
+  {
+   "text": "I found #Overwatchdle hero #37 in classic mode in 1 tries\n\n🟩 🟩 🟩 🟩 🟩 🟩 🟩\n\nhttps://overwatchdle.net",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true,
+    "Puzzle": 37
+   }
+  },
+  {
+   "text": "I found #Overwatchdle hero #2 in classic mode in 3 tries\n\n🟥 🟩 🟥 🟥 🟥 ⬆️ ⬆️\n🟩 🟩 🟩 🟥 🟥 ⬆️ ⬆️\n🟩 🟩 🟩 🟩 🟩 🟩 🟩\n\nhttps://overwatchdle.net",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true,
+    "Puzzle": 2
+   }
+  },
+  {
+   "text": "I found #Overwatchdle hero #173 in classic mode in 8 tries\n\n🟥 🟥 🟩 🟥 🟥 ⬇️ ⬆️\n🟩 🟥 🟩 🟥 🟥 ⬇️ ⬆️\n🟩 🟩 🟩 🟥 🟥 ⬆️ ⬇️\n🟩 🟩 🟩 🟩 🟥 ⬆️ 🟩\n🟩 🟩 🟩 🟩 🟥 🟩 🟩\nand 3 more...\n\nhttps://overwatchdle.net",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 8,
+    "Solved": true,
+    "Puzzle": 173
+   }
+  }
+ ],
+ "fermi": [
+  {
+   "text": "Fermi · No. 50\n01  1.00×\n02  1.02×\n03  1.07×\n─────────\n1.03× score · top 1%",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 1.03,
+    "Top": 1,
+    "Questions": [
+     1.0,
+     1.02,
+     1.07
+    ],
+    "Puzzle": 50,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Fermi · No. 72\n01  1.36×\n02  1.20×\n03  3.67×\n─────────\n1.82× score · top 16%\n<https://fermi.gg/s/daily>",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 1.82,
+    "Top": 16,
+    "Questions": [
+     1.36,
+     1.2,
+     3.67
+    ],
+    "Puzzle": 72,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Fermi · No. 63\n01  2.50×\n02  4.25×\n03  16.8×\n─────────\n5.62× score · top 45%\n<https://fermi.gg/s/daily>",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 5.62,
+    "Top": 45,
+    "Questions": [
+     2.5,
+     4.25,
+     16.8
+    ],
+    "Puzzle": 63,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Fermi · No. 71\n01  91,274×\n02  2,165×\n03  2,222×\n─────────\n1,000× score · top 99%\nhttps://fermi.gg/s/daily",
+   "outcome": "partial",
+   "evidence": "C",
+   "expected": {
+    "Score": 1000,
+    "Top": 99,
+    "Questions": [
+     91274,
+     2165,
+     2222
+    ],
+    "Puzzle": 71,
+    "Solved": true
+   }
+  },
+  {
+   "text": "Fermi · No. 8\n01  1.00×\n02  1.00×\n03  1.02×\n─────────\n1.01× score · top 1%\nfermi.gg",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Score": 1.01,
+    "Top": 1,
+    "Questions": [
+     1.0,
+     1.0,
+     1.02
+    ],
+    "Puzzle": 8,
+    "Solved": true
+   }
+  }
+ ],
+ "rivalsdle": [
+  {
+   "text": "I found #Rivalsdle hero #286 with a video in 4 tries",
+   "outcome": "win",
+   "evidence": "C",
+   "expected": {
+    "Guesses": 4,
+    "Solved": true,
+    "Puzzle": 286
+   }
+  },
+  {
+   "text": "I found #Rivalsdle hero #611 with a video in 1 tries\n",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 1,
+    "Solved": true,
+    "Puzzle": 611
+   }
+  },
+  {
+   "text": "Ich habe den #Rivalsdle-Helden #611 mit einem Video in 3 Versuchen gefunden\n",
+   "outcome": "win",
+   "evidence": "S",
+   "expected": {
+    "Guesses": 3,
+    "Solved": true,
+    "Puzzle": 611
+   }
+  }
  ]
 }

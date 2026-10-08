@@ -122,6 +122,8 @@
             const clean = { id: game.id, name: game.name, url: game.url };
             if (game.tracking) clean.tracking = game.tracking;
             if (typeof game.example === 'string' && game.example) clean.example = game.example.slice(0, 2000);
+            if (typeof game.about === 'string' && game.about.trim()) clean.about = game.about.trim().slice(0, 100);
+            if (typeof game.picture === 'string' && game.picture) clean.picture = game.picture;
             const i = this.custom.findIndex(g => g.id === game.id);
             if (i >= 0) {
                 // Keep anything we don't model (e.g. legacy rules) alongside the new fields.
@@ -275,6 +277,7 @@
         setTheme(theme) {
             this.storage.setItem(THEME_KEY, theme);
         }
+
     }
 
     PT.Store = Store;

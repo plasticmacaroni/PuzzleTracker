@@ -380,6 +380,8 @@
         if (typeof game.id !== 'string' || !GAME_ID.test(game.id)) errors.push('id must be lowercase letters, numbers and dashes');
         if (typeof game.name !== 'string' || !game.name.trim() || game.name.length > LIMITS.nameLength) errors.push(`name must be 1–${LIMITS.nameLength} characters`);
         if (!isSafeUrl(game.url)) errors.push('link must start with https:// or http://');
+        if (game.about !== undefined && !(typeof game.about === 'string' && game.about.length <= 100)) errors.push('description must be text, up to 100 characters');
+        if (game.picture !== undefined && !(typeof game.picture === 'string' && /^[a-z0-9]{1,16}$/.test(game.picture))) errors.push('picture must be one of the listed kinds');
         if (game.tracking !== undefined) validateTracking(game.tracking, errors);
         return errors;
     }
