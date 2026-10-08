@@ -2477,3 +2477,223 @@ code {
         font-size: 21px;
     }
 }
+
+/* ---- profiles ------------------------------------------------------------------- */
+
+.profile-badge {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    background: var(--block, var(--block-2));
+    color: var(--ink);
+    font: 400 12px/1 var(--font-logo);
+}
+
+.profile-badge.is-large {
+    width: 40px;
+    height: 40px;
+    font-size: 17px;
+}
+
+.profile-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 180px;
+    height: 40px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text);
+    font: 500 13px var(--font-label);
+    cursor: pointer;
+}
+
+.profile-btn:hover {
+    background: var(--surface-2);
+}
+
+.profile-btn-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profile-list,
+.pick-list,
+.import-list {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.profile-item,
+.pick-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.profile-item.is-active {
+    border-color: var(--text);
+}
+
+.profile-text {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+    gap: 2px;
+}
+
+.profile-name {
+    overflow: hidden;
+    color: var(--text);
+    font: 400 18px/1.2 var(--font-display);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profile-meta {
+    color: var(--text-2);
+    font: 400 12px/1.4 var(--font-label);
+}
+
+.profile-actions,
+.profile-confirm,
+.profile-rename {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.profile-item {
+    flex-wrap: wrap;
+}
+
+/* The delete question gets its own line under the profile. */
+.profile-item .profile-confirm {
+    flex-basis: 100%;
+    justify-content: flex-start;
+    padding-left: 52px;
+}
+
+.profile-confirm span {
+    flex-basis: 100%;
+    font-size: 14px;
+}
+
+.profile-rename {
+    flex: 1;
+    flex-wrap: nowrap;
+}
+
+.profile-rename .input {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-add {
+    display: flex;
+    gap: 8px;
+}
+
+.profile-add .input {
+    flex: 1;
+    min-width: 0;
+}
+
+.pick-item {
+    cursor: pointer;
+}
+
+.pick-item input,
+.import-head input {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    accent-color: var(--ink);
+}
+
+.pick-item.is-off,
+.import-item.is-off .import-head,
+.import-item.is-off .import-note {
+    opacity: 0.55;
+}
+
+.import-item {
+    display: grid;
+    gap: 8px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+.import-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.import-into {
+    padding-left: 30px;
+}
+
+.import-into .select {
+    flex: 1;
+    min-width: 0;
+}
+
+.import-note {
+    padding-left: 30px;
+    color: var(--text-2);
+    font-size: 14px;
+}
+
+.import-note.is-new {
+    color: var(--text);
+}
+
+.import-note.is-warn {
+    color: var(--bad);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .pick-item input,
+    :root:not([data-theme='light']) .import-head input {
+        accent-color: var(--text);
+    }
+}
+
+:root[data-theme='dark'] .pick-item input,
+:root[data-theme='dark'] .import-head input {
+    accent-color: var(--text);
+}
+
+@media (max-width: 600px) {
+    .profile-btn-name {
+        display: none;
+    }
+
+    .profile-btn {
+        padding: 0 7px;
+    }
+
+    .profile-item .profile-actions {
+        flex-basis: 100%;
+    }
+
+    .profile-item .profile-confirm {
+        padding-left: 0;
+    }
+}

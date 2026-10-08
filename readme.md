@@ -10,7 +10,8 @@ Everything stays in your browser. There are no accounts and no server.
 - **Paste anywhere**: press Ctrl+V (⌘V on Mac) anywhere on the page, or tap **Paste a result** on a phone. You confirm the detected game and day before it's saved.
 - **Game details**: tap a game for its stats (played, solved %, streaks, average), a distribution or trend chart, a paste box, and editable history.
 - **Manage games**: choose and order your games, or create your own.
-- **Backups**: *Back up* downloads a JSON file. *Restore* merges a backup into what's already here and never overwrites a result you have locally.
+- **Profiles**: each profile has its own results and game list (custom games and the theme are shared). Switch or add profiles from the badge in the top bar.
+- **Backups**: *Back up* downloads one JSON file with the profiles you pick. *Restore* first shows each profile in the file, its dates, and how many results you don't have yet, then merges the ones you choose into a profile here or adds them as new profiles. It never overwrites a result you have locally.
 
 ## Tracking rules
 
@@ -78,9 +79,10 @@ node --test
 | `js/rules.js` | pattern matching, the five blocks, validation |
 | `js/games.js` | built-in games and their rules |
 | `js/stats.js` | streaks, averages, distributions |
-| `js/store.js` | localStorage, migration from older versions, backup merge |
+| `js/store.js` | localStorage, profiles, migration from older versions, backup merge |
 | `js/app.js` | home, paste-anywhere, game details, manage games |
 | `js/builder.js` | the visual rule builder |
+| `js/profiles.js` | profile switcher, backup and restore screens |
 
 ## License
 

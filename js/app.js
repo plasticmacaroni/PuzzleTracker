@@ -64,12 +64,14 @@
         return h('header', { class: 'topbar' },
             h('div', { class: 'brand' }, PT.whimsy.wordmark()),
             h('div', { class: 'topbar-actions' },
+                PT.profiles.button(store, { onChange: render }),
                 h('button', { class: 'icon-btn', type: 'button', title: dark ? 'Light theme' : 'Dark theme', 'aria-label': dark ? 'Switch to light theme' : 'Switch to dark theme', onclick: toggleTheme }, icon(dark ? 'sun' : 'moon')),
                 h('button', {
                     class: 'icon-btn', type: 'button', 'aria-label': 'Menu', 'aria-haspopup': 'menu',
                     onclick: e => menu(e.currentTarget, [
                         { label: 'Manage games', icon: 'list', onSelect: openManage },
                         { label: 'Create a game', icon: 'plus', onSelect: () => PT.builder.open(null, builderOptions()) },
+                        { label: 'Profiles', icon: 'user', onSelect: () => PT.profiles.open(store, { onChange: render }) },
                         { label: 'Back up my data', icon: 'download', onSelect: exportData },
                         { label: 'Restore from backup', icon: 'upload', onSelect: importData },
                     ]),
@@ -571,34 +573,11 @@
     // ---- backup -------------------------------------------------------------------
 
     function exportData() {
-        const blob = new Blob([store.exportJson()], { type: 'application/json' });
-        const a = h('a', { href: URL.createObjectURL(blob), download: `puzzletracker-backup-${today}.json` });
-        document.body.append(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-        render();
-        toast('Backup downloaded', { tone: 'good' });
+        PT.profiles.exportData(store, { today, onDone: render });
     }
 
     function importData() {
-        const input = h('input', { type: 'file', accept: '.json,application/json' });
-        input.addEventListener('change', async () => {
-            const file = input.files[0];
-            if (!file) return;
-            try {
-                const summary = store.importJson(await file.text());
-                render();
-                const parts = [`${summary.added} result${summary.added === 1 ? '' : 's'} added`];
-                if (summary.same) parts.push(`${summary.same} already here`);
-                if (summary.conflicts) parts.push(`${summary.conflicts} kept as they were here`);
-                if (summary.games) parts.push(`${summary.games} custom game${summary.games === 1 ? '' : 's'}`);
-                toast(`Restored: ${parts.join(', ')}.`, { tone: 'good', duration: 8000 });
-            } catch (error) {
-                toast(`Couldn’t restore: ${error.message}`, { tone: 'bad', duration: 8000 });
-            }
-        });
-        input.click();
+        PT.profiles.importData(store, { onDone: render });
     }
 
     // ---- day changes --------------------------------------------------------------
