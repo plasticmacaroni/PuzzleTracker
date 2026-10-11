@@ -288,6 +288,18 @@
             this.save();
         }
 
+        // Moves one of my games in front of another, as when it's dragged.
+        // A missing beforeId puts it last.
+        moveMineBefore(id, beforeId) {
+            const list = this.data.myGames;
+            if (id === beforeId || !list.includes(id)) return;
+            const rest = list.filter(x => x !== id);
+            const at = rest.indexOf(beforeId);
+            rest.splice(at < 0 ? rest.length : at, 0, id);
+            this.data.myGames = rest;
+            this.save();
+        }
+
         // Saves a custom game, or an edited copy of a built-in game.
         saveGame(game) {
             const clean = { id: game.id, name: game.name, url: game.url };

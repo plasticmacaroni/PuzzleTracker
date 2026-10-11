@@ -10,7 +10,7 @@ Everything stays in your browser. There are no accounts and no server.
 - **Paste anywhere**: press Ctrl+V (⌘V on Mac) anywhere on the page, or tap **Paste a result** on a phone. You confirm the detected game and day before it's saved.
 - **Game details**: tap a game for its stats (played, solved %, streaks, average), a distribution or trend chart, a paste box, and editable history.
 - **Manage games**: choose and order your games, or create your own.
-- **Sorting**: Today lists games by most played unless you pick recently played, A to Z, or your own order (set with the arrows in *Manage games*). Each profile keeps its own choice.
+- **Sorting**: Today lists games by most played unless you pick recently played, A to Z, or your own order (drag games, or use the arrows, in *Manage games*). Each profile keeps its own choice.
 - **Profiles**: each profile has its own results and game list (custom games and the theme are shared). Switch or add profiles from the badge in the top bar.
 - **Backups**: *Back up* downloads one JSON file with the profiles you pick. *Restore* first shows each profile in the file, its dates, and how many results you don't have yet, then merges the ones you choose into a profile here or adds them as new profiles. It never overwrites a result you have locally.
 

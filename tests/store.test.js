@@ -338,3 +338,19 @@ test('the sort choice is saved per profile and unknown values fall back to most 
     store.data.sort = 'something-old';
     assert.equal(store.sortMode(), 'played');
 });
+
+test('a dragged game lands in front of the game it was dropped before, and the move is saved', () => {
+    const storage = new MemoryStorage({ guessrTrackerData: JSON.stringify({ gameResults: {}, myGames: ['wordle', 'framed', 'gone', 'waffle', 'bandle'], version: 2 }) });
+    const store = new Store(storage);
+    const order = () => store.data.myGames;
+    store.moveMineBefore('bandle', 'wordle');
+    assert.deepEqual(order(), ['bandle', 'wordle', 'framed', 'gone', 'waffle'], 'to the top');
+    store.moveMineBefore('wordle', null);
+    assert.deepEqual(order(), ['bandle', 'framed', 'gone', 'waffle', 'wordle'], 'no next game means last');
+    store.moveMineBefore('framed', 'wordle');
+    assert.deepEqual(order(), ['bandle', 'gone', 'waffle', 'framed', 'wordle'], 'down, keeping an id with no game behind it');
+    assert.deepEqual(new Store(storage).data.myGames, order(), 'saved');
+    store.moveMineBefore('framed', 'framed');
+    store.moveMineBefore('queens', 'bandle');
+    assert.deepEqual(order(), ['bandle', 'gone', 'waffle', 'framed', 'wordle'], 'no-ops leave the list alone');
+});

@@ -1,6 +1,6 @@
 // PuzzleTracker: today's list, paste-anywhere import, game details and game management.
 (function () {
-    const { h, fill, icon, gameIcon, sheet, sheetHeader, toast, menu, relativeDay } = PT.ui;
+    const { h, fill, icon, gameIcon, sheet, sheetHeader, toast, menu, sortable, relativeDay } = PT.ui;
     const { localDate, addDays, format, summarize, statOf } = PT.stats;
     const { rowSummary, statChips } = PT.cards;
 
@@ -543,16 +543,24 @@
                 PT.puzzles.thumb(game, 32),
                 manageName(game, !game.builtIn ? h('span', { class: 'badge', text: 'custom' }) : null),
                 h('button', { class: 'btn btn-small', type: 'button', onclick: () => { store.addToMine(game.id); draw(); } }, icon('plus', { size: 16 }), 'Add'));
+            // My games, dragged by the grip or moved with the arrows.
+            const myList = games => {
+                const list = h('ul', { class: 'manage-list' }, games.map((game, i) => h('li', { class: 'manage-item', dataset: { id: game.id } },
+                    games.length > 1 ? h('span', { class: 'drag-handle', 'aria-hidden': 'true', title: 'Drag to reorder' }, icon('grip', { size: 18 })) : null,
+                    PT.puzzles.thumb(game, 32),
+                    manageName(game, !game.tracking ? h('span', { class: 'badge', text: 'no stats' }) : null),
+                    h('span', { class: 'move-btns' },
+                        h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Move ${game.name} up`, disabled: i === 0, onclick: () => { store.moveMine(game.id, -1); draw(); } }, icon('up', { size: 18 })),
+                        h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Move ${game.name} down`, disabled: i === games.length - 1, onclick: () => { store.moveMine(game.id, 1); draw(); } }, icon('down', { size: 18 }))),
+                    h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Edit ${game.name} tracking`, onclick: () => PT.builder.open(game.id, builderOptions(draw)) }, icon('sliders', { size: 18 })),
+                    h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Remove ${game.name}`, onclick: () => { store.removeFromMine(game.id); draw(); } }, icon('x', { size: 18 })))));
+                sortable(list, { handle: '.drag-handle', onDrop: (row, next) => { store.moveMineBefore(row.dataset.id, next && next.dataset.id); draw(); } });
+                return list;
+            };
             const body = h('div', { class: 'sheet-body' },
                 h('h3', { class: 'panel-title', text: `My games (${mine.length})` }),
                 mine.length > 1 ? orderHint(draw) : null,
-                mine.length ? h('ul', { class: 'manage-list' }, mine.map((game, i) => h('li', { class: 'manage-item' },
-                    PT.puzzles.thumb(game, 32),
-                    manageName(game, !game.tracking ? h('span', { class: 'badge', text: 'no stats' }) : null),
-                    h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Move ${game.name} up`, disabled: i === 0, onclick: () => { store.moveMine(game.id, -1); draw(); } }, icon('up', { size: 18 })),
-                    h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Move ${game.name} down`, disabled: i === mine.length - 1, onclick: () => { store.moveMine(game.id, 1); draw(); } }, icon('down', { size: 18 })),
-                    h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Edit ${game.name} tracking`, onclick: () => PT.builder.open(game.id, builderOptions(draw)) }, icon('sliders', { size: 18 })),
-                    h('button', { class: 'icon-btn', type: 'button', 'aria-label': `Remove ${game.name}`, onclick: () => { store.removeFromMine(game.id); draw(); } }, icon('x', { size: 18 }))))) : h('p', { class: 'muted small', text: 'No games yet. Add some below.' }),
+                mine.length ? myList(mine) : h('p', { class: 'muted small', text: 'No games yet. Add some below.' }),
                 h('div', { class: 'manage-add-head' },
                     h('h3', { class: 'panel-title', text: 'Add games' }),
                     h('button', { class: 'btn btn-small', type: 'button', onclick: () => PT.builder.open(null, builderOptions(draw)) }, icon('plus', { size: 16 }), 'Create a game')),
@@ -568,12 +576,12 @@
         draw();
     }
 
-    // The arrows below set "Your order"; say so when Today is sorted another way.
+    // The list below sets "Your order"; say so when Today is sorted another way.
     function orderHint(redraw) {
         const mode = store.sortMode();
-        if (mode === 'custom') return h('p', { class: 'muted small', text: 'Today shows your games in this order.' });
+        if (mode === 'custom') return h('p', { class: 'muted small', text: 'Today shows your games in this order. Drag a game by its handle, or use the arrows, to move it.' });
         return h('p', { class: 'muted small order-hint' },
-            `Today is sorted by ${SORT_LABELS[mode].toLowerCase()}. The arrows set your own order. `,
+            `Today is sorted by ${SORT_LABELS[mode].toLowerCase()}. Drag games, or use the arrows, to set your own order. `,
             h('button', { class: 'link-btn', type: 'button', text: 'Use this order on Today', onclick: () => { store.setSortMode('custom'); render(); redraw(); } }));
     }
 

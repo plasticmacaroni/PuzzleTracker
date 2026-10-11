@@ -1167,6 +1167,7 @@ code {
 
 .manage-list {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2px;
     margin: 0;
     padding: 0;
@@ -1183,6 +1184,74 @@ code {
 
 .manage-item:hover {
     background: var(--surface-2);
+}
+
+/* Rows can't widen the sheet; the name gives way instead. */
+.sheet-manage .sheet-body {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.move-btns {
+    display: flex;
+    gap: 10px;
+}
+
+.drag-handle {
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 40px;
+    margin: 0 -6px 0 -6px;
+    flex-shrink: 0;
+    color: var(--text-3);
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.drag-handle:hover {
+    color: var(--text);
+}
+
+.manage-list.is-sorting {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.manage-list.is-sorting .manage-item:not(.is-dragging):hover {
+    background: transparent;
+}
+
+.manage-list .manage-item.is-dragging {
+    position: relative;
+    z-index: 3;
+    background: var(--surface);
+    box-shadow: var(--shadow-2);
+    outline: 2px solid var(--text);
+}
+
+.is-dragging .drag-handle {
+    color: var(--text);
+    cursor: grabbing;
+}
+
+/* Phones: the up and down arrows stack, so the name keeps room. */
+@media (max-width: 600px) {
+    .manage-item {
+        gap: 6px;
+        padding-left: 2px;
+    }
+
+    .move-btns {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .move-btns .icon-btn {
+        width: 36px;
+        height: 34px;
+    }
 }
 
 .manage-name {

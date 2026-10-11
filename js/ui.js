@@ -57,6 +57,7 @@
         sliders: ['M4 21v-7', 'M4 10V3', 'M12 21v-9', 'M12 8V3', 'M20 21v-5', 'M20 12V3', 'M1 14h6', 'M9 8h6', 'M17 16h6'],
         user: ['M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2', 'M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z'],
         sort: ['m21 16-4 4-4-4', 'M17 20V4', 'm3 8 4-4 4 4', 'M7 4v16'],
+        grip: ['M9 5h.01', 'M9 12h.01', 'M9 19h.01', 'M15 5h.01', 'M15 12h.01', 'M15 19h.01'],
         list: ['M8 6h13', 'M8 12h13', 'M8 18h13', 'M3 6h.01', 'M3 12h.01', 'M3 18h.01'],
         puzzle: ['M19.44 7.85c-.05.32.06.65.29.88l1.57 1.57c.47.47.7 1.09.7 1.7s-.23 1.24-.7 1.71l-1.61 1.61a.98.98 0 0 1-.84.28c-.47-.07-.8-.48-.97-.93a2.5 2.5 0 1 0-3.21 3.21c.45.17.86.5.93.97a.98.98 0 0 1-.28.84l-1.61 1.61a2.4 2.4 0 0 1-1.7.7 2.4 2.4 0 0 1-1.71-.7l-1.57-1.57a1.03 1.03 0 0 0-.88-.29c-.49.07-.84.5-1.02.97a2.5 2.5 0 1 1-3.24-3.24c.47-.18.9-.53.97-1.02a1.03 1.03 0 0 0-.29-.88l-1.57-1.57A2.4 2.4 0 0 1 2 12c0-.62.24-1.23.7-1.7L4.23 8.77c.24-.24.58-.35.92-.3.51.08.88.53 1.07 1.01a2.5 2.5 0 1 0 3.26-3.26c-.48-.2-.93-.56-1.01-1.07-.05-.34.06-.68.3-.92L10.3 2.7A2.4 2.4 0 0 1 12 2c.62 0 1.23.24 1.7.7l1.57 1.57c.23.23.56.34.88.29.49-.07.84-.5 1.02-.97a2.5 2.5 0 1 1 3.24 3.24c-.47.18-.9.53-.97 1.02Z'],
     };
@@ -178,6 +179,94 @@
         list.querySelector('button')?.focus();
     }
 
+    // Lets a list's rows be dragged into a new order by their handle, with a
+    // mouse, finger or pen. Rows move live as the dragged one passes their middle,
+    // and the list scrolls when it's held near an edge. onDrop(row, nextRow) runs
+    // only when the order changed; nextRow is null when the row ended up last.
+    function sortable(list, { handle, onDrop }) {
+        const still = matchMedia('(prefers-reduced-motion: reduce)');
+        list.addEventListener('pointerdown', e => {
+            const grip = e.target.closest(handle);
+            if (!grip || !list.contains(grip) || e.button !== 0) return;
+            let row = grip;
+            while (row.parentElement !== list) row = row.parentElement;
+            e.preventDefault();
+            grip.setPointerCapture(e.pointerId);
+
+            const scroller = scrollParent(list);
+            const origin = row.nextElementSibling;
+            const grab = e.clientY - row.getBoundingClientRect().top;
+            const done = new AbortController();
+            let y = e.clientY;
+            let shift = 0;
+            let frame = requestAnimationFrame(edgeScroll);
+            row.classList.add('is-dragging');
+            list.classList.add('is-sorting');
+
+            // Layout positions come from offsetTop, which ignores the transforms
+            // used for dragging and for the sliding rows.
+            function place() {
+                const center = y - grab + row.offsetHeight / 2;
+                for (;;) {
+                    const top = row.getBoundingClientRect().top - shift;
+                    const middle = el => top + el.offsetTop - row.offsetTop + el.offsetHeight / 2;
+                    const prev = row.previousElementSibling;
+                    const next = row.nextElementSibling;
+                    // The neighbours move, not the row: moving the row would end the drag.
+                    if (prev && center < middle(prev)) slide(prev, () => row.after(prev));
+                    else if (next && center > middle(next)) slide(next, () => row.before(next));
+                    else break;
+                }
+                shift = y - grab - (row.getBoundingClientRect().top - shift);
+                row.style.transform = `translateY(${shift}px)`;
+            }
+
+            // Swaps a neighbour past the row, easing it into its new spot.
+            function slide(other, move) {
+                const before = other.offsetTop;
+                move();
+                const by = before - other.offsetTop;
+                if (by && !still.matches) other.animate([{ transform: `translateY(${by}px)` }, { transform: 'none' }], { duration: 150, easing: 'ease-out' });
+            }
+
+            function edgeScroll() {
+                const box = scroller === document.scrollingElement ? { top: 0, bottom: innerHeight } : scroller.getBoundingClientRect();
+                const zone = Math.min(80, (box.bottom - box.top) / 4);
+                const into = y < box.top + zone ? y - box.top - zone : y > box.bottom - zone ? y - box.bottom + zone : 0;
+                if (into) {
+                    const before = scroller.scrollTop;
+                    scroller.scrollTop += Math.sign(into) * Math.ceil(Math.min(zone, Math.abs(into)) / 4);
+                    if (scroller.scrollTop !== before) place();
+                }
+                frame = requestAnimationFrame(edgeScroll);
+            }
+
+            function end(ev) {
+                done.abort();
+                cancelAnimationFrame(frame);
+                row.style.transform = '';
+                row.classList.remove('is-dragging');
+                list.classList.remove('is-sorting');
+                if (ev.type === 'pointercancel') list.insertBefore(row, origin);
+                else if (row.nextElementSibling !== origin) onDrop(row, row.nextElementSibling);
+            }
+
+            const opts = { signal: done.signal };
+            grip.addEventListener('pointermove', ev => { y = ev.clientY; place(); }, opts);
+            grip.addEventListener('pointerup', end, opts);
+            grip.addEventListener('pointercancel', end, opts);
+            grip.addEventListener('lostpointercapture', end, opts);
+        });
+    }
+
+    function scrollParent(el) {
+        for (let p = el.parentElement; p; p = p.parentElement) {
+            const overflow = getComputedStyle(p).overflowY;
+            if ((overflow === 'auto' || overflow === 'scroll') && p.scrollHeight > p.clientHeight) return p;
+        }
+        return document.scrollingElement;
+    }
+
     function relativeDay(date, today) {
         if (date === today) return 'Today';
         if (date === PT.stats.addDays(today, -1)) return 'Yesterday';
@@ -186,5 +275,5 @@
         return d.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: sameYear ? undefined : 'numeric' });
     }
 
-    PT.ui = { h, append, fill, icon, gameIcon, sheet, sheetHeader, toast, menu, relativeDay };
+    PT.ui = { h, append, fill, icon, gameIcon, sheet, sheetHeader, toast, menu, sortable, relativeDay };
 })(typeof window !== 'undefined' ? window : globalThis);
