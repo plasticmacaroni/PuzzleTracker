@@ -2,7 +2,7 @@
 //
 // Keys (kept from earlier versions so existing data keeps working):
 //   guessrTrackerData        the first profile's save:
-//                            { gameResults: { [gameId]: [{ date, rawOutput }] }, myGames, lastExport, lastUpdated, version }
+//                            { gameResults: { [gameId]: [{ date, rawOutput }] }, myGames, sort, lastExport, lastUpdated, version }
 //   guessrTrackerData:<id>   every other profile's save, in the same shape
 //   guessrTrackerProfiles    { active, profiles: [{ id, name }] }; written once a second profile exists
 //   guessrTrackerGames       custom games and edited copies of built-in games, shared by all profiles
@@ -19,6 +19,8 @@
     const VERSION = 2;
     const BACKUP_VERSION = 3;
     const NAME_MAX = 30;
+    // How the Today list is ordered. 'custom' is the order of myGames itself.
+    const SORTS = ['played', 'recent', 'name', 'custom'];
 
     const dataKey = id => (id === FIRST_PROFILE ? DATA_KEY : `${DATA_KEY}:${id}`);
     const validId = id => typeof id === 'string' && /^[a-z0-9-]{1,40}$/.test(id);
@@ -249,6 +251,32 @@
         removeFromMine(id) {
             this.data.myGames = this.data.myGames.filter(x => x !== id);
             this.save();
+        }
+
+        sortMode() {
+            return SORTS.includes(this.data.sort) ? this.data.sort : 'played';
+        }
+
+        setSortMode(mode) {
+            if (!SORTS.includes(mode)) throw new Error(`Unknown sort: ${mode}`);
+            this.data.sort = mode;
+            this.save();
+        }
+
+        // My games in the chosen order, worked out from results each time. Ties keep
+        // the player's own order, so games with equal counts never swap places.
+        sortedGames(mode = this.sortMode()) {
+            const mine = this.myGames();
+            const position = new Map(mine.map((g, i) => [g.id, i]));
+            const count = new Map(mine.map(g => [g.id, this.results(g.id).length]));
+            const last = new Map(mine.map(g => [g.id, this.results(g.id).reduce((latest, r) => (r.date > latest ? r.date : latest), '')]));
+            const compare = {
+                played: (a, b) => count.get(b.id) - count.get(a.id),
+                recent: (a, b) => last.get(b.id).localeCompare(last.get(a.id)),
+                name: (a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }),
+                custom: () => 0,
+            }[mode];
+            return mine.slice().sort((a, b) => compare(a, b) || position.get(a.id) - position.get(b.id));
         }
 
         moveMine(id, delta) {
@@ -521,6 +549,7 @@
     }
 
     Store.describe = describe;
+    Store.SORTS = SORTS;
     PT.Store = Store;
 
     if (typeof module !== 'undefined' && module.exports) module.exports = Store;

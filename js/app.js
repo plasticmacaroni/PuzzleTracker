@@ -40,7 +40,7 @@
     // ---- home ---------------------------------------------------------------------
 
     function render() {
-        const games = store.myGames();
+        const games = store.sortedGames();
         const rows = games.map(game => ({ game, s: summarize(game, store.results(game.id), today) }));
         const todo = rows.filter(r => !r.s.today);
         const done = rows.filter(r => r.s.today);
@@ -53,8 +53,8 @@
             pendingCallout(),
             games.length === 0 ? emptyState() : null,
             onboarding(),
-            todo.length ? section(`Up next`, todo.length, todo.map(r => gameRow(r.game, r.s)), addGamesLink()) : null,
-            done.length ? section('Done today', done.length, done.map(r => gameRow(r.game, r.s)), todo.length ? null : addGamesLink()) : null,
+            todo.length ? section(`Up next`, todo.length, todo.map(r => gameRow(r.game, r.s)), listActions()) : null,
+            done.length ? section('Done today', done.length, done.map(r => gameRow(r.game, r.s)), todo.length ? null : listActions()) : null,
             games.length && !todo.length ? h('p', { class: 'all-done', text: 'All done for today. See you tomorrow!' }) : null,
             footer());
     }
@@ -110,8 +110,19 @@
             h('ul', { class: 'rows' }, rows));
     }
 
-    function addGamesLink() {
-        return h('button', { class: 'section-action', type: 'button', onclick: openManage }, '+ Add games');
+    const SORT_LABELS = { played: 'Most played', recent: 'Recently played', name: 'A to Z', custom: 'Your order' };
+
+    function listActions() {
+        const mode = store.sortMode();
+        return h('div', { class: 'section-actions' },
+            h('button', {
+                class: 'section-action sort-btn', type: 'button', 'aria-haspopup': 'menu', 'aria-label': `Sort games: ${SORT_LABELS[mode]}`,
+                onclick: e => menu(e.currentTarget, [
+                    ...PT.Store.SORTS.map(m => ({ label: SORT_LABELS[m], icon: m === mode ? 'check' : null, onSelect: () => { store.setSortMode(m); render(); } })),
+                    { label: 'Rearrange your order', icon: 'list', onSelect: openManage },
+                ]),
+            }, icon('sort', { size: 15 }), SORT_LABELS[mode]),
+            h('button', { class: 'section-action', type: 'button', onclick: openManage }, '+ Add games'));
     }
 
     function gameRow(game, s) {
@@ -534,6 +545,7 @@
                 h('button', { class: 'btn btn-small', type: 'button', onclick: () => { store.addToMine(game.id); draw(); } }, icon('plus', { size: 16 }), 'Add'));
             const body = h('div', { class: 'sheet-body' },
                 h('h3', { class: 'panel-title', text: `My games (${mine.length})` }),
+                mine.length > 1 ? orderHint(draw) : null,
                 mine.length ? h('ul', { class: 'manage-list' }, mine.map((game, i) => h('li', { class: 'manage-item' },
                     PT.puzzles.thumb(game, 32),
                     manageName(game, !game.tracking ? h('span', { class: 'badge', text: 'no stats' }) : null),
@@ -554,6 +566,15 @@
             fill(content, sheetHeader('Manage games', () => close()), body);
         }
         draw();
+    }
+
+    // The arrows below set "Your order"; say so when Today is sorted another way.
+    function orderHint(redraw) {
+        const mode = store.sortMode();
+        if (mode === 'custom') return h('p', { class: 'muted small', text: 'Today shows your games in this order.' });
+        return h('p', { class: 'muted small order-hint' },
+            `Today is sorted by ${SORT_LABELS[mode].toLowerCase()}. The arrows set your own order. `,
+            h('button', { class: 'link-btn', type: 'button', text: 'Use this order on Today', onclick: () => { store.setSortMode('custom'); render(); redraw(); } }));
     }
 
     // A game's name with its one-line description underneath.

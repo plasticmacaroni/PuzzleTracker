@@ -296,3 +296,45 @@ test('backups without any profiles are rejected', () => {
     const store = new Store(new MemoryStorage());
     assert.throws(() => store.readBackup(JSON.stringify({ app: 'PuzzleTracker', version: 3, profiles: [] })), /no profiles/);
 });
+
+// ---- sorting --------------------------------------------------------------------
+
+function sortFixture() {
+    const store = new Store(new MemoryStorage({ guessrTrackerData: JSON.stringify({ gameResults: {}, myGames: ['wordle', 'framed', 'waffle', 'bandle'], version: 2 }) }));
+    const add = (id, dates) => dates.forEach(d => store.setResult(id, d, `${id} ${d}`));
+    add('waffle', ['2026-10-01', '2026-10-02', '2026-10-03']);
+    add('framed', ['2026-09-01', '2026-09-02']);
+    add('bandle', ['2026-10-05', '2026-10-06']);
+    return store;
+}
+const ids = games => games.map(g => g.id);
+
+test('games are sorted by most played by default; ties keep your order', () => {
+    const store = sortFixture();
+    assert.equal(store.sortMode(), 'played');
+    assert.deepEqual(ids(store.sortedGames()), ['waffle', 'framed', 'bandle', 'wordle']);
+});
+
+test('games can be sorted by recently played, by name, or in your own order', () => {
+    const store = sortFixture();
+    assert.deepEqual(ids(store.sortedGames('recent')), ['bandle', 'waffle', 'framed', 'wordle'], 'never-played games go last');
+    assert.deepEqual(store.sortedGames('name').map(g => g.name), ['Bandle', 'Framed', 'Waffle', 'Wordle']);
+    assert.deepEqual(ids(store.sortedGames('custom')), ['wordle', 'framed', 'waffle', 'bandle']);
+    store.moveMine('bandle', -1);
+    assert.deepEqual(ids(store.sortedGames('custom')), ['wordle', 'framed', 'bandle', 'waffle'], 'your order is the game list itself');
+    assert.deepEqual(ids(store.sortedGames('played')), ['waffle', 'framed', 'bandle', 'wordle'], 'and still breaks ties');
+});
+
+test('the sort choice is saved per profile and unknown values fall back to most played', () => {
+    const storage = new MemoryStorage();
+    const store = new Store(storage);
+    store.setSortMode('custom');
+    const sam = store.createProfile('Sam');
+    store.switchProfile(sam);
+    assert.equal(store.sortMode(), 'played');
+    store.switchProfile('default');
+    assert.equal(new Store(storage).sortMode(), 'custom');
+    assert.throws(() => store.setSortMode('random'));
+    store.data.sort = 'something-old';
+    assert.equal(store.sortMode(), 'played');
+});

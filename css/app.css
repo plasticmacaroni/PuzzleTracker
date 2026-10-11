@@ -1254,6 +1254,12 @@ code {
     color: var(--text-2);
 }
 
+.menu-icon-space {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
 .menu-item.danger {
     color: var(--bad);
 }
@@ -2695,5 +2701,38 @@ code {
 
     .profile-item .profile-confirm {
         padding-left: 0;
+    }
+}
+
+/* ---- sorting the Today list -------------------------------------------------------- */
+
+.section-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    text-decoration: none;
+}
+
+.sort-btn:hover {
+    text-decoration: underline;
+}
+
+.order-hint .link-btn {
+    font-size: inherit;
+}
+
+@media (max-width: 400px) {
+    .section-actions {
+        gap: 12px;
+    }
+
+    .section-action {
+        font-size: 12px;
     }
 }
